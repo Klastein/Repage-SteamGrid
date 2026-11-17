@@ -1,3 +1,11 @@
+Repage SteamGrid 5.2.1 - API Key Privacy Blur & Settings-Only Restart Button
+-----------------------------------------------------------------------------
+* API Key Privacy Toggle:
+  - Added an eye button next to the API key field that blurs the key on
+    screen (persisted across sessions).
+* Restart Steam Placement:
+  - Moved the Restart Steam button exclusively to the Settings tab header.
+
 Repage SteamGrid 5.2.0 - Streamlined Installation Guide & Public Release
 ------------------------------------------------------------------------
 * Rewrote INSTALLATION.txt into a clean, concise English guide focused on

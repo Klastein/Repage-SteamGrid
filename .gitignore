@@ -1,0 +1,19 @@
+# Local dev source & build scripts (kept private on local machine)
+src/
+scripts/
+package.json
+package-lock.json
+node_modules/
+
+# Release output & archives
+dist/
+*.zip
+
+# Temporary & OS files
+.millennium/Dist/.check_tmp.js
+_ai_export_tmp/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+*.tmp
