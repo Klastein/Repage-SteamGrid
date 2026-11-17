@@ -1,6 +1,6 @@
 # Repage SteamGrid
 
-![Version](https://img.shields.io/badge/version-5.2.0-438FCB?style=flat-square)
+![Version](https://img.shields.io/github/v/release/Klastein/Repage-SteamGrid?label=version&color=438FCB&style=flat-square)
 ![Framework](https://img.shields.io/badge/Millennium-Steam%20Plugin-1b2838?style=flat-square)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20Steam%20Deck-2a475e?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-49C695?style=flat-square)
