@@ -1,0 +1,46 @@
+REPAGE STEAMGRID — INSTALLATION GUIDE
+=====================================
+
+Requirements:
+- Steam client with Millennium installed (https://github.com/SteamClientHomebrew/Millennium)
+- A free SteamGridDB API key (https://www.steamgriddb.com/profile/preferences/api)
+- Supported platforms: Windows and Linux / Steam Deck (native Steam installation; Flatpak and Snap are not supported by Millennium).
+
+Installation Steps:
+1. Extract this archive into a folder named "repage-steamgrid".
+2. Move the "repage-steamgrid" folder into your Millennium plugins directory:
+
+   Windows:
+     <Steam folder>\plugins\repage-steamgrid
+     (Default: C:\Program Files (x86)\Steam\plugins\repage-steamgrid)
+
+   Linux / Steam Deck (Desktop Mode):
+     ~/.local/share/millennium/plugins/repage-steamgrid
+
+3. Restart Steam, open Millennium Settings -> Plugins, and enable "Repage SteamGrid".
+4. Open Repage SteamGrid (right-click any game -> Repage SteamGrid -> Open, double-click a game banner, or press Ctrl+Shift+P).
+5. Go to the Settings tab, paste your SteamGridDB API key, and click "Apply key".
+
+Folder Structure:
+  repage-steamgrid/
+    .millennium/Dist/index.js
+    backend/main.lua
+    backend/icons.lua
+    plugin.json
+    metadata.json
+    README.md, INSTALLATION.txt, PATCH_NOTES.txt, CREDITS.md, LICENSE
+
+Quick Controls & Shortcuts:
+- Open / Close Panel: Ctrl + Shift + P (Keyboard) | R2/RT + L3 + R3 (Controller) | Double-click game banner
+- Navigate: Arrow keys / Mouse | D-Pad / Left Stick
+- Scroll Gallery: Mouse Wheel / PageUp / PageDown | Right Stick / LT / RT
+- Apply Artwork: Left Click / Enter / Space | A (Cross)
+- Image Context Menu / Save to Disk: Right Click / Shift + F10 | X (Square)
+- Show / Hide Filters: Y (Triangle)
+- Switch Tabs: Ctrl + PageUp / PageDown | LB / RB (L1 / R1)
+- Toggle Library Sidebar: P | R3 (Right Stick Click)
+- Jump to Library Top: Home | L3 (Left Stick Click)
+- Back / Close: Esc | B (Circle)
+
+Uninstallation:
+- Disable "Repage SteamGrid" in Millennium Settings -> Plugins and delete the "repage-steamgrid" folder.

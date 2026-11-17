@@ -1,0 +1,9 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SteamClientHomebrew/Millennium/main/src/sys/plugin-schema.json",
+  "name": "repage-steamgrid",
+  "common_name": "Repage SteamGrid",
+  "description": "SteamGridDB artwork manager with multilingual interface, favorites, advanced library sorting, and customizable acrylic visuals.",
+  "version": "5.2.0",
+  "author": "Klastein",
+  "backendType": "lua"
+}
