@@ -130,9 +130,29 @@ end
 pcall(math.randomseed, os.time() + math.floor((os.clock() or 0) * 1000000))
 local session_prefix = tostring(os.time()) .. "x" .. tostring(math.random(100000, 999999))
 local TEMP_PREFIX = "repage_"
+local last_heartbeat_at = 0
+local function touch_session_heartbeat(force)
+    local now = os.time()
+    if not force and (now - last_heartbeat_at) < 60 then return end
+    last_heartbeat_at = now
+    local dir = temp_directory()
+    if not dir then return end
+    local hb = dir .. path_separator() .. "repage_hb_" .. session_prefix .. ".lock"
+    local f = io.open(hb, "wb")
+    if f then
+        f:write(tostring(now))
+        f:close()
+    end
+end
+local function remove_session_heartbeat()
+    local dir = temp_directory()
+    if not dir then return end
+    pcall(os.remove, dir .. path_separator() .. "repage_hb_" .. session_prefix .. ".lock")
+end
 local function make_tmpfile()
     download_counter = download_counter + 1
-    return temp_directory() .. path_separator() .. TEMP_PREFIX .. session_prefix .. "_" .. tostring(download_counter) .. ".bin"
+    touch_session_heartbeat(false)
+    return temp_directory() .. path_separator() .. TEMP_PREFIX .. session_prefix .. "_t" .. tostring(os.time()) .. "_" .. tostring(download_counter) .. ".bin"
 end
 
 -- Steam appids of non-Steam shortcuts are unsigned 32-bit values, but some
@@ -1114,7 +1134,110 @@ function stage_update_file(a_rel_path, b_b64_data)
     return "ok"
 end
 
+local function encode_backup_name(rel)
+    return (tostring(rel):gsub("[^%w%.%-_]", "__"))
+end
+
+local function replace_file_safely(tmp_dst, final_dst, expected_bytes)
+    local old_swap = final_dst .. ".old_swap"
+    pcall(os.remove, old_swap)
+    local had_existing = file_exists(final_dst)
+    if had_existing then
+        local moved_old = os.rename(final_dst, old_swap)
+        if moved_old then
+            local moved_new = os.rename(tmp_dst, final_dst)
+            if moved_new then
+                pcall(os.remove, old_swap)
+                return true
+            end
+            os.rename(old_swap, final_dst)
+        end
+    else
+        if os.rename(tmp_dst, final_dst) then
+            return true
+        end
+    end
+    local wf = io.open(final_dst, "wb")
+    if not wf then
+        pcall(os.remove, tmp_dst)
+        return false
+    end
+    local ok_direct = wf:write(expected_bytes)
+    wf:flush()
+    wf:close()
+    pcall(os.remove, tmp_dst)
+    pcall(os.remove, old_swap)
+    local df = ok_direct and io.open(final_dst, "rb") or nil
+    local d_size = df and (df:seek("end") or -1) or -1
+    if df then df:close() end
+    return ok_direct and d_size == #expected_bytes
+end
+
+local function cleanup_backup_dir(bdir, sep, rel_list)
+    if not bdir then return end
+    if type(rel_list) == "table" then
+        for _, rel in ipairs(rel_list) do
+            pcall(os.remove, bdir .. sep .. encode_backup_name(rel) .. ".bak")
+        end
+    end
+    for _, entry in ipairs(icons.safe_list(bdir)) do
+        if entry.is_file then
+            pcall(os.remove, entry.path)
+        end
+    end
+    pcall(os.remove, bdir .. sep .. "journal.txt")
+    pcall(fs.remove, bdir)
+    pcall(os.remove, bdir)
+end
+
+local function recover_interrupted_update()
+    local dir = resolve_plugin_dir()
+    if not dir then return false end
+    local sep = path_separator()
+    local bdir = dir .. sep .. ".repage_update_backup"
+    local jpath = bdir .. sep .. "journal.txt"
+    local jf = io.open(jpath, "rb")
+    if not jf then return false end
+    local jcontent = jf:read("*a") or ""
+    jf:close()
+    logger:error("[self-update] Interrupted update transaction detected in " .. bdir .. "; rolling back from disk backup")
+    local rels = {}
+    for line in jcontent:gmatch("[^\r\n]+") do
+        local state, rel = line:match("^(%u+)\t(.+)$")
+        if state and rel then
+            table.insert(rels, rel)
+            local dst = dir .. sep .. rel:gsub("/", sep)
+            pcall(os.remove, dst .. ".tmp_new")
+            pcall(os.remove, dst .. ".old_swap")
+            if state == "EXISTED" then
+                local bfile = bdir .. sep .. encode_backup_name(rel) .. ".bak"
+                local bf = io.open(bfile, "rb")
+                if bf then
+                    local old_bytes = bf:read("*a")
+                    bf:close()
+                    if old_bytes ~= nil then
+                        local tmp_restore = dst .. ".tmp_restore"
+                        local rf = io.open(tmp_restore, "wb")
+                        if rf then
+                            rf:write(old_bytes)
+                            rf:flush()
+                            rf:close()
+                            replace_file_safely(tmp_restore, dst, old_bytes)
+                        end
+                    end
+                end
+            elseif state == "NEW" then
+                pcall(os.remove, dst)
+            end
+        end
+    end
+    cleanup_backup_dir(bdir, sep, rels)
+    logger:info("[self-update] Disk rollback finished cleanly")
+    return true
+end
+
 function commit_staged_update()
+    touch_session_heartbeat(true)
     local dir = resolve_plugin_dir()
     if not dir then return "no_plugin_dir" end
     local sep = path_separator()
@@ -1130,6 +1253,7 @@ function commit_staged_update()
     end
 
     local write_plan = {}
+    local ordered_rels = {}
     local backups = {}
     for rel, src_path in pairs(STAGED_FILES) do
         local target_rel = rel
@@ -1154,8 +1278,57 @@ function commit_staged_update()
         else
             backups[target_rel] = { existed = false, bytes = nil, dst = dst }
         end
-        write_plan[target_rel] = { dst = dst, new_bytes = new_bytes }
+        if not write_plan[target_rel] then
+            table.insert(ordered_rels, target_rel)
+        end
+        write_plan[target_rel] = { dst = dst, new_bytes = new_bytes, stage_src = src_path }
     end
+
+    table.sort(ordered_rels, function(a, b)
+        local wa = (a == "backend/main.lua" and 3) or (a == "plugin.json" and 2) or 1
+        local wb = (b == "backend/main.lua" and 3) or (b == "plugin.json" and 2) or 1
+        if wa ~= wb then return wa < wb end
+        return a < b
+    end)
+
+    local bdir = dir .. sep .. ".repage_update_backup"
+    cleanup_backup_dir(bdir, sep, ordered_rels)
+    pcall(fs.create_directories, bdir)
+    local journal_lines = {}
+    for _, rel in ipairs(ordered_rels) do
+        local b = backups[rel]
+        if b.existed then
+            local bfile = bdir .. sep .. encode_backup_name(rel) .. ".bak"
+            local wf = io.open(bfile, "wb")
+            if not wf then
+                cleanup_backup_dir(bdir, sep, ordered_rels)
+                return "backup_write_failed:" .. rel
+            end
+            local ok_b = wf:write(b.bytes)
+            wf:flush()
+            wf:close()
+            local vf = ok_b and io.open(bfile, "rb") or nil
+            local vsz = vf and (vf:seek("end") or -1) or -1
+            if vf then vf:close() end
+            if not ok_b or vsz ~= #b.bytes then
+                cleanup_backup_dir(bdir, sep, ordered_rels)
+                return "backup_verify_failed:" .. rel
+            end
+            table.insert(journal_lines, "EXISTED\t" .. rel)
+        else
+            table.insert(journal_lines, "NEW\t" .. rel)
+        end
+    end
+
+    local jpath = bdir .. sep .. "journal.txt"
+    local jf = io.open(jpath, "wb")
+    if not jf then
+        cleanup_backup_dir(bdir, sep, ordered_rels)
+        return "journal_write_failed"
+    end
+    jf:write(table.concat(journal_lines, "\n") .. "\n")
+    jf:flush()
+    jf:close()
 
     local modified = {}
     local function rollback_all(reason)
@@ -1165,21 +1338,26 @@ function commit_staged_update()
             local b = backups[rel]
             if b then
                 pcall(os.remove, b.dst .. ".tmp_new")
+                pcall(os.remove, b.dst .. ".old_swap")
                 if b.existed and b.bytes ~= nil then
-                    local wf = io.open(b.dst, "wb")
+                    local tmp_restore = b.dst .. ".tmp_restore"
+                    local wf = io.open(tmp_restore, "wb")
                     if wf then
                         wf:write(b.bytes)
                         wf:flush()
                         wf:close()
+                        replace_file_safely(tmp_restore, b.dst, b.bytes)
                     end
                 elseif not b.existed then
                     pcall(os.remove, b.dst)
                 end
             end
         end
+        cleanup_backup_dir(bdir, sep, ordered_rels)
     end
 
-    for rel, plan in pairs(write_plan) do
+    for _, rel in ipairs(ordered_rels) do
+        local plan = write_plan[rel]
         local parent = plan.dst:match("^(.*)[/\\][^/\\]+$")
         if parent and not is_directory(parent) then
             pcall(fs.create_directories, parent)
@@ -1203,29 +1381,14 @@ function commit_staged_update()
         end
 
         table.insert(modified, rel)
-        local renamed = os.rename(tmp_dst, plan.dst)
-        if not renamed then
-            local wf = io.open(plan.dst, "wb")
-            if not wf then
-                pcall(os.remove, tmp_dst)
-                rollback_all("dst_open:" .. rel)
-                return "commit_write_failed:" .. rel
-            end
-            local ok_direct = wf:write(plan.new_bytes)
-            wf:flush()
-            wf:close()
-            pcall(os.remove, tmp_dst)
-            local df = ok_direct and io.open(plan.dst, "rb") or nil
-            local d_size = df and (df:seek("end") or -1) or -1
-            if df then df:close() end
-            if not ok_direct or d_size ~= #plan.new_bytes then
-                rollback_all("dst_verify:" .. rel)
-                return "commit_verify_failed:" .. rel
-            end
+        if not replace_file_safely(tmp_dst, plan.dst, plan.new_bytes) then
+            rollback_all("replace:" .. rel)
+            return "commit_verify_failed:" .. rel
         end
-        pcall(os.remove, STAGED_FILES[rel])
+        pcall(os.remove, plan.stage_src)
     end
 
+    cleanup_backup_dir(bdir, sep, ordered_rels)
     STAGED_FILES = {}
     pcall(fs.remove, dir .. sep .. ".repage_update_stage")
     if not is_windows then
@@ -1270,22 +1433,50 @@ local function on_frontend_loaded()
     logger:info("Frontend loaded")
 end
 
+local function is_session_heartbeat_active(dir, sep, sid, now, ttl)
+    if not sid or sid == "" then return false end
+    if sid == session_prefix then return true end
+    local hb = dir .. sep .. "repage_hb_" .. sid .. ".lock"
+    local f = io.open(hb, "rb")
+    if not f then return false end
+    local raw = f:read(64) or ""
+    f:close()
+    local ts = tonumber(raw:match("(%d+)"))
+    if ts and (now - ts) <= ttl and ts <= (now + 60) then
+        return true
+    end
+    return false
+end
+
 local function cleanup_stale_temp_files()
     local dir = temp_directory()
     if not dir then return end
+    local sep = path_separator()
+    touch_session_heartbeat(true)
     local own_prefix = TEMP_PREFIX .. session_prefix .. "_"
     local own_update = "repage_update_" .. session_prefix .. ".zip"
+    local own_hb = "repage_hb_" .. session_prefix .. ".lock"
     local now = os.time()
     local STALE_TTL = 3600
     for _, entry in ipairs(icons.safe_list(dir)) do
         if entry.is_file then
             local name = icons.base_name(entry.path)
-            local is_other_bin = name:match("^repage_.*%.bin$") and name:sub(1, #own_prefix) ~= own_prefix
-            local is_other_zip = name:match("^repage_update_.*%.zip$") and name ~= own_update
-            if is_other_bin or is_other_zip then
-                local ts = tonumber(name:match("^repage_update_(%d+)x") or name:match("^repage_(%d+)x"))
-                if not ts or (now - ts) > STALE_TTL or ts > (now + 60) then
+            if name:match("^repage_hb_.*%.lock$") and name ~= own_hb then
+                local sid = name:match("^repage_hb_(%d+x%d+)%.lock$")
+                if not is_session_heartbeat_active(dir, sep, sid, now, STALE_TTL) then
                     pcall(os.remove, entry.path)
+                end
+            else
+                local is_other_bin = name:match("^repage_.*%.bin$") and name:sub(1, #own_prefix) ~= own_prefix
+                local is_other_zip = name:match("^repage_update_.*%.zip$") and name ~= own_update
+                if is_other_bin or is_other_zip then
+                    local sid = name:match("^repage_update_(%d+x%d+)") or name:match("^repage_(%d+x%d+)_")
+                    local file_ts = tonumber(name:match("_t(%d+)_") or name:match("^repage_update_(%d+)x") or name:match("^repage_(%d+)x"))
+                    local session_alive = is_session_heartbeat_active(dir, sep, sid, now, STALE_TTL)
+                    local file_fresh = file_ts and ((now - file_ts) <= STALE_TTL and file_ts <= (now + 60)) or false
+                    if not session_alive and not file_fresh then
+                        pcall(os.remove, entry.path)
+                    end
                 end
             end
         end
@@ -1293,6 +1484,7 @@ local function cleanup_stale_temp_files()
 end
 
 local function on_load()
+    pcall(recover_interrupted_update)
     cleanup_stale_temp_files()
     check_and_repair_linux_frontend()
     logger:info("Backend loaded on " .. platform_name .. " (temp dir: " .. tostring(temp_directory()) .. ")")
@@ -1300,9 +1492,6 @@ local function on_load()
 end
 
 local function on_unload()
-    -- These are plugin-owned temporary downloads, not Steam artwork. Remove
-    -- every tracked file when the backend unloads so normal shutdown/reload
-    -- does not leave cache files accumulating in the system temp directory.
     local cached_urls = {}
     for url in pairs(img_cache) do
         table.insert(cached_urls, url)
@@ -1310,6 +1499,8 @@ local function on_unload()
     for _, url in ipairs(cached_urls) do
         drop_cached(url, true)
     end
+    pcall(cleanup_update_zip)
+    pcall(remove_session_heartbeat)
     logger:info("Backend unloaded; temporary cache cleaned")
 end
 

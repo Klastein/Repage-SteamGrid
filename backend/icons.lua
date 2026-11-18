@@ -174,9 +174,9 @@ function M.grid_dirs(create, allow_multi_read)
             end
             if safe_exists(grid_dir) then
                 table.insert(result, grid_dir)
-                return result
             end
         end
+        return result
     end
 
     local account_entries = {}

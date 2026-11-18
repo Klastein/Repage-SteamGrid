@@ -1,3 +1,15 @@
+Repage SteamGrid 5.3.5 - Persistent Update Journal, Crash Recovery & Account/ZIP Hardening
+------------------------------------------------------------------------------------------
+* Added persistent on-disk update backups (.repage_update_backup/ + journal.txt)
+  with swap-based file replacement and automatic startup rollback in on_load() if
+  Steam or the OS crashes mid-update.
+* Closed the single-account fallback in backend/icons.lua when active_account_id()
+  identifies an account whose userdata folder does not yet exist.
+* Added per-file creation timestamps and active session heartbeat locks
+  (repage_hb_<session>.lock) so long-running sessions never lose temp files.
+* Verified Local File Header filenames against Central Directory filenames in
+  egParseZipArchive().
+
 Repage SteamGrid 5.3.4 - Transactional Rollback, CRC32 ZIP Guard & Multi-Account Isolation
 --------------------------------------------------------------------------------------------
 * Added full transactional backup and automatic rollback to commit_staged_update
