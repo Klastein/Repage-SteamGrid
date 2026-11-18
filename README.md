@@ -70,11 +70,9 @@
 3. Restart Steam, open **Millennium → Plugins**, and enable **Repage SteamGrid**.
 4. Open Repage SteamGrid (right-click any game → **Repage SteamGrid → Open**, double-click a banner, or press `Ctrl+Shift+P`), open **Settings**, paste your **SteamGridDB API key**, and click **Apply key**.
 
-> **Linux / Steam Deck Note:** If the backend loads in Millennium Logs (`Backend loaded on linux`) but the UI does not appear, check folder permissions and `dist` folder casing:
+> **Linux / Steam Deck Note:** If the backend loads in Millennium Logs (`Backend loaded on linux`) but the UI does not appear on your first install, run the included `linux-fix.sh` script inside the plugin folder (it runs automatically after in-plugin updates):
 > ```bash
-> cd ~/.local/share/millennium/plugins/repage-steamgrid
-> [ -d .millennium/dist ] && [ ! -d .millennium/Dist ] && ln -s dist .millennium/Dist
-> chmod -R u+rwX,go+rX ~/.local/share/millennium/plugins/repage-steamgrid
+> bash ~/.local/share/millennium/plugins/repage-steamgrid/linux-fix.sh
 > ```
 
 ---

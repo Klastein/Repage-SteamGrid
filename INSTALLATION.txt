@@ -46,7 +46,5 @@ Uninstallation:
 - Disable "Repage SteamGrid" in Millennium Settings -> Plugins and delete the "repage-steamgrid" folder.
 
 Linux / Steam Deck Note:
-- If the plugin backend loads in Millennium Logs but the UI does not appear, ensure read permissions and dist casing:
-    cd ~/.local/share/millennium/plugins/repage-steamgrid
-    [ -d .millennium/dist ] && [ ! -d .millennium/Dist ] && ln -s dist .millennium/Dist
-    chmod -R u+rwX,go+rX ~/.local/share/millennium/plugins/repage-steamgrid
+- If the plugin backend loads in Millennium Logs but the UI does not appear on first install, run the included helper script:
+    bash ~/.local/share/millennium/plugins/repage-steamgrid/linux-fix.sh

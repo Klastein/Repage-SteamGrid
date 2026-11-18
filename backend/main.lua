@@ -833,7 +833,7 @@ function read_artwork_preview(a_appid, b_imagetype)
                 -- The preview crosses the IPC bridge as base64 and Lua calls are
                 -- serialized, so keep it small. Bigger files are reported as "toobig"
                 -- (the UI keeps its cached thumbnail instead of clearing it).
-                local max_size = ext == "webm" and (4 * 1024 * 1024) or (6 * 1024 * 1024)
+                local max_size = 8 * 1024 * 1024
                 if size > max_size then
                     found_oversized = true
                     f:close()
@@ -1148,8 +1148,40 @@ function commit_staged_update()
         pcall(os.remove, stage_path)
     end
     STAGED_FILES = {}
+    if not is_windows then
+        local lower_d = dir .. "/.millennium/dist"
+        local upper_d = dir .. "/.millennium/Dist"
+        if is_directory(lower_d) and not file_exists(upper_d .. "/index.js") then
+            pcall(os.execute, string.format('ln -sfn dist "%s" 2>/dev/null', upper_d))
+        end
+        pcall(os.execute, string.format('chmod -R u+rwX,go+rX "%s" 2>/dev/null', dir))
+    end
     logger:info("Self-update committed cleanly to " .. dir)
     return "ok"
+end
+
+local function check_and_repair_linux_frontend()
+    if is_windows then return end
+    local dir = resolve_plugin_dir()
+    if not dir then
+        logger:error("[linux-frontend] Could not resolve plugin folder; check plugins directory path.")
+        return
+    end
+    local lower_idx = dir .. "/.millennium/dist/index.js"
+    local upper_idx = dir .. "/.millennium/Dist/index.js"
+    local has_lower = file_exists(lower_idx)
+    local has_upper = file_exists(upper_idx)
+    if not has_lower and not has_upper then
+        logger:error("[linux-frontend] Frontend missing! Neither .millennium/dist/index.js nor .millennium/Dist/index.js is readable in " .. dir)
+    else
+        logger:info(string.format("[linux-frontend] Check OK in %s (dist=%s, Dist=%s)", dir, tostring(has_lower), tostring(has_upper)))
+    end
+    if has_lower and not has_upper then
+        pcall(os.execute, string.format('ln -sfn dist "%s/.millennium/Dist" 2>/dev/null', dir))
+    elseif has_upper and not has_lower then
+        pcall(os.execute, string.format('ln -sfn Dist "%s/.millennium/dist" 2>/dev/null', dir))
+    end
+    pcall(os.execute, string.format('chmod -R u+rwX,go+rX "%s" 2>/dev/null', dir))
 end
 
 -- PLUGIN MANAGEMENT
@@ -1174,6 +1206,7 @@ end
 
 local function on_load()
     cleanup_stale_temp_files()
+    check_and_repair_linux_frontend()
     logger:info("Backend loaded on " .. platform_name .. " (temp dir: " .. tostring(temp_directory()) .. ")")
     millennium.ready()
 end

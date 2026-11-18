@@ -1,3 +1,16 @@
+Repage SteamGrid 5.2.4 - Animated Current-Art Preview & Linux Auto-Repair
+---------------------------------------------------------------------------
+* Animated Current-Artwork Fix:
+  - Updated apply() and verifyAndSetCurrentArt() to save and render animated
+    WebM/WebP/GIF previews immediately in the Current chip/popover even when
+    files exceed the backend IPC size limit (also raised preview read cap to
+    8 MB).
+* Linux / Steam Deck Diagnostics & Auto-Repair:
+  - Added check_and_repair_linux_frontend() in backend/main.lua on_load() and
+    commit_staged_update() to log missing/unreadable frontend index.js files
+    and automatically repair dist/Dist symlinks and read permissions.
+  - Included linux-fix.sh in the release archive for first-time Linux setup.
+
 Repage SteamGrid 5.2.3 - In-Plugin GitHub Release Auto-Updater
 -----------------------------------------------------------------
 * Added automatic & manual GitHub Releases update checking (Settings -> Account
