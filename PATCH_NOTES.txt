@@ -1,3 +1,15 @@
+Repage SteamGrid 5.3.4 - Transactional Rollback, CRC32 ZIP Guard & Multi-Account Isolation
+--------------------------------------------------------------------------------------------
+* Added full transactional backup and automatic rollback to commit_staged_update
+  in backend/main.lua so interrupted updates never leave mixed-version files.
+* Hardened egParseZipArchive with streaming chunk limits, a 32 MB global
+  uncompressed ceiling, 64-entry cap, header consistency checks, and CRC32
+  verification for every extracted file.
+* Isolated write/delete operations in backend/icons.lua so ambiguous
+  multi-account setups never modify other Steam accounts' grid folders.
+* Added a 1-hour minimum age check to cleanup_stale_temp_files() before
+  removing temp files from other sessions.
+
 Repage SteamGrid 5.3.1 - Clean Multi-res / Original Badge
 ------------------------------------------------------------
 * Replaced '? × ?' on cards missing fixed resolution metadata (such as .ico

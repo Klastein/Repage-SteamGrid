@@ -788,7 +788,7 @@ function artwork_file_size(a_appid, b_imagetype, c_ext, d_expected)
     local file_name = app .. suffix .. "." .. ext
     local expected = tonumber(d_expected)
     local first_size = -1
-    for _, grid_dir in ipairs(icons.grid_dirs(false)) do
+    for _, grid_dir in ipairs(icons.grid_dirs(false, true)) do
         local f = io.open(fs.join(grid_dir, file_name), "rb")
         if f then
             local size = f:seek("end") or -1
@@ -813,7 +813,7 @@ function read_artwork_preview(a_appid, b_imagetype)
 
     local exts = { "png", "jpg", "jpeg", "webp", "gif", "webm" }
     local found_oversized = false
-    local dirs = icons.grid_dirs(false)
+    local dirs = icons.grid_dirs(false, true)
     if b_imagetype == 4 then
         local root_ok, root = pcall(millennium.steam_path)
         if root_ok and type(root) == "string" and root ~= "" then
@@ -878,7 +878,7 @@ function artwork_file_path(a_appid, b_imagetype, c_ext)
     local ext = sanitize_ext(c_ext)
     if suffix == nil or not app or not ext then return "" end
     local file_name = app .. suffix .. "." .. ext
-    for _, grid_dir in ipairs(icons.grid_dirs(false)) do
+    for _, grid_dir in ipairs(icons.grid_dirs(false, true)) do
         local path = fs.join(grid_dir, file_name)
         local f = io.open(path, "rb")
         if f then
@@ -1128,25 +1128,104 @@ function commit_staged_update()
             pcall(os.rename, upper_dist, lower_dist)
         end
     end
-    for rel, stage_path in pairs(STAGED_FILES) do
-        local input = io.open(stage_path, "rb")
-        if not input then return "read_stage_failed:" .. rel end
-        local bytes = input:read("*a")
-        input:close()
-        local dst = dir .. sep .. (is_windows and rel:gsub("/", "\\") or rel)
-        local parent = dst:match("^(.*)[/\\][^/\\]+$")
-        if parent then pcall(fs.create_directories, parent) end
-        local out = io.open(dst, "wb")
-        if not out then
-            pcall(os.remove, dst)
-            out = io.open(dst, "wb")
+
+    local write_plan = {}
+    local backups = {}
+    for rel, src_path in pairs(STAGED_FILES) do
+        local target_rel = rel
+        if target_rel == ".millennium/Dist/index.js" then
+            target_rel = ".millennium/dist/index.js"
         end
-        if not out then return "write_failed:" .. rel end
-        local ok = out:write(bytes)
-        out:close()
-        if not ok then return "write_failed:" .. rel end
-        pcall(os.remove, stage_path)
+        local rf = io.open(src_path, "rb")
+        if not rf then return "stage_open_failed:" .. target_rel end
+        local new_bytes = rf:read("*a")
+        rf:close()
+        if not new_bytes or #new_bytes == 0 then
+            return "stage_empty:" .. target_rel
+        end
+        local dst = dir .. sep .. target_rel:gsub("/", sep)
+        if file_exists(dst) then
+            local bf = io.open(dst, "rb")
+            if not bf then return "backup_read_failed:" .. target_rel end
+            local old_bytes = bf:read("*a")
+            bf:close()
+            if old_bytes == nil then return "backup_read_failed:" .. target_rel end
+            backups[target_rel] = { existed = true, bytes = old_bytes, dst = dst }
+        else
+            backups[target_rel] = { existed = false, bytes = nil, dst = dst }
+        end
+        write_plan[target_rel] = { dst = dst, new_bytes = new_bytes }
     end
+
+    local modified = {}
+    local function rollback_all(reason)
+        logger:error("commit_staged_update failed (" .. tostring(reason) .. "); rolling back " .. tostring(#modified) .. " file(s)")
+        for i = #modified, 1, -1 do
+            local rel = modified[i]
+            local b = backups[rel]
+            if b then
+                pcall(os.remove, b.dst .. ".tmp_new")
+                if b.existed and b.bytes ~= nil then
+                    local wf = io.open(b.dst, "wb")
+                    if wf then
+                        wf:write(b.bytes)
+                        wf:flush()
+                        wf:close()
+                    end
+                elseif not b.existed then
+                    pcall(os.remove, b.dst)
+                end
+            end
+        end
+    end
+
+    for rel, plan in pairs(write_plan) do
+        local parent = plan.dst:match("^(.*)[/\\][^/\\]+$")
+        if parent and not is_directory(parent) then
+            pcall(fs.create_directories, parent)
+        end
+        local tmp_dst = plan.dst .. ".tmp_new"
+        local tf = io.open(tmp_dst, "wb")
+        if not tf then
+            rollback_all("tmp_open:" .. rel)
+            return "commit_write_failed:" .. rel
+        end
+        local ok_w = tf:write(plan.new_bytes)
+        tf:flush()
+        tf:close()
+        local vf = ok_w and io.open(tmp_dst, "rb") or nil
+        local v_size = vf and (vf:seek("end") or -1) or -1
+        if vf then vf:close() end
+        if not ok_w or v_size ~= #plan.new_bytes then
+            pcall(os.remove, tmp_dst)
+            rollback_all("tmp_verify:" .. rel)
+            return "commit_verify_failed:" .. rel
+        end
+
+        table.insert(modified, rel)
+        local renamed = os.rename(tmp_dst, plan.dst)
+        if not renamed then
+            local wf = io.open(plan.dst, "wb")
+            if not wf then
+                pcall(os.remove, tmp_dst)
+                rollback_all("dst_open:" .. rel)
+                return "commit_write_failed:" .. rel
+            end
+            local ok_direct = wf:write(plan.new_bytes)
+            wf:flush()
+            wf:close()
+            pcall(os.remove, tmp_dst)
+            local df = ok_direct and io.open(plan.dst, "rb") or nil
+            local d_size = df and (df:seek("end") or -1) or -1
+            if df then df:close() end
+            if not ok_direct or d_size ~= #plan.new_bytes then
+                rollback_all("dst_verify:" .. rel)
+                return "commit_verify_failed:" .. rel
+            end
+        end
+        pcall(os.remove, STAGED_FILES[rel])
+    end
+
     STAGED_FILES = {}
     pcall(fs.remove, dir .. sep .. ".repage_update_stage")
     if not is_windows then
@@ -1195,11 +1274,19 @@ local function cleanup_stale_temp_files()
     local dir = temp_directory()
     if not dir then return end
     local own_prefix = TEMP_PREFIX .. session_prefix .. "_"
+    local own_update = "repage_update_" .. session_prefix .. ".zip"
+    local now = os.time()
+    local STALE_TTL = 3600
     for _, entry in ipairs(icons.safe_list(dir)) do
         if entry.is_file then
             local name = icons.base_name(entry.path)
-            if name:match("^repage_.*%.bin$") and name:sub(1, #own_prefix) ~= own_prefix then
-                pcall(os.remove, entry.path)
+            local is_other_bin = name:match("^repage_.*%.bin$") and name:sub(1, #own_prefix) ~= own_prefix
+            local is_other_zip = name:match("^repage_update_.*%.zip$") and name ~= own_update
+            if is_other_bin or is_other_zip then
+                local ts = tonumber(name:match("^repage_update_(%d+)x") or name:match("^repage_(%d+)x"))
+                if not ts or (now - ts) > STALE_TTL or ts > (now + 60) then
+                    pcall(os.remove, entry.path)
+                end
             end
         end
     end

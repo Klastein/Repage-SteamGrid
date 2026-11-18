@@ -130,6 +130,8 @@ function M.active_account_id()
     local content = f:read(512 * 1024)
     f:close()
     if type(content) ~= "string" or content == "" then return nil end
+    local best_ts = -1
+    local best_id = nil
     for steamid, block in content:gmatch('"(7656%d+)"%s*(%b{})') do
         if block:find('"[Mm]ost[Rr]ecent"%s*"1"') then
             local account_id = subtract_steamid64_base(steamid)
@@ -137,18 +139,25 @@ function M.active_account_id()
                 return account_id
             end
         end
+        local ts_str = block:match('"[Tt]imestamp"%s*"(%d+)"')
+        local ts = ts_str and tonumber(ts_str) or -1
+        if ts and ts > best_ts then
+            local account_id = subtract_steamid64_base(steamid)
+            if account_id then
+                best_ts = ts
+                best_id = account_id
+            end
+        end
     end
-    return nil
+    return best_id
 end
 
----Config/grid folder to operate on. Steam only reads (and SetCustomArtworkForApp
----only writes) the logged-in account's folder, so touching the other accounts of
----a shared PC / Steam Deck would delete or overwrite somebody else's artwork.
----When the active account cannot be identified, every account folder is used
----(the previous behaviour).
----@param create boolean create missing config/grid folders
+---Config/grid folder to operate on. Never performs destructive or write
+---operations across multiple accounts when the active account is ambiguous.
+---@param create boolean create missing config/grid folder for the resolved account
+---@param allow_multi_read boolean|nil allow read-only fallback across accounts
 ---@return string[]
-function M.grid_dirs(create)
+function M.grid_dirs(create, allow_multi_read)
     local result = {}
     local userdata_path = steam_userdata_path()
     if not userdata_path or not safe_exists(userdata_path) then
@@ -157,25 +166,46 @@ function M.grid_dirs(create)
 
     local active = M.active_account_id()
     if active then
-        local grid_dir = fs.join(fs.join(userdata_path, active), "config", "grid")
-        if not safe_exists(grid_dir) and create then
-            pcall(fs.create_directories, grid_dir)
-        end
-        if safe_exists(grid_dir) then
-            table.insert(result, grid_dir)
-            return result
-        end
-    end
-
-    for _, entry in ipairs(safe_list(userdata_path)) do
-        if is_account_dir(entry) then
-            local grid_dir = fs.join(entry.path, "config", "grid")
+        local account_dir = fs.join(userdata_path, active)
+        if safe_exists(account_dir) or create then
+            local grid_dir = fs.join(account_dir, "config", "grid")
             if not safe_exists(grid_dir) and create then
                 pcall(fs.create_directories, grid_dir)
             end
             if safe_exists(grid_dir) then
                 table.insert(result, grid_dir)
+                return result
             end
+        end
+    end
+
+    local account_entries = {}
+    for _, entry in ipairs(safe_list(userdata_path)) do
+        if is_account_dir(entry) then
+            table.insert(account_entries, entry)
+        end
+    end
+
+    if #account_entries == 1 then
+        local grid_dir = fs.join(account_entries[1].path, "config", "grid")
+        if not safe_exists(grid_dir) and create then
+            pcall(fs.create_directories, grid_dir)
+        end
+        if safe_exists(grid_dir) then
+            table.insert(result, grid_dir)
+        end
+        return result
+    end
+
+    if not allow_multi_read then
+        logger:error("grid_dirs: active Steam account could not be identified among " .. tostring(#account_entries) .. " accounts; refusing multi-account write/delete")
+        return result
+    end
+
+    for _, entry in ipairs(account_entries) do
+        local grid_dir = fs.join(entry.path, "config", "grid")
+        if safe_exists(grid_dir) then
+            table.insert(result, grid_dir)
         end
     end
     return result
