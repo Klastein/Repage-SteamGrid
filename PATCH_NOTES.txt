@@ -1,3 +1,17 @@
+Repage SteamGrid 5.3.6 - Fail-Safe Journal Lifecycle & Continuous Session Heartbeat
+------------------------------------------------------------------------------------
+* Verified update journal persistence by writing to journal.txt.tmp with
+  ACTIVE/END_JOURNAL sentinels, flushing, reading back byte-for-byte from disk,
+  and promoting to journal.txt before modifying any plugin file.
+* Reordered post-commit cleanup so journal.txt is marked COMMITTED and removed
+  before any .bak files are deleted, preventing interrupted cleanup from
+  triggering a false rollback on next startup.
+* Made recover_interrupted_update() and rollback_all() fail-safe: every restored
+  file is verified on disk, and .repage_update_backup is preserved if any file
+  cannot be restored.
+* Added a periodic 10-minute frontend->backend session heartbeat timer so
+  long-running idle sessions keep their temp cache locks active.
+
 Repage SteamGrid 5.3.5 - Persistent Update Journal, Crash Recovery & Account/ZIP Hardening
 ------------------------------------------------------------------------------------------
 * Added persistent on-disk update backups (.repage_update_backup/ + journal.txt)

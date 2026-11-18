@@ -149,6 +149,10 @@ local function remove_session_heartbeat()
     if not dir then return end
     pcall(os.remove, dir .. path_separator() .. "repage_hb_" .. session_prefix .. ".lock")
 end
+function ping_session_heartbeat()
+    touch_session_heartbeat(true)
+    return "ok"
+end
 local function make_tmpfile()
     download_counter = download_counter + 1
     touch_session_heartbeat(false)
@@ -1138,6 +1142,22 @@ local function encode_backup_name(rel)
     return (tostring(rel):gsub("[^%w%.%-_]", "__"))
 end
 
+local function verify_file_exact_bytes(path, expected_bytes)
+    local f = io.open(path, "rb")
+    if not f then return false end
+    local content = f:read("*a")
+    f:close()
+    return content == expected_bytes
+end
+
+local function verify_file_size(path, expected_len)
+    local f = io.open(path, "rb")
+    if not f then return false end
+    local sz = f:seek("end") or -1
+    f:close()
+    return sz == expected_len
+end
+
 local function replace_file_safely(tmp_dst, final_dst, expected_bytes)
     local old_swap = final_dst .. ".old_swap"
     pcall(os.remove, old_swap)
@@ -1146,14 +1166,15 @@ local function replace_file_safely(tmp_dst, final_dst, expected_bytes)
         local moved_old = os.rename(final_dst, old_swap)
         if moved_old then
             local moved_new = os.rename(tmp_dst, final_dst)
-            if moved_new then
+            if moved_new and verify_file_size(final_dst, #expected_bytes) then
                 pcall(os.remove, old_swap)
                 return true
             end
+            pcall(os.remove, final_dst)
             os.rename(old_swap, final_dst)
         end
     else
-        if os.rename(tmp_dst, final_dst) then
+        if os.rename(tmp_dst, final_dst) and verify_file_size(final_dst, #expected_bytes) then
             return true
         end
     end
@@ -1163,18 +1184,40 @@ local function replace_file_safely(tmp_dst, final_dst, expected_bytes)
         return false
     end
     local ok_direct = wf:write(expected_bytes)
-    wf:flush()
+    local ok_flush = wf:flush()
     wf:close()
     pcall(os.remove, tmp_dst)
-    pcall(os.remove, old_swap)
-    local df = ok_direct and io.open(final_dst, "rb") or nil
-    local d_size = df and (df:seek("end") or -1) or -1
-    if df then df:close() end
-    return ok_direct and d_size == #expected_bytes
+    if ok_direct and ok_flush ~= false and verify_file_size(final_dst, #expected_bytes) then
+        pcall(os.remove, old_swap)
+        return true
+    end
+    if had_existing and file_exists(old_swap) then
+        pcall(os.remove, final_dst)
+        os.rename(old_swap, final_dst)
+    end
+    return false
+end
+
+local function mark_journal_committed_and_remove(bdir, sep)
+    if not bdir then return true end
+    local jpath = bdir .. sep .. "journal.txt"
+    local jtmp = jpath .. ".tmp"
+    pcall(os.remove, jtmp)
+    if file_exists(jpath) then
+        local cf = io.open(jpath, "wb")
+        if cf then
+            cf:write("COMMITTED\n")
+            cf:flush()
+            cf:close()
+        end
+        pcall(os.remove, jpath)
+    end
+    return not file_exists(jpath)
 end
 
 local function cleanup_backup_dir(bdir, sep, rel_list)
     if not bdir then return end
+    mark_journal_committed_and_remove(bdir, sep)
     if type(rel_list) == "table" then
         for _, rel in ipairs(rel_list) do
             pcall(os.remove, bdir .. sep .. encode_backup_name(rel) .. ".bak")
@@ -1185,9 +1228,44 @@ local function cleanup_backup_dir(bdir, sep, rel_list)
             pcall(os.remove, entry.path)
         end
     end
-    pcall(os.remove, bdir .. sep .. "journal.txt")
     pcall(fs.remove, bdir)
     pcall(os.remove, bdir)
+end
+
+local function parse_active_journal(jcontent)
+    if type(jcontent) ~= "string" or jcontent == "" then return nil, "empty" end
+    local first_line = jcontent:match("^([^\r\n]+)") or ""
+    if first_line == "COMMITTED" then
+        return nil, "committed"
+    end
+    local expected_count = tonumber(first_line:match("^ACTIVE\t(%d+)$"))
+    local entries = {}
+    local saw_end = false
+    local end_count = -1
+    for line in jcontent:gmatch("[^\r\n]+") do
+        if line ~= first_line then
+            local ec = line:match("^END_JOURNAL\t(%d+)$")
+            if ec then
+                saw_end = true
+                end_count = tonumber(ec) or -1
+            else
+                local state, rel = line:match("^(%u+)\t(.+)$")
+                if (state == "EXISTED" or state == "NEW") and rel and rel ~= "" then
+                    table.insert(entries, { state = state, rel = rel })
+                end
+            end
+        end
+    end
+    if not expected_count then
+        if #entries > 0 then
+            return entries, "legacy_active"
+        end
+        return nil, "invalid"
+    end
+    if not saw_end or end_count ~= expected_count or #entries ~= expected_count then
+        return nil, "incomplete_journal"
+    end
+    return entries, "active"
 end
 
 local function recover_interrupted_update()
@@ -1195,44 +1273,86 @@ local function recover_interrupted_update()
     if not dir then return false end
     local sep = path_separator()
     local bdir = dir .. sep .. ".repage_update_backup"
+    if not is_directory(bdir) then return false end
     local jpath = bdir .. sep .. "journal.txt"
+    if not file_exists(jpath) then
+        cleanup_backup_dir(bdir, sep, nil)
+        return false
+    end
     local jf = io.open(jpath, "rb")
     if not jf then return false end
     local jcontent = jf:read("*a") or ""
     jf:close()
-    logger:error("[self-update] Interrupted update transaction detected in " .. bdir .. "; rolling back from disk backup")
+    local entries, status = parse_active_journal(jcontent)
+    if status == "committed" or status == "incomplete_journal" or status == "empty" then
+        if status == "incomplete_journal" then
+            logger:info("[self-update] Removing unpromoted/incomplete journal before any live file changes")
+        end
+        cleanup_backup_dir(bdir, sep, nil)
+        return false
+    end
+    if not entries then
+        logger:error("[self-update] Unrecognized journal format in " .. jpath .. "; preserving backup folder")
+        return false
+    end
+
+    logger:error("[self-update] Interrupted update transaction detected in " .. bdir .. "; rolling back " .. tostring(#entries) .. " file(s) from disk backup")
     local rels = {}
-    for line in jcontent:gmatch("[^\r\n]+") do
-        local state, rel = line:match("^(%u+)\t(.+)$")
-        if state and rel then
-            table.insert(rels, rel)
-            local dst = dir .. sep .. rel:gsub("/", sep)
-            pcall(os.remove, dst .. ".tmp_new")
-            pcall(os.remove, dst .. ".old_swap")
-            if state == "EXISTED" then
-                local bfile = bdir .. sep .. encode_backup_name(rel) .. ".bak"
-                local bf = io.open(bfile, "rb")
-                if bf then
-                    local old_bytes = bf:read("*a")
-                    bf:close()
-                    if old_bytes ~= nil then
-                        local tmp_restore = dst .. ".tmp_restore"
-                        local rf = io.open(tmp_restore, "wb")
-                        if rf then
-                            rf:write(old_bytes)
-                            rf:flush()
-                            rf:close()
-                            replace_file_safely(tmp_restore, dst, old_bytes)
+    local failed = {}
+    for i = #entries, 1, -1 do
+        local item = entries[i]
+        local state, rel = item.state, item.rel
+        table.insert(rels, rel)
+        local dst = dir .. sep .. rel:gsub("/", sep)
+        pcall(os.remove, dst .. ".tmp_new")
+        pcall(os.remove, dst .. ".old_swap")
+        if state == "EXISTED" then
+            local bfile = bdir .. sep .. encode_backup_name(rel) .. ".bak"
+            local bf = io.open(bfile, "rb")
+            if not bf then
+                table.insert(failed, rel .. "(missing_bak)")
+            else
+                local old_bytes = bf:read("*a")
+                bf:close()
+                if old_bytes == nil then
+                    table.insert(failed, rel .. "(unreadable_bak)")
+                else
+                    local parent = dst:match("^(.*)[/\\][^/\\]+$")
+                    if parent and not is_directory(parent) then
+                        pcall(fs.create_directories, parent)
+                    end
+                    local tmp_restore = dst .. ".tmp_restore"
+                    local rf = io.open(tmp_restore, "wb")
+                    if not rf then
+                        table.insert(failed, rel .. "(tmp_open_failed)")
+                    else
+                        local ok_w = rf:write(old_bytes)
+                        local ok_f = rf:flush()
+                        rf:close()
+                        if not ok_w or ok_f == false or not replace_file_safely(tmp_restore, dst, old_bytes) or not verify_file_size(dst, #old_bytes) then
+                            pcall(os.remove, tmp_restore)
+                            table.insert(failed, rel .. "(restore_verify_failed)")
                         end
                     end
                 end
-            elseif state == "NEW" then
+            end
+        elseif state == "NEW" then
+            if file_exists(dst) then
                 pcall(os.remove, dst)
+                if file_exists(dst) then
+                    table.insert(failed, rel .. "(remove_new_failed)")
+                end
             end
         end
     end
+
+    if #failed > 0 then
+        logger:error("[self-update] Rollback incomplete for: " .. table.concat(failed, ", ") .. "; preserving .repage_update_backup for retry")
+        return false
+    end
+
     cleanup_backup_dir(bdir, sep, rels)
-    logger:info("[self-update] Disk rollback finished cleanly")
+    logger:info("[self-update] Disk rollback finished cleanly and all files verified")
     return true
 end
 
@@ -1294,7 +1414,7 @@ function commit_staged_update()
     local bdir = dir .. sep .. ".repage_update_backup"
     cleanup_backup_dir(bdir, sep, ordered_rels)
     pcall(fs.create_directories, bdir)
-    local journal_lines = {}
+    local journal_lines = { "ACTIVE\t" .. tostring(#ordered_rels) }
     for _, rel in ipairs(ordered_rels) do
         local b = backups[rel]
         if b.existed then
@@ -1305,12 +1425,9 @@ function commit_staged_update()
                 return "backup_write_failed:" .. rel
             end
             local ok_b = wf:write(b.bytes)
-            wf:flush()
+            local ok_f = wf:flush()
             wf:close()
-            local vf = ok_b and io.open(bfile, "rb") or nil
-            local vsz = vf and (vf:seek("end") or -1) or -1
-            if vf then vf:close() end
-            if not ok_b or vsz ~= #b.bytes then
+            if not ok_b or ok_f == false or not verify_file_size(bfile, #b.bytes) then
                 cleanup_backup_dir(bdir, sep, ordered_rels)
                 return "backup_verify_failed:" .. rel
             end
@@ -1319,20 +1436,48 @@ function commit_staged_update()
             table.insert(journal_lines, "NEW\t" .. rel)
         end
     end
+    table.insert(journal_lines, "END_JOURNAL\t" .. tostring(#ordered_rels))
+    local journal_payload = table.concat(journal_lines, "\n") .. "\n"
 
     local jpath = bdir .. sep .. "journal.txt"
-    local jf = io.open(jpath, "wb")
+    local jtmp = jpath .. ".tmp"
+    local jf = io.open(jtmp, "wb")
     if not jf then
         cleanup_backup_dir(bdir, sep, ordered_rels)
         return "journal_write_failed"
     end
-    jf:write(table.concat(journal_lines, "\n") .. "\n")
-    jf:flush()
+    local ok_jw = jf:write(journal_payload)
+    local ok_jf = jf:flush()
     jf:close()
+    if not ok_jw or ok_jf == false or not verify_file_exact_bytes(jtmp, journal_payload) then
+        cleanup_backup_dir(bdir, sep, ordered_rels)
+        return "journal_verify_failed"
+    end
+    pcall(os.remove, jpath)
+    if not os.rename(jtmp, jpath) then
+        local df = io.open(jpath, "wb")
+        if not df then
+            cleanup_backup_dir(bdir, sep, ordered_rels)
+            return "journal_write_failed"
+        end
+        local ok_dw = df:write(journal_payload)
+        local ok_df = df:flush()
+        df:close()
+        pcall(os.remove, jtmp)
+        if not ok_dw or ok_df == false then
+            cleanup_backup_dir(bdir, sep, ordered_rels)
+            return "journal_verify_failed"
+        end
+    end
+    if not verify_file_exact_bytes(jpath, journal_payload) then
+        cleanup_backup_dir(bdir, sep, ordered_rels)
+        return "journal_verify_failed"
+    end
 
     local modified = {}
     local function rollback_all(reason)
         logger:error("commit_staged_update failed (" .. tostring(reason) .. "); rolling back " .. tostring(#modified) .. " file(s)")
+        local rollback_ok = true
         for i = #modified, 1, -1 do
             local rel = modified[i]
             local b = backups[rel]
@@ -1342,18 +1487,32 @@ function commit_staged_update()
                 if b.existed and b.bytes ~= nil then
                     local tmp_restore = b.dst .. ".tmp_restore"
                     local wf = io.open(tmp_restore, "wb")
-                    if wf then
-                        wf:write(b.bytes)
-                        wf:flush()
+                    if not wf then
+                        rollback_ok = false
+                    else
+                        local ok_rw = wf:write(b.bytes)
+                        local ok_rf = wf:flush()
                         wf:close()
-                        replace_file_safely(tmp_restore, b.dst, b.bytes)
+                        if not ok_rw or ok_rf == false or not replace_file_safely(tmp_restore, b.dst, b.bytes) or not verify_file_size(b.dst, #b.bytes) then
+                            pcall(os.remove, tmp_restore)
+                            rollback_ok = false
+                        end
                     end
                 elseif not b.existed then
-                    pcall(os.remove, b.dst)
+                    if file_exists(b.dst) then
+                        pcall(os.remove, b.dst)
+                        if file_exists(b.dst) then
+                            rollback_ok = false
+                        end
+                    end
                 end
             end
         end
-        cleanup_backup_dir(bdir, sep, ordered_rels)
+        if rollback_ok then
+            cleanup_backup_dir(bdir, sep, ordered_rels)
+        else
+            logger:error("[self-update] In-process rollback had errors; preserving .repage_update_backup for startup recovery")
+        end
     end
 
     for _, rel in ipairs(ordered_rels) do
@@ -1369,25 +1528,23 @@ function commit_staged_update()
             return "commit_write_failed:" .. rel
         end
         local ok_w = tf:write(plan.new_bytes)
-        tf:flush()
+        local ok_f = tf:flush()
         tf:close()
-        local vf = ok_w and io.open(tmp_dst, "rb") or nil
-        local v_size = vf and (vf:seek("end") or -1) or -1
-        if vf then vf:close() end
-        if not ok_w or v_size ~= #plan.new_bytes then
+        if not ok_w or ok_f == false or not verify_file_size(tmp_dst, #plan.new_bytes) then
             pcall(os.remove, tmp_dst)
             rollback_all("tmp_verify:" .. rel)
             return "commit_verify_failed:" .. rel
         end
 
         table.insert(modified, rel)
-        if not replace_file_safely(tmp_dst, plan.dst, plan.new_bytes) then
+        if not replace_file_safely(tmp_dst, plan.dst, plan.new_bytes) or not verify_file_size(plan.dst, #plan.new_bytes) then
             rollback_all("replace:" .. rel)
             return "commit_verify_failed:" .. rel
         end
         pcall(os.remove, plan.stage_src)
     end
 
+    mark_journal_committed_and_remove(bdir, sep)
     cleanup_backup_dir(bdir, sep, ordered_rels)
     STAGED_FILES = {}
     pcall(fs.remove, dir .. sep .. ".repage_update_stage")
@@ -1427,9 +1584,17 @@ local function check_and_repair_linux_frontend()
     pcall(os.execute, string.format('chmod -R u+rwX,go+rX "%s" 2>/dev/null', dir))
 end
 
+-- PLATFORM
+
+function get_platform()
+    touch_session_heartbeat(false)
+    return platform_name
+end
+
 -- PLUGIN MANAGEMENT
 
 local function on_frontend_loaded()
+    touch_session_heartbeat(true)
     logger:info("Frontend loaded")
 end
 
