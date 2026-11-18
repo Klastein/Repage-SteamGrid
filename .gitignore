@@ -6,7 +6,7 @@ package-lock.json
 node_modules/
 
 # Release output & archives
-dist/
+/dist/
 *.zip
 
 # Temporary & OS files
@@ -17,3 +17,6 @@ Thumbs.db
 Desktop.ini
 *.log
 *.tmp
+!.millennium/
+!.millennium/dist/
+!.millennium/dist/index.js
