@@ -928,6 +928,230 @@ function get_platform()
     return platform_name
 end
 
+-- SELF-UPDATER (GitHub Releases)
+
+local GITHUB_LATEST_API = "https://api.github.com/repos/Klastein/Repage-SteamGrid/releases/latest"
+local UPDATE_ZIP_CACHE = nil
+
+local function is_allowed_github_url(url)
+    local host = url_host(url)
+    if not host then return false end
+    return host == "api.github.com"
+        or host_in_domain(host, "github.com")
+        or host_in_domain(host, "githubusercontent.com")
+end
+
+local function verify_plugin_dir(dir)
+    if not dir or dir == "" then return false end
+    local pjson = read_text_file(dir .. path_separator() .. "plugin.json")
+    if type(pjson) ~= "string" then return false end
+    return pjson:find('"name"%s*:%s*"repage%-steamgrid"') ~= nil
+end
+
+local function resolve_plugin_dir()
+    local sep = path_separator()
+    local ok_dbg, info = pcall(function() return debug and debug.getinfo and debug.getinfo(1, "S") end)
+    if ok_dbg and type(info) == "table" and type(info.source) == "string" then
+        local src = info.source:gsub("^@", "")
+        local is_abs = is_windows and (src:match("^[A-Za-z]:[/\\]") ~= nil) or (src:sub(1, 1) == "/")
+        if is_abs then
+            local norm = is_windows and src:gsub("/", "\\") or src
+            local parent = norm:match("^(.*)[/\\]backend[/\\]main%.lua$")
+            if parent and verify_plugin_dir(parent) then
+                return parent
+            end
+        end
+    end
+
+    local candidates = {}
+    local ok_root, sroot = pcall(millennium.steam_path)
+    if ok_root and type(sroot) == "string" and sroot ~= "" then
+        local sr = strip_trailing_sep(sroot)
+        table.insert(candidates, sr .. sep .. "plugins" .. sep .. "repage-steamgrid")
+    end
+    if not is_windows then
+        local xdg = env("XDG_DATA_HOME")
+        if xdg then
+            table.insert(candidates, strip_trailing_sep(xdg) .. "/millennium/plugins/repage-steamgrid")
+        end
+        local home = home_directory()
+        if home then
+            table.insert(candidates, strip_trailing_sep(home) .. "/.local/share/millennium/plugins/repage-steamgrid")
+        end
+    end
+
+    for _, dir in ipairs(candidates) do
+        if verify_plugin_dir(dir) then return dir end
+    end
+
+    for _, dir in ipairs(candidates) do
+        local plugins_root = dir:match("^(.*)[/\\][^/\\]+$")
+        if plugins_root and is_directory(plugins_root) then
+            for _, entry in ipairs(icons.safe_list(plugins_root)) do
+                if entry.is_directory and verify_plugin_dir(entry.path) then
+                    return entry.path
+                end
+            end
+        end
+    end
+    return nil
+end
+
+local function is_safe_rel_path(rel)
+    if type(rel) ~= "string" or rel == "" or #rel > 240 then return false end
+    if rel:find("[%c\\:]") or rel:sub(1, 1) == "/" then return false end
+    if rel:find("%.%.") then return false end
+    return true
+end
+
+function check_github_update()
+    local response, err = http.get(GITHUB_LATEST_API, {
+        headers = {
+            ["Accept"] = "application/vnd.github+json",
+            ["User-Agent"] = "Repage-SteamGrid-Updater/1.0"
+        }
+    })
+    if not response then
+        logger:info("check_github_update failed: " .. tostring(err))
+        return "{\"http_status\":0}"
+    end
+    if response.status ~= 200 or type(response.body) ~= "string" or response.body == "" then
+        logger:info("check_github_update HTTP " .. tostring(response.status))
+        return string.format("{\"http_status\":%d}", tonumber(response.status) or 0)
+    end
+    return response.body
+end
+
+function download_update_zip(a_zip_url)
+    local url = tostring(a_zip_url or "")
+    if not is_allowed_github_url(url) then
+        logger:error("download_update_zip rejected untrusted URL: " .. url)
+        return 0
+    end
+    if UPDATE_ZIP_CACHE then
+        pcall(os.remove, UPDATE_ZIP_CACHE)
+        UPDATE_ZIP_CACHE = nil
+    end
+    local tmp = temp_directory() .. path_separator() .. "repage_update_" .. session_prefix .. ".zip"
+    local result, err = http.download(url, tmp)
+    if not result or result.status ~= 200 then
+        pcall(os.remove, tmp)
+        logger:error("download_update_zip failed: " .. tostring(err or (result and result.status)))
+        return 0
+    end
+    local bytes_written = tonumber(result.bytes_written) or 0
+    if bytes_written < 1024 or bytes_written > 32 * 1024 * 1024 then
+        pcall(os.remove, tmp)
+        logger:error("download_update_zip invalid size: " .. tostring(bytes_written))
+        return 0
+    end
+    local probe = io.open(tmp, "rb")
+    local sig = probe and probe:read(4) or nil
+    if probe then probe:close() end
+    if sig ~= "PK\3\4" then
+        pcall(os.remove, tmp)
+        logger:error("download_update_zip rejected: not a valid ZIP archive")
+        return 0
+    end
+    UPDATE_ZIP_CACHE = tmp
+    return bytes_written
+end
+
+function get_update_zip_chunk(a_chunk_index)
+    if not UPDATE_ZIP_CACHE then return "" end
+    local f = io.open(UPDATE_ZIP_CACHE, "rb")
+    if not f then return "" end
+    local index = tonumber(a_chunk_index)
+    if not index or index < 0 or index ~= math.floor(index) then
+        f:close()
+        return ""
+    end
+    f:seek("set", index * CHUNK_SIZE)
+    local data = f:read(CHUNK_SIZE)
+    f:close()
+    if not data or #data == 0 then return "" end
+    local b64 = utils.base64_encode(data) or ""
+    return string.gsub(b64, "[^A-Za-z0-9+/=]", "")
+end
+
+function cleanup_update_zip()
+    if UPDATE_ZIP_CACHE then
+        pcall(os.remove, UPDATE_ZIP_CACHE)
+        UPDATE_ZIP_CACHE = nil
+    end
+    return true
+end
+
+local STAGED_FILES = {}
+
+function begin_update_stage()
+    local dir = resolve_plugin_dir()
+    if not dir then return "no_plugin_dir" end
+    if not can_write_in(dir) then return "no_write_permission" end
+    STAGED_FILES = {}
+    local stage_dir = dir .. path_separator() .. ".repage_update_stage"
+    pcall(fs.create_directories, stage_dir)
+    if not can_write_in(stage_dir) then return "no_write_permission" end
+    return "ok"
+end
+
+function stage_update_file(a_rel_path, b_b64_data)
+    local rel = tostring(a_rel_path or ""):gsub("\\", "/")
+    if not is_safe_rel_path(rel) then return "invalid_path" end
+    local dir = resolve_plugin_dir()
+    if not dir then return "no_plugin_dir" end
+    local bytes = base64_decode(b_b64_data)
+    local sep = path_separator()
+    local stage_path = dir .. sep .. ".repage_update_stage" .. sep .. (is_windows and rel:gsub("/", "\\") or rel)
+    local parent = stage_path:match("^(.*)[/\\][^/\\]+$")
+    if parent then pcall(fs.create_directories, parent) end
+    local f = io.open(stage_path, "wb")
+    if not f then return "write_failed:" .. rel end
+    local ok = f:write(bytes)
+    f:close()
+    if not ok then return "write_failed:" .. rel end
+    STAGED_FILES[rel] = stage_path
+    return "ok"
+end
+
+function commit_staged_update()
+    local dir = resolve_plugin_dir()
+    if not dir then return "no_plugin_dir" end
+    local sep = path_separator()
+    if not STAGED_FILES["plugin.json"] or not STAGED_FILES["backend/main.lua"] or (not STAGED_FILES[".millennium/dist/index.js"] and not STAGED_FILES[".millennium/Dist/index.js"]) then
+        return "incomplete_stage"
+    end
+    if not is_windows then
+        local upper_dist = dir .. "/.millennium/Dist"
+        local lower_dist = dir .. "/.millennium/dist"
+        if is_directory(upper_dist) and not is_directory(lower_dist) then
+            pcall(os.rename, upper_dist, lower_dist)
+        end
+    end
+    for rel, stage_path in pairs(STAGED_FILES) do
+        local input = io.open(stage_path, "rb")
+        if not input then return "read_stage_failed:" .. rel end
+        local bytes = input:read("*a")
+        input:close()
+        local dst = dir .. sep .. (is_windows and rel:gsub("/", "\\") or rel)
+        local parent = dst:match("^(.*)[/\\][^/\\]+$")
+        if parent then pcall(fs.create_directories, parent) end
+        local out = io.open(dst, "wb")
+        if not out then
+            pcall(os.remove, dst)
+            out = io.open(dst, "wb")
+        end
+        if not out then return "write_failed:" .. rel end
+        local ok = out:write(bytes)
+        out:close()
+        if not ok then return "write_failed:" .. rel end
+        pcall(os.remove, stage_path)
+    end
+    STAGED_FILES = {}
+    logger:info("Self-update committed cleanly to " .. dir)
+    return "ok"
+end
+
 -- PLUGIN MANAGEMENT
 
 local function on_frontend_loaded()

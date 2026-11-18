@@ -1,3 +1,11 @@
+Repage SteamGrid 5.2.3 - In-Plugin GitHub Release Auto-Updater
+-----------------------------------------------------------------
+* Added automatic & manual GitHub Releases update checking (Settings -> Account
+  & Backup and About header), paired with a theme-aware acrylic modal.
+* Built-in pure-Chromium ZIP extraction (DecompressionStream) + staged atomic
+  file verification in Lua, automatically resolving custom Windows/Linux/Steam
+  Deck plugin paths with clean permission/network fallback.
+
 Repage SteamGrid 5.2.2 - Instant Filter Switching, Linux dist Standard & Updated README
 --------------------------------------------------------------------------------------
 * Filter Reactivity Fix:
