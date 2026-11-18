@@ -1148,6 +1148,7 @@ function commit_staged_update()
         pcall(os.remove, stage_path)
     end
     STAGED_FILES = {}
+    pcall(fs.remove, dir .. sep .. ".repage_update_stage")
     if not is_windows then
         local lower_d = dir .. "/.millennium/dist"
         local upper_d = dir .. "/.millennium/Dist"

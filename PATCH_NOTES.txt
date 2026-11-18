@@ -1,3 +1,10 @@
+Repage SteamGrid 5.2.5 - Auto-Updater 32-Bit ZIP Offset Fix
+-------------------------------------------------------------
+* Fixed ZIP Central Directory parsing (getUint32 instead of getUint16 for
+  local header offset) so release archives over 64 KB extract and install
+  properly on Windows, Linux, and Steam Deck.
+* Added technical error detail logging and cleaned up .repage_update_stage.
+
 Repage SteamGrid 5.2.4 - Animated Current-Art Preview & Linux Auto-Repair
 ---------------------------------------------------------------------------
 * Animated Current-Artwork Fix:
