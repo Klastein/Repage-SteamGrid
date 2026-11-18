@@ -1,14 +1,8 @@
-Repage SteamGrid 5.2.9 - Redesigned Card Apply Progress Ring & Failure Logging
-----------------------------------------------------------------------------------
-* Card Apply Indicator Redesign:
-  - Replaced plain text pill with a flexbox-centered, high-contrast progress
-    ring badge displaying distinct stages (Downloading -> Applying ->
-    Applied / Failed) with crisp icons and protective background scrim.
-  - Automatically switches to a clean 44px circular medallion on compact
-    cards (such as Icon cards) so labels never clip or overflow.
-* Failure Diagnostics:
-  - Logged exact stage and reason ([apply-fail]) to Millennium Logs whenever
-    remote or local artwork application fails.
+Repage SteamGrid 5.3.0 - Clean Steam Restart Fix
+-------------------------------------------------
+* Fixed Steam hanging / 'Steam stopped responding' on Restart Steam by
+  closing the Repage modal and popup window cleanly 320ms before calling
+  SteamClient.User.StartRestart.
 
 Repage SteamGrid 5.2.8 - Self-Updater Quote Unwrap Fix & Detailed Step Logs
 -----------------------------------------------------------------------------
