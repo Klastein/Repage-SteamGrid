@@ -1,3 +1,17 @@
+Repage SteamGrid 5.2.2 - Instant Filter Switching, Linux dist Standard & Updated README
+--------------------------------------------------------------------------------------
+* Filter Reactivity Fix:
+  - Cleared the visible grid and lowered the reveal gate immediately inside
+    recomputeFromRaw() when switching filters (e.g. NSFW -> Only), preventing
+    stale unfiltered artwork from lingering during preview prep.
+  - Added state sync effect on the NSFW / Humor / Epilepsy dropdown (z).
+* Linux Compatibility & GitHub Polish:
+  - Standardized frontend build path to lowercase .millennium/dist/index.js
+    for native Linux case-sensitivity compatibility (with Windows NTFS case
+    normalization during build).
+  - Added Linux / Steam Deck permission & symlink fallback note to README.md
+    and INSTALLATION.txt, and completely refined README.md.
+
 Repage SteamGrid 5.2.1 - API Key Privacy Blur & Settings-Only Restart Button
 -----------------------------------------------------------------------------
 * API Key Privacy Toggle:
