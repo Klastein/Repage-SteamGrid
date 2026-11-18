@@ -1,3 +1,8 @@
+Repage SteamGrid 5.3.1 - Clean Multi-res / Original Badge
+------------------------------------------------------------
+* Replaced '? × ?' on cards missing fixed resolution metadata (such as .ico
+  icons) with a clean, themed 'Multi-res' / 'Original' pill badge.
+
 Repage SteamGrid 5.3.0 - Clean Steam Restart Fix
 -------------------------------------------------
 * Fixed Steam hanging / 'Steam stopped responding' on Restart Steam by
