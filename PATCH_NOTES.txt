@@ -1,3 +1,22 @@
+Repage SteamGrid 5.2.9 - Redesigned Card Apply Progress Ring & Failure Logging
+----------------------------------------------------------------------------------
+* Card Apply Indicator Redesign:
+  - Replaced plain text pill with a flexbox-centered, high-contrast progress
+    ring badge displaying distinct stages (Downloading -> Applying ->
+    Applied / Failed) with crisp icons and protective background scrim.
+  - Automatically switches to a clean 44px circular medallion on compact
+    cards (such as Icon cards) so labels never clip or overflow.
+* Failure Diagnostics:
+  - Logged exact stage and reason ([apply-fail]) to Millennium Logs whenever
+    remote or local artwork application fails.
+
+Repage SteamGrid 5.2.8 - Self-Updater Quote Unwrap Fix & Detailed Step Logs
+-----------------------------------------------------------------------------
+* Fixed Millennium Lua->JS quoted string return handling (e.g. '"ok"' / '"windows"')
+  in egInstallLatestUpdate and egRefreshPlatform via egUnwrapLuaStr().
+* Added detailed [self-update] step logs in Millennium Logs (download size,
+  ZIP entry validation, staging, and commit results).
+
 Repage SteamGrid 5.2.7 - Instant Big Picture Library D-Pad Navigation
 ------------------------------------------------------------------------
 * Eliminated ~574ms-626ms per-press D-pad lag in Big Picture library
