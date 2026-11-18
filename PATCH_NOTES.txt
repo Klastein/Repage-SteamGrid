@@ -1,3 +1,17 @@
+Repage SteamGrid 5.2.7 - Instant Big Picture Library D-Pad Navigation
+------------------------------------------------------------------------
+* Eliminated ~574ms-626ms per-press D-pad lag in Big Picture library
+  navigation (found via 5.2.6 telemetry):
+  - Replaced per-row getComputedStyle/getBoundingClientRect visibility scans
+    across 280-430 library items with O(1) visibility check on the library
+    container plus single-target verification in egLibraryNavTarget.
+
+Repage SteamGrid 5.2.6 - Big Picture & Library D-Pad Performance Telemetry
+-----------------------------------------------------------------------------
+* Added detailed PadNav, PadLibScan, PadFocus, PadAutoSelect, and PadFrameRAF
+  timings to Copy diagnostics and Millennium backend logs to pinpoint Big
+  Picture D-pad latency.
+
 Repage SteamGrid 5.2.5 - Auto-Updater 32-Bit ZIP Offset Fix
 -------------------------------------------------------------
 * Fixed ZIP Central Directory parsing (getUint32 instead of getUint16 for
