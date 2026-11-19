@@ -1,3 +1,15 @@
+Repage SteamGrid 5.3.9 - Fail-Closed Backup Directory Inspection & Categorized What's New
+------------------------------------------------------------------------------------------
+* Replaced safe_list-based backup directory checks with fail-closed
+  inspect_backup_dir() that explicitly distinguishes missing, empty, has_files,
+  and filesystem read error states, blocking transactions and preserving backups
+  whenever directory listing fails.
+* Added explicit user-facing messages in the frontend for
+  commit_journal_finalize_failed and locked/unreadable backup directories.
+* Reorganized the 'What's new' section in the About tab into 4 categorized
+  panels (Performance & Loading, Security/Updater & Backend, Interface/Themes &
+  QoL, and Controller/Big Picture & Steam Deck) ordered newest-first.
+
 Repage SteamGrid 5.3.8 - Pre-Transaction Backup Guard & Explicit Finalization Status
 --------------------------------------------------------------------------------------
 * Added ensure_clean_backup_dir_before_transaction() so commit_staged_update()

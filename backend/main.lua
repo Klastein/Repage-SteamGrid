@@ -1216,21 +1216,58 @@ local function write_verified_marker(tmp_path, final_path, payload)
     return verify_file_exact_bytes(final_path, payload)
 end
 
-local function backup_dir_has_files(bdir)
-    if not bdir or not is_directory(bdir) then return false end
-    for _, entry in ipairs(icons.safe_list(bdir)) do
-        if entry.is_file then
-            return true
+local function inspect_backup_dir(bdir)
+    if not bdir or bdir == "" then
+        return "error", nil, "invalid_path"
+    end
+    local ok_ex, exists = pcall(fs.exists, bdir)
+    if not ok_ex then
+        logger:error("[self-update] fs.exists failed for backup dir " .. tostring(bdir) .. ": " .. tostring(exists))
+        return "error", nil, "exists_check_failed"
+    end
+    if not exists then
+        return "missing", {}, nil
+    end
+    local ok_ls, entries = pcall(fs.list, bdir)
+    if not ok_ls or type(entries) ~= "table" then
+        logger:error("[self-update] fs.list failed for backup dir " .. tostring(bdir) .. ": " .. tostring(entries))
+        return "error", nil, "list_failed"
+    end
+    local files = {}
+    for _, entry in ipairs(entries) do
+        if entry and (entry.is_file or entry.is_directory) then
+            table.insert(files, entry)
         end
     end
-    return false
+    if #files == 0 then
+        return "empty", files, nil
+    end
+    return "has_files", files, nil
+end
+
+local function backup_dir_is_confirmed_empty(bdir)
+    local state, _, err = inspect_backup_dir(bdir)
+    if state == "missing" or state == "empty" then
+        return true, state
+    end
+    return false, (state == "error" and (err or "list_error") or "has_files")
 end
 
 local function purge_unpromoted_backup_dir(bdir, sep, rel_list)
-    if not bdir or not is_directory(bdir) then return true end
+    if not bdir then return false, "invalid_path" end
+    local state, entries = inspect_backup_dir(bdir)
+    if state == "missing" or state == "empty" then
+        pcall(fs.remove, bdir)
+        pcall(os.remove, bdir)
+        return true, "clean"
+    end
+    if state == "error" then
+        logger:error("[self-update] purge_unpromoted_backup_dir aborted: cannot list " .. tostring(bdir))
+        return false, "backup_dir_unreadable"
+    end
     local jpath = bdir .. sep .. "journal.txt"
     if file_exists(jpath) then
-        return false
+        return false, "active_journal_present"
     end
     pcall(os.remove, jpath .. ".tmp")
     pcall(os.remove, bdir .. sep .. "journal.committed")
@@ -1240,18 +1277,29 @@ local function purge_unpromoted_backup_dir(bdir, sep, rel_list)
             pcall(os.remove, bdir .. sep .. encode_backup_name(rel) .. ".bak")
         end
     end
-    for _, entry in ipairs(icons.safe_list(bdir)) do
+    for _, entry in ipairs(entries) do
         if entry.is_file then
             pcall(os.remove, entry.path)
         end
     end
     pcall(fs.remove, bdir)
     pcall(os.remove, bdir)
-    return not backup_dir_has_files(bdir)
+    local empty_ok, after_reason = backup_dir_is_confirmed_empty(bdir)
+    if not empty_ok then
+        logger:error("[self-update] purge_unpromoted_backup_dir could not confirm empty dir (" .. tostring(after_reason) .. ")")
+        return false, after_reason
+    end
+    return true, "clean"
 end
 
 local function mark_journal_committed_and_remove(bdir, sep)
-    if not bdir or not is_directory(bdir) then return true end
+    if not bdir then return false end
+    local state = inspect_backup_dir(bdir)
+    if state == "missing" then return true end
+    if state == "error" then
+        logger:error("[self-update] Cannot neutralize journal: backup dir is unreadable: " .. tostring(bdir))
+        return false
+    end
     local payload = "COMMITTED\n"
     local jpath = bdir .. sep .. "journal.txt"
     local jtmp = jpath .. ".tmp"
@@ -1272,7 +1320,8 @@ local function mark_journal_committed_and_remove(bdir, sep)
 
     local journal_gone = not file_exists(jpath)
     local journal_marked = (not journal_gone) and verify_file_exact_bytes(jpath, payload)
-    if (journal_gone and (marker_ok or not backup_dir_has_files(bdir))) or (journal_marked and marker_ok) then
+    local empty_ok = backup_dir_is_confirmed_empty(bdir)
+    if (journal_gone and (marker_ok or empty_ok)) or (journal_marked and marker_ok) then
         return true
     end
 
@@ -1281,7 +1330,13 @@ local function mark_journal_committed_and_remove(bdir, sep)
 end
 
 local function cleanup_backup_dir(bdir, sep, rel_list)
-    if not bdir or not is_directory(bdir) then return true, "clean" end
+    if not bdir then return false, "invalid_path" end
+    local init_state = inspect_backup_dir(bdir)
+    if init_state == "missing" then return true, "clean" end
+    if init_state == "error" then
+        logger:error("[self-update] cleanup_backup_dir aborted: backup directory cannot be listed: " .. tostring(bdir))
+        return false, "backup_dir_unreadable"
+    end
     if not mark_journal_committed_and_remove(bdir, sep) then
         logger:error("[self-update] cleanup_backup_dir aborted: journal could not be safely removed or marked COMMITTED; keeping all .bak files intact")
         return false, "journal_active"
@@ -1300,11 +1355,18 @@ local function cleanup_backup_dir(bdir, sep, rel_list)
             end
         end
     end
-    for _, entry in ipairs(icons.safe_list(bdir)) do
-        if entry.is_file and entry.path ~= cpath and entry.path ~= jpath then
-            pcall(os.remove, entry.path)
-            if file_exists(entry.path) then
-                all_baks_removed = false
+    local ls_state, entries = inspect_backup_dir(bdir)
+    if ls_state == "error" then
+        logger:error("[self-update] cleanup_backup_dir failed to list remaining files in " .. tostring(bdir) .. "; keeping commit marker")
+        return false, "backup_dir_unreadable"
+    end
+    if type(entries) == "table" then
+        for _, entry in ipairs(entries) do
+            if entry.is_file and entry.path ~= cpath and entry.path ~= jpath then
+                pcall(os.remove, entry.path)
+                if file_exists(entry.path) then
+                    all_baks_removed = false
+                end
             end
         end
     end
@@ -1316,9 +1378,12 @@ local function cleanup_backup_dir(bdir, sep, rel_list)
         pcall(os.remove, cpath)
         pcall(fs.remove, bdir)
         pcall(os.remove, bdir)
-        if not backup_dir_has_files(bdir) then
+        local empty_ok, empty_reason = backup_dir_is_confirmed_empty(bdir)
+        if empty_ok then
             return true, "clean"
         end
+        logger:error("[self-update] cleanup_backup_dir could not confirm empty backup dir after removal (" .. tostring(empty_reason) .. ")")
+        return false, empty_reason
     end
     logger:error("[self-update] cleanup_backup_dir incomplete (baks_removed=" .. tostring(all_baks_removed) .. ", journal_gone=" .. tostring(journal_gone) .. "); keeping commit marker")
     return false, "baks_pending"
@@ -1365,7 +1430,12 @@ local function recover_interrupted_update()
     if not dir then return false end
     local sep = path_separator()
     local bdir = dir .. sep .. ".repage_update_backup"
-    if not is_directory(bdir) then return false end
+    local bstate = inspect_backup_dir(bdir)
+    if bstate == "missing" or bstate == "empty" then return false end
+    if bstate == "error" then
+        logger:error("[self-update] recover_interrupted_update cannot inspect " .. tostring(bdir) .. "; preserving directory")
+        return false
+    end
     local jpath = bdir .. sep .. "journal.txt"
     local cpath = bdir .. sep .. "journal.committed"
     if verify_file_exact_bytes(cpath, "COMMITTED\n") then
@@ -1461,7 +1531,14 @@ local function recover_interrupted_update()
 end
 
 local function ensure_clean_backup_dir_before_transaction(bdir, sep)
-    if not is_directory(bdir) then return true, "clean" end
+    local init_state = inspect_backup_dir(bdir)
+    if init_state == "missing" or init_state == "empty" then
+        return true, "clean"
+    end
+    if init_state == "error" then
+        logger:error("[self-update] Refusing to start update: backup directory cannot be listed or verified: " .. tostring(bdir))
+        return false, "backup_dir_unreadable"
+    end
     local jpath = bdir .. sep .. "journal.txt"
     local cpath = bdir .. sep .. "journal.committed"
     if file_exists(jpath) and not verify_file_exact_bytes(cpath, "COMMITTED\n") then
@@ -1473,16 +1550,23 @@ local function ensure_clean_backup_dir_before_transaction(bdir, sep)
         end
     end
     if file_exists(cpath) or file_exists(jpath) then
-        local ok_clean = cleanup_backup_dir(bdir, sep, nil)
-        if not ok_clean or backup_dir_has_files(bdir) then
-            logger:error("[self-update] Refusing to start update: previous backup directory could not be cleaned in " .. tostring(bdir))
-            return false, "pre_cleanup_failed"
+        local ok_clean, clean_reason = cleanup_backup_dir(bdir, sep, nil)
+        local empty_ok = backup_dir_is_confirmed_empty(bdir)
+        if not ok_clean or not empty_ok then
+            logger:error("[self-update] Refusing to start update: previous backup directory could not be cleaned in " .. tostring(bdir) .. " (" .. tostring(clean_reason) .. ")")
+            return false, (clean_reason == "backup_dir_unreadable" and "backup_dir_unreadable" or "pre_cleanup_failed")
         end
-    elseif backup_dir_has_files(bdir) then
-        if not purge_unpromoted_backup_dir(bdir, sep, nil) then
-            logger:error("[self-update] Refusing to start update: leftover files in backup directory could not be purged in " .. tostring(bdir))
-            return false, "pre_cleanup_failed"
+    else
+        local ok_purge, purge_reason = purge_unpromoted_backup_dir(bdir, sep, nil)
+        local empty_ok = backup_dir_is_confirmed_empty(bdir)
+        if not ok_purge or not empty_ok then
+            logger:error("[self-update] Refusing to start update: leftover files in backup directory could not be purged in " .. tostring(bdir) .. " (" .. tostring(purge_reason) .. ")")
+            return false, (purge_reason == "backup_dir_unreadable" and "backup_dir_unreadable" or "pre_cleanup_failed")
         end
+    end
+    local final_empty, final_reason = backup_dir_is_confirmed_empty(bdir)
+    if not final_empty then
+        return false, (final_reason == "list_failed" and "backup_dir_unreadable" or "pre_cleanup_failed")
     end
     return true, "clean"
 end
