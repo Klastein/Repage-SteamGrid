@@ -421,12 +421,14 @@ function download_image(a_img_url)
     end
     -- Already downloaded (for example by a hover prefetch): answer at once
     if img_cache[a_img_url] and img_size[a_img_url] then
-        -- Only reuse the cached file if it still exists on disk
+        local expected_sz = tonumber(img_size[a_img_url]) or 0
         local f = io.open(img_cache[a_img_url], "rb")
         if f then
             local sz = f:seek("end") or 0
+            local head = (sz >= 12 and f:seek("set", 0)) and f:read(12) or nil
             f:close()
-            if sz > 0 then
+            if sz > 0 and sz == expected_sz and detect_media_kind(head) then
+                img_cleanup_pending[a_img_url] = nil
                 mark_cache_recent(a_img_url)
                 logger:info("Image already cached: " .. a_img_url)
                 return sz
@@ -476,6 +478,7 @@ function download_image(a_img_url)
 
     img_cache[a_img_url] = tmpfile
     img_size[a_img_url] = bytes_written
+    img_cleanup_pending[a_img_url] = nil
     cache_bytes = cache_bytes + bytes_written
     mark_cache_recent(a_img_url)
 
@@ -1231,18 +1234,27 @@ local function inspect_backup_dir(bdir)
             return "error", nil, "invalid_parent_path"
         end
         local ok_p, p_entries = pcall(fs.list, parent_dir)
-        if not ok_p or type(p_entries) ~= "table" then
-            logger:error("[self-update] Cannot verify non-existence of " .. tostring(bdir) .. ": parent dir listing failed")
+        if not ok_p or type(p_entries) ~= "table" or #p_entries == 0 then
+            logger:error("[self-update] Cannot verify non-existence of " .. tostring(bdir) .. ": parent dir listing failed or returned empty")
             return "error", nil, "parent_dir_unreadable"
         end
+        local saw_known_sibling = false
         for _, p_entry in ipairs(p_entries) do
             if type(p_entry) ~= "table" or type(p_entry.path) ~= "string" or p_entry.path == "" then
                 return "error", nil, "parent_unclassifiable_entry"
             end
-            if icons.base_name(p_entry.path) == leaf_name then
+            local bname = icons.base_name(p_entry.path)
+            if bname == "plugin.json" or bname == "backend" or bname == ".millennium" then
+                saw_known_sibling = true
+            end
+            if bname == leaf_name then
                 logger:error("[self-update] fs.exists returned false for " .. tostring(bdir) .. " but entry exists in parent dir (permission denied)")
                 return "error", nil, "exists_permission_mismatch"
             end
+        end
+        if not saw_known_sibling then
+            logger:error("[self-update] Parent directory listing for " .. tostring(parent_dir) .. " did not contain expected plugin files; treating as unreadable")
+            return "error", nil, "parent_dir_witness_missing"
         end
         return "missing", {}, nil
     end
@@ -1260,6 +1272,11 @@ local function inspect_backup_dir(bdir)
         table.insert(files, entry)
     end
     if #files == 0 then
+        local sep = path_separator()
+        if file_exists(bdir .. sep .. "journal.txt") or file_exists(bdir .. sep .. "journal.committed") or not can_write_in(bdir) then
+            logger:error("[self-update] fs.list returned 0 entries for " .. tostring(bdir) .. " but directory is locked or contains hidden journal files")
+            return "error", nil, "empty_list_permission_denied"
+        end
         return "empty", files, nil
     end
     return "has_files", files, nil
