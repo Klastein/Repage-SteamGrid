@@ -1,3 +1,28 @@
+Repage SteamGrid 5.4.5 - Paw & Coffee Café Pattern + Theme-Colored Fluxuos Loader
+-----------------------------------------------------------------------------------
+* Replaced the bow motif in the Fluxuos Core background and preset card
+  pattern with cute raccoon paw prints, steaming coffee cups, and stars.
+* Updated the Fluxuos loading emblem to dynamically adopt each theme's accent
+  color via luminance masking with a soft matching glow.
+
+Repage SteamGrid 5.4.4 - Custom Fluxuos Line-Art Emblem & Fluxuos Core Card Polish
+----------------------------------------------------------------------------------
+* Replaced the geometric logo and loader head with Klastein's custom Fluxuos
+  line-art artwork (transparent anti-aliased asset bundled at build time).
+* Updated the Fluxuos Core accent color to #5E4B86 (with #8B74B8 hover).
+* Refined the Fluxuos Core preset card with a thicker glowing café-lace border,
+  more visible exclusive card texture, and a clean star emblem (removing the
+  'Special' text pill and background watermark behind the text).
+
+Repage SteamGrid 5.4.3 - Fluxuos Logo, Signature Loader & Special Fluxuos Core Theme
+-------------------------------------------------------------------------------------
+* Redesigned the Repage logo mark (EgRepageMark) and center/boot loading
+  animation (EgFluxuosLoader) inspired by Fluxuos.
+* Replaced Emerald Pine with the special 'Fluxuos Core' Dark OLED theme as the
+  1st preset in Personalization, featuring a subtle exclusive café-lace/star
+  background pattern, signature card badge & watermark, and an exclusive cozy
+  Web Audio soundscape active only while Fluxuos Core is selected.
+
 Repage SteamGrid 5.4.2 - Round-Trip List Probe, Unique Write Probe & Strict Retry
 -----------------------------------------------------------------------------------
 * Added a round-trip directory enumeration probe in inspect_backup_dir(): when
