@@ -1,3 +1,8 @@
+Repage SteamGrid 5.5.5 - Smooth Fluxuos Orbit Fix & Zero-Lag Circular Apply Medallion
+--------------------------------------------------------------------------------------
+* Fixed the frozen Fluxuos comet-star loader animation by removing the !important transform override that blocked @keyframes rclOrbit.
+* Streamlined the circular apply medallion by removing per-chunk percentage ticks and re-render overhead, using pure GPU-composited ring rotation across Downloading, Applying, Applied, and Failed states (Normal and Compact modes).
+
 Repage SteamGrid 5.5.4 - Synchronized Fluxuos Comet Loader & Circular Progress Medallion
 ----------------------------------------------------------------------------------------
 * Synchronized the Fluxuos loading comet arc and leading star inside a single unified orbit so the arc smoothly trails behind the star and can never overtake or cross it.
