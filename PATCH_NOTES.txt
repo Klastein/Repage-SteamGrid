@@ -1,3 +1,13 @@
+Repage SteamGrid 5.3.8 - Pre-Transaction Backup Guard & Explicit Finalization Status
+--------------------------------------------------------------------------------------
+* Added ensure_clean_backup_dir_before_transaction() so commit_staged_update()
+  aborts immediately with pending_recovery_locked or pre_cleanup_failed if a
+  previous backup directory cannot be recovered and verified clean.
+* Separated unpromoted backup cleanup (purge_unpromoted_backup_dir) from active
+  journal cleanup.
+* Returned explicit post-commit states (ok, ok_cleanup_pending, or
+  commit_journal_finalize_failed) from commit_staged_update() to the frontend.
+
 Repage SteamGrid 5.3.7 - Verified Journal Finalization & Fail-Safe Backup Cleanup
 ----------------------------------------------------------------------------------
 * Reworked mark_journal_committed_and_remove() to write and byte-verify a

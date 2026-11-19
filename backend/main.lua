@@ -1216,6 +1216,40 @@ local function write_verified_marker(tmp_path, final_path, payload)
     return verify_file_exact_bytes(final_path, payload)
 end
 
+local function backup_dir_has_files(bdir)
+    if not bdir or not is_directory(bdir) then return false end
+    for _, entry in ipairs(icons.safe_list(bdir)) do
+        if entry.is_file then
+            return true
+        end
+    end
+    return false
+end
+
+local function purge_unpromoted_backup_dir(bdir, sep, rel_list)
+    if not bdir or not is_directory(bdir) then return true end
+    local jpath = bdir .. sep .. "journal.txt"
+    if file_exists(jpath) then
+        return false
+    end
+    pcall(os.remove, jpath .. ".tmp")
+    pcall(os.remove, bdir .. sep .. "journal.committed")
+    pcall(os.remove, bdir .. sep .. "journal.committed.tmp")
+    if type(rel_list) == "table" then
+        for _, rel in ipairs(rel_list) do
+            pcall(os.remove, bdir .. sep .. encode_backup_name(rel) .. ".bak")
+        end
+    end
+    for _, entry in ipairs(icons.safe_list(bdir)) do
+        if entry.is_file then
+            pcall(os.remove, entry.path)
+        end
+    end
+    pcall(fs.remove, bdir)
+    pcall(os.remove, bdir)
+    return not backup_dir_has_files(bdir)
+end
+
 local function mark_journal_committed_and_remove(bdir, sep)
     if not bdir or not is_directory(bdir) then return true end
     local payload = "COMMITTED\n"
@@ -1238,7 +1272,7 @@ local function mark_journal_committed_and_remove(bdir, sep)
 
     local journal_gone = not file_exists(jpath)
     local journal_marked = (not journal_gone) and verify_file_exact_bytes(jpath, payload)
-    if journal_gone or (journal_marked and marker_ok) then
+    if (journal_gone and (marker_ok or not backup_dir_has_files(bdir))) or (journal_marked and marker_ok) then
         return true
     end
 
@@ -1247,28 +1281,47 @@ local function mark_journal_committed_and_remove(bdir, sep)
 end
 
 local function cleanup_backup_dir(bdir, sep, rel_list)
-    if not bdir or not is_directory(bdir) then return true end
+    if not bdir or not is_directory(bdir) then return true, "clean" end
     if not mark_journal_committed_and_remove(bdir, sep) then
         logger:error("[self-update] cleanup_backup_dir aborted: journal could not be safely removed or marked COMMITTED; keeping all .bak files intact")
-        return false
+        return false, "journal_active"
     end
+    local jpath = bdir .. sep .. "journal.txt"
     local cpath = bdir .. sep .. "journal.committed"
+    local all_baks_removed = true
     if type(rel_list) == "table" then
         for _, rel in ipairs(rel_list) do
-            pcall(os.remove, bdir .. sep .. encode_backup_name(rel) .. ".bak")
+            local bfile = bdir .. sep .. encode_backup_name(rel) .. ".bak"
+            if file_exists(bfile) then
+                pcall(os.remove, bfile)
+                if file_exists(bfile) then
+                    all_baks_removed = false
+                end
+            end
         end
     end
     for _, entry in ipairs(icons.safe_list(bdir)) do
-        if entry.is_file and entry.path ~= cpath then
+        if entry.is_file and entry.path ~= cpath and entry.path ~= jpath then
             pcall(os.remove, entry.path)
+            if file_exists(entry.path) then
+                all_baks_removed = false
+            end
         end
     end
-    if not file_exists(bdir .. sep .. "journal.txt") then
+    if file_exists(jpath) then
+        pcall(os.remove, jpath)
+    end
+    local journal_gone = not file_exists(jpath)
+    if all_baks_removed and journal_gone then
         pcall(os.remove, cpath)
         pcall(fs.remove, bdir)
         pcall(os.remove, bdir)
+        if not backup_dir_has_files(bdir) then
+            return true, "clean"
+        end
     end
-    return true
+    logger:error("[self-update] cleanup_backup_dir incomplete (baks_removed=" .. tostring(all_baks_removed) .. ", journal_gone=" .. tostring(journal_gone) .. "); keeping commit marker")
+    return false, "baks_pending"
 end
 
 local function parse_active_journal(jcontent)
@@ -1321,7 +1374,7 @@ local function recover_interrupted_update()
         return false
     end
     if not file_exists(jpath) then
-        cleanup_backup_dir(bdir, sep, nil)
+        purge_unpromoted_backup_dir(bdir, sep, nil)
         return false
     end
     local jf = io.open(jpath, "rb")
@@ -1329,11 +1382,14 @@ local function recover_interrupted_update()
     local jcontent = jf:read("*a") or ""
     jf:close()
     local entries, status = parse_active_journal(jcontent)
-    if status == "committed" or status == "incomplete_journal" or status == "empty" then
-        if status == "incomplete_journal" then
-            logger:info("[self-update] Removing unpromoted/incomplete journal before any live file changes")
-        end
+    if status == "committed" then
         cleanup_backup_dir(bdir, sep, nil)
+        return false
+    end
+    if status == "incomplete_journal" or status == "empty" then
+        logger:info("[self-update] Removing unpromoted/incomplete journal before any live file changes")
+        pcall(os.remove, jpath)
+        purge_unpromoted_backup_dir(bdir, sep, nil)
         return false
     end
     if not entries then
@@ -1396,9 +1452,39 @@ local function recover_interrupted_update()
         return false
     end
 
-    cleanup_backup_dir(bdir, sep, rels)
+    if not cleanup_backup_dir(bdir, sep, rels) then
+        logger:error("[self-update] Rollback restored files, but backup dir cleanup could not be completed")
+        return false
+    end
     logger:info("[self-update] Disk rollback finished cleanly and all files verified")
     return true
+end
+
+local function ensure_clean_backup_dir_before_transaction(bdir, sep)
+    if not is_directory(bdir) then return true, "clean" end
+    local jpath = bdir .. sep .. "journal.txt"
+    local cpath = bdir .. sep .. "journal.committed"
+    if file_exists(jpath) and not verify_file_exact_bytes(cpath, "COMMITTED\n") then
+        logger:info("[self-update] Existing active journal found before new update; attempting recovery first")
+        recover_interrupted_update()
+        if file_exists(jpath) and not verify_file_exact_bytes(cpath, "COMMITTED\n") then
+            logger:error("[self-update] Refusing to start update: previous interrupted update recovery is still pending in " .. tostring(bdir))
+            return false, "pending_recovery_locked"
+        end
+    end
+    if file_exists(cpath) or file_exists(jpath) then
+        local ok_clean = cleanup_backup_dir(bdir, sep, nil)
+        if not ok_clean or backup_dir_has_files(bdir) then
+            logger:error("[self-update] Refusing to start update: previous backup directory could not be cleaned in " .. tostring(bdir))
+            return false, "pre_cleanup_failed"
+        end
+    elseif backup_dir_has_files(bdir) then
+        if not purge_unpromoted_backup_dir(bdir, sep, nil) then
+            logger:error("[self-update] Refusing to start update: leftover files in backup directory could not be purged in " .. tostring(bdir))
+            return false, "pre_cleanup_failed"
+        end
+    end
+    return true, "clean"
 end
 
 function commit_staged_update()
@@ -1415,6 +1501,12 @@ function commit_staged_update()
         if is_directory(upper_dist) and not is_directory(lower_dist) then
             pcall(os.rename, upper_dist, lower_dist)
         end
+    end
+
+    local bdir = dir .. sep .. ".repage_update_backup"
+    local pre_ok, pre_reason = ensure_clean_backup_dir_before_transaction(bdir, sep)
+    if not pre_ok then
+        return pre_reason or "pre_cleanup_failed"
     end
 
     local write_plan = {}
@@ -1456,8 +1548,6 @@ function commit_staged_update()
         return a < b
     end)
 
-    local bdir = dir .. sep .. ".repage_update_backup"
-    cleanup_backup_dir(bdir, sep, ordered_rels)
     pcall(fs.create_directories, bdir)
     local journal_lines = { "ACTIVE\t" .. tostring(#ordered_rels) }
     for _, rel in ipairs(ordered_rels) do
@@ -1466,14 +1556,14 @@ function commit_staged_update()
             local bfile = bdir .. sep .. encode_backup_name(rel) .. ".bak"
             local wf = io.open(bfile, "wb")
             if not wf then
-                cleanup_backup_dir(bdir, sep, ordered_rels)
+                purge_unpromoted_backup_dir(bdir, sep, ordered_rels)
                 return "backup_write_failed:" .. rel
             end
             local ok_b = wf:write(b.bytes)
             local ok_f = wf:flush()
             wf:close()
             if not ok_b or ok_f == false or not verify_file_size(bfile, #b.bytes) then
-                cleanup_backup_dir(bdir, sep, ordered_rels)
+                purge_unpromoted_backup_dir(bdir, sep, ordered_rels)
                 return "backup_verify_failed:" .. rel
             end
             table.insert(journal_lines, "EXISTED\t" .. rel)
@@ -1486,36 +1576,9 @@ function commit_staged_update()
 
     local jpath = bdir .. sep .. "journal.txt"
     local jtmp = jpath .. ".tmp"
-    local jf = io.open(jtmp, "wb")
-    if not jf then
-        cleanup_backup_dir(bdir, sep, ordered_rels)
-        return "journal_write_failed"
-    end
-    local ok_jw = jf:write(journal_payload)
-    local ok_jf = jf:flush()
-    jf:close()
-    if not ok_jw or ok_jf == false or not verify_file_exact_bytes(jtmp, journal_payload) then
-        cleanup_backup_dir(bdir, sep, ordered_rels)
-        return "journal_verify_failed"
-    end
-    pcall(os.remove, jpath)
-    if not os.rename(jtmp, jpath) then
-        local df = io.open(jpath, "wb")
-        if not df then
-            cleanup_backup_dir(bdir, sep, ordered_rels)
-            return "journal_write_failed"
-        end
-        local ok_dw = df:write(journal_payload)
-        local ok_df = df:flush()
-        df:close()
-        pcall(os.remove, jtmp)
-        if not ok_dw or ok_df == false then
-            cleanup_backup_dir(bdir, sep, ordered_rels)
-            return "journal_verify_failed"
-        end
-    end
-    if not verify_file_exact_bytes(jpath, journal_payload) then
-        cleanup_backup_dir(bdir, sep, ordered_rels)
+    if not write_verified_marker(jtmp, jpath, journal_payload) then
+        pcall(os.remove, jpath)
+        purge_unpromoted_backup_dir(bdir, sep, ordered_rels)
         return "journal_verify_failed"
     end
 
@@ -1589,9 +1652,7 @@ function commit_staged_update()
         pcall(os.remove, plan.stage_src)
     end
 
-    if not cleanup_backup_dir(bdir, sep, ordered_rels) then
-        logger:error("[self-update] Update files were applied, but journal cleanup could not be confirmed; .bak files preserved in " .. tostring(bdir))
-    end
+    local clean_ok, clean_state = cleanup_backup_dir(bdir, sep, ordered_rels)
     STAGED_FILES = {}
     pcall(fs.remove, dir .. sep .. ".repage_update_stage")
     if not is_windows then
@@ -1601,6 +1662,14 @@ function commit_staged_update()
             pcall(os.execute, string.format('ln -sfn dist "%s" 2>/dev/null', upper_d))
         end
         pcall(os.execute, string.format('chmod -R u+rwX,go+rX "%s" 2>/dev/null', dir))
+    end
+    if not clean_ok then
+        if clean_state == "journal_active" then
+            logger:error("[self-update] Update files were written, but journal neutralization failed; returning commit_journal_finalize_failed")
+            return "commit_journal_finalize_failed"
+        end
+        logger:info("[self-update] Update committed and journal neutralized; backup file cleanup deferred to next startup")
+        return "ok_cleanup_pending"
     end
     logger:info("Self-update committed cleanly to " .. dir)
     return "ok"
