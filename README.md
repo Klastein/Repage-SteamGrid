@@ -50,7 +50,7 @@
 - **Portable Profile Backups:** Export and import your complete configuration (filters, theme presets, favorite games, favorite artworks, hidden games, and SGDB ID overrides) as JSON — your API key is never exported.
 
 ### 🎨 Themes, Languages & Accessibility
-- **12 Curated Themes + Custom Presets:** Switch between palettes like *Steam Blue*, *Midnight*, *Midnight OLED*, *Nordic Frost*, *Crimson Velvet*, *Emerald Pine*, *Night City Neon*, *Umbrella Kiss*, *Bonnie & Clyde*, *The Green Hero*, *Firefly Glow*, and *Cassino Inkwell*, tweak lights/surfaces/corners, or save up to 9 presets of your own.
+- **12 Curated Themes + Custom Presets:** Switch between palettes like *Fluxuos Core* (special OLED theme with exclusive subtle café background pattern and cozy custom audio), *Steam Blue*, *Midnight*, *Midnight OLED*, *Nordic Frost*, *Crimson Velvet*, *Night City Neon*, *Umbrella Kiss*, *Bonnie & Clyde*, *The Green Hero*, *Firefly Glow*, and *Cassino Inkwell*, tweak lights/surfaces/corners, or save up to 9 presets of your own.
 - **7 Languages with Auto-Detection:** English, Portuguese (Brazil), Spanish, Japanese, Korean, Russian, and French — automatically matching your Steam language or selectable per preference.
 - **Adaptive On-Screen Keyboard & Audio Feedback:** Automatically uses Steam's keyboard in Big Picture / Steam Deck and Repage's built-in controller keyboard on Desktop, paired with subtle, toggleable UI navigation sounds.
 

@@ -132,7 +132,39 @@ function M.active_account_id()
     if type(content) ~= "string" or content == "" then return nil end
     local best_ts = -1
     local best_id = nil
-    for steamid, block in content:gmatch('"(7656%d+)"%s*(%b{})') do
+    local pos = 1
+    local len = #content
+    while pos <= len do
+        local s, e, steamid = content:find('"(7656%d+)"%s*{', pos)
+        if not s then break end
+        local depth = 1
+        local in_str = false
+        local esc = false
+        local i = e + 1
+        while i <= len and depth > 0 do
+            local ch = content:sub(i, i)
+            if in_str then
+                if esc then
+                    esc = false
+                elseif ch == "\\" then
+                    esc = true
+                elseif ch == '"' then
+                    in_str = false
+                end
+            else
+                if ch == '"' then
+                    in_str = true
+                elseif ch == "{" then
+                    depth = depth + 1
+                elseif ch == "}" then
+                    depth = depth - 1
+                end
+            end
+            i = i + 1
+        end
+        if depth ~= 0 then break end
+        local block = content:sub(e, i - 1)
+        pos = i
         if block:find('"[Mm]ost[Rr]ecent"%s*"1"') then
             local account_id = subtract_steamid64_base(steamid)
             if account_id then

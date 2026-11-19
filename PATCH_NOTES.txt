@@ -1,3 +1,23 @@
+Repage SteamGrid 5.5.1 - Big Picture Overlay Scroll Lock & Compact Header Brand Fix
+-----------------------------------------------------------------------------------
+* Locked background scrolling and analog stick input (Big Picture and Desktop) while any dropdown menu, multiselect filter, context menu, virtual keyboard, or update modal is open, and replaced ancestor-bubbling scrollIntoView() inside menus with contained menu scrolling.
+* Removed the lingering 3D transform on .repage-main after entrance animation so fixed Big Picture dropdown modals always stay centered inside the viewport.
+* Stacked the REPAGE / STEAMGRID brand wordmark cleanly beside the Fluxuos emblem with overflow guards so the version chip never overlaps the logo on narrow windows.
+
+Repage SteamGrid 5.5.0 - Deep Audit, Reliability, Controller, Linux & Performance Overhaul
+------------------------------------------------------------------------------------------
+* Fixed strict-mode ReferenceError ('failReason') during artwork apply retry.
+* Fixed WebM video viewport prioritization (added missing 'index' field in egPosterAcquire and raised video pool to 3).
+* Awaited clear_artwork_files() inside egFinishApply() to prevent fast consecutive applies from deleting newly written artwork.
+* Fixed mid-load sort/filter switching concatenating stale lockedHead results on top of freshly sorted artwork.
+* Hardened local file apply: added 1.8s metadata timeouts for local images/WebM, proper GIF/WebP/ICO handling on non-icon slots, and signed shortcut ID + RequestIconDataForApp refresh for local icons.
+* Replaced Lua %b{} matching in backend/icons.lua active_account_id() with a string-aware VDF brace parser so Steam nicknames containing '{' or '}' never break multi-account detection.
+* Hardened Linux / Steam Deck shell commands in backend/main.lua with single-quote shell escaping, recursive .repage_update_stage cleanup, explicit +x permission on linux-fix.sh, and lowercase .millennium/dist/.check_tmp.js in scripts/build.mjs.
+* Fixed Big Picture Personalization D-pad navigation (up from My Presets now lands on row 4 instead of jumping to row 2, and Performance Mode disabled controls are properly skipped).
+* Fixed Escape key closing the desktop update modal, deferred auto-update session flag until the check actually runs, fixed popup AudioContext routing (including Fluxuos Core sounds), and muted clicks on disabled buttons.
+* Eliminated 60 Hz forced layout reflows in desktop gamepad polling, cached egAppKind() via WeakMap, cached IndexedDB connections, cleaned detached popup/focus references on unmount, and completed onDismount() cleanup.
+* Fixed untranslated filter labels (Types/Mimes/Styles/Dimensions) in Millennium Settings, removed dead code & duplicated Fluxuos CSS layers, added -webkit-mask-source-type luminance fallback, updated About/README, and finalized MIT LICENSE.
+
 Repage SteamGrid 5.4.5 - Paw & Coffee Café Pattern + Theme-Colored Fluxuos Loader
 -----------------------------------------------------------------------------------
 * Replaced the bow motif in the Fluxuos Core background and preset card

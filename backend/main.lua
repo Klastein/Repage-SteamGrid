@@ -963,14 +963,6 @@ function refresh_artwork_file(a_appid, b_imagetype, c_ext)
     return touched
 end
 
--- PLATFORM
-
--- "windows" | "linux" | "steamdeck" | "macos". Used by the frontend to pick
--- platform-specific wording and behavior.
-function get_platform()
-    return platform_name
-end
-
 -- SELF-UPDATER (GitHub Releases)
 
 local GITHUB_LATEST_API = "https://api.github.com/repos/Klastein/Repage-SteamGrid/releases/latest"
@@ -1125,6 +1117,29 @@ function cleanup_update_zip()
     return true
 end
 
+local function shell_quote(s)
+    return "'" .. tostring(s or ""):gsub("'", "'\\''") .. "'"
+end
+
+local function remove_tree_safe(path, depth)
+    if not path or path == "" or (depth or 0) > 8 then return end
+    local ok_ls, entries = pcall(fs.list, path)
+    if ok_ls and type(entries) == "table" then
+        for _, entry in ipairs(entries) do
+            if type(entry) == "table" and type(entry.path) == "string" and entry.path ~= "" then
+                if entry.is_directory then
+                    remove_tree_safe(entry.path, (depth or 0) + 1)
+                else
+                    pcall(os.remove, entry.path)
+                    pcall(fs.remove, entry.path)
+                end
+            end
+        end
+    end
+    pcall(fs.remove, path)
+    pcall(os.remove, path)
+end
+
 local STAGED_FILES = {}
 
 function begin_update_stage()
@@ -1133,6 +1148,7 @@ function begin_update_stage()
     if not can_write_in(dir) then return "no_write_permission" end
     STAGED_FILES = {}
     local stage_dir = dir .. path_separator() .. ".repage_update_stage"
+    remove_tree_safe(stage_dir, 0)
     pcall(fs.create_directories, stage_dir)
     if not can_write_in(stage_dir) then return "no_write_permission" end
     return "ok"
@@ -1844,14 +1860,17 @@ function commit_staged_update()
 
     local clean_ok, clean_state = cleanup_backup_dir(bdir, sep, ordered_rels)
     STAGED_FILES = {}
-    pcall(fs.remove, dir .. sep .. ".repage_update_stage")
+    remove_tree_safe(dir .. sep .. ".repage_update_stage", 0)
     if not is_windows then
         local lower_d = dir .. "/.millennium/dist"
         local upper_d = dir .. "/.millennium/Dist"
         if is_directory(lower_d) and not file_exists(upper_d .. "/index.js") then
-            pcall(os.execute, string.format('ln -sfn dist "%s" 2>/dev/null', upper_d))
+            pcall(os.execute, "ln -sfn dist " .. shell_quote(upper_d) .. " 2>/dev/null")
         end
-        pcall(os.execute, string.format('chmod -R u+rwX,go+rX "%s" 2>/dev/null', dir))
+        pcall(os.execute, "chmod -R u+rwX,go+rX " .. shell_quote(dir) .. " 2>/dev/null")
+        if file_exists(dir .. "/linux-fix.sh") then
+            pcall(os.execute, "chmod u+x,go+rx " .. shell_quote(dir .. "/linux-fix.sh") .. " 2>/dev/null")
+        end
     end
     if not clean_ok then
         if clean_state == "journal_active" then
@@ -1882,11 +1901,14 @@ local function check_and_repair_linux_frontend()
         logger:info(string.format("[linux-frontend] Check OK in %s (dist=%s, Dist=%s)", dir, tostring(has_lower), tostring(has_upper)))
     end
     if has_lower and not has_upper then
-        pcall(os.execute, string.format('ln -sfn dist "%s/.millennium/Dist" 2>/dev/null', dir))
+        pcall(os.execute, "ln -sfn dist " .. shell_quote(dir .. "/.millennium/Dist") .. " 2>/dev/null")
     elseif has_upper and not has_lower then
-        pcall(os.execute, string.format('ln -sfn Dist "%s/.millennium/dist" 2>/dev/null', dir))
+        pcall(os.execute, "ln -sfn Dist " .. shell_quote(dir .. "/.millennium/dist") .. " 2>/dev/null")
     end
-    pcall(os.execute, string.format('chmod -R u+rwX,go+rX "%s" 2>/dev/null', dir))
+    pcall(os.execute, "chmod -R u+rwX,go+rX " .. shell_quote(dir) .. " 2>/dev/null")
+    if file_exists(dir .. "/linux-fix.sh") then
+        pcall(os.execute, "chmod u+x,go+rx " .. shell_quote(dir .. "/linux-fix.sh") .. " 2>/dev/null")
+    end
 end
 
 -- PLATFORM
