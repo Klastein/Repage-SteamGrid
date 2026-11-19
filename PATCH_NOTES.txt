@@ -1,3 +1,9 @@
+Repage SteamGrid 5.5.4 - Synchronized Fluxuos Comet Loader & Circular Progress Medallion
+----------------------------------------------------------------------------------------
+* Synchronized the Fluxuos loading comet arc and leading star inside a single unified orbit so the arc smoothly trails behind the star and can never overtake or cross it.
+* Rebuilt the artwork card apply status into a high-contrast circular progress medallion displaying live Downloading (%), Applying (%), Applied (green checkmark), and Failed (red cross) states legible over any artwork background.
+* Added an automatic compact circular medallion mode for small cards and Big Picture icon tiles so the indicator never clips or overflows, plus tighter resolution typography on compact cards.
+
 Repage SteamGrid 5.5.3 - Lock-Serialized Deferred Cleanup & Backend Duplicate Guard
 -----------------------------------------------------------------------------------
 * Serialized deferred artwork cleanup (egFlushPendingArtCleanups) through egWithApplyLock() with per-slot monotonic generation tracking (egSlotGen) so a stale cleanup can never run concurrently with or overwrite a newer apply or reset.
