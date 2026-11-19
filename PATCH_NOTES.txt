@@ -1,3 +1,9 @@
+Repage SteamGrid 5.5.8 - Compact About Hero Layout & Proportional Fluxuos Emblem
+---------------------------------------------------------------------------------
+* Bounded the About hero card to a compact max-width (960px) aligned to the left, closing the empty middle void and framing the Fluxuos emblem directly alongside the text and actions.
+* Enlarged the featured Fluxuos emblem to 108px with a softened, focused glow that preserves fine line-art clarity.
+* Rigidly guarded against resizing and long-locale overlaps with fixed flex proportions and responsive wrapping.
+
 Repage SteamGrid 5.5.7 - Tapered Comet Loader & Redesigned About Hero Header
 -----------------------------------------------------------------------------
 * Tapered the Fluxuos loader comet arc into a 3-layer soft fade-in ribbon with sharp pointed tips instead of solid round caps.
