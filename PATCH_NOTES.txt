@@ -1,8 +1,13 @@
-Repage SteamGrid 5.5.8 - Compact About Hero Layout & Proportional Fluxuos Emblem
----------------------------------------------------------------------------------
-* Bounded the About hero card to a compact max-width (960px) aligned to the left, closing the empty middle void and framing the Fluxuos emblem directly alongside the text and actions.
-* Enlarged the featured Fluxuos emblem to 108px with a softened, focused glow that preserves fine line-art clarity.
-* Rigidly guarded against resizing and long-locale overlaps with fixed flex proportions and responsive wrapping.
+Repage SteamGrid 5.5.9 - L3/R3 Filter Hint Bar Glyphs & 144px About Fluxuos Emblem
+----------------------------------------------------------------------------------
+* Added L3/LS (Library top) and R3/RS (Library) controller glyphs to the editor hint bar below the filters across all artwork tabs.
+* Enlarged the About tab Fluxuos emblem to 144x144px and shifted it slightly left for a tighter, more balanced hero card layout.
+
+Repage SteamGrid 5.5.8 - Root-Folder Release ZIP Fix, 124px Fluxuos Hero & Controller/Keyboard Glyphs
+-----------------------------------------------------------------------------------------------------
+* Fixed release ZIP archive packaging in scripts/build.mjs so all runtime files are nested inside the top-level 'repage-steamgrid/' directory as documented in INSTALLATION.txt and README.md.
+* Refined the About tab hero card into a fixed 2-column CSS Grid (max-width 920px) with a larger, clearer 124x124px Fluxuos emblem, softer glow, anti-overlap layout across all window sizes and languages, and an updated studio description in all 7 languages.
+* Added platform-reactive L3/LS, R3/RS, and R2/RT controller SVG glyphs plus a dedicated keyboard shortcut row with a keyboard icon and hardware keycap badges (Ctrl, Shift, P, Home, Esc) in the About tab.
 
 Repage SteamGrid 5.5.7 - Tapered Comet Loader & Redesigned About Hero Header
 -----------------------------------------------------------------------------
