@@ -1,3 +1,15 @@
+Repage SteamGrid 5.4.0 - Fail-Closed Parent/Entry Backup Verification & First-Click Apply Fix
+---------------------------------------------------------------------------------------------
+* Hardened inspect_backup_dir() in backend/main.lua to reject unclassifiable
+  fs.list() entries as errors and cross-check fs.exists(bdir)==false against a
+  verified parent directory listing so permission failures are never mistaken
+  for a missing folder.
+* Fixed first-click artwork apply failures after hover prefetch by unwrapping
+  quoted Lua boolean/empty-string returns in R() (egLuaBool + pre-sanitized
+  base64 chunks) and forcing a fresh download retry if a cached temp file was
+  evicted.
+* Added an automatic retry on SetCustomArtworkForApp verification.
+
 Repage SteamGrid 5.3.9 - Fail-Closed Backup Directory Inspection & Categorized What's New
 ------------------------------------------------------------------------------------------
 * Replaced safe_list-based backup directory checks with fail-closed

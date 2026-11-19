@@ -1222,10 +1222,28 @@ local function inspect_backup_dir(bdir)
     end
     local ok_ex, exists = pcall(fs.exists, bdir)
     if not ok_ex then
-        logger:error("[self-update] fs.exists failed for backup dir " .. tostring(bdir) .. ": " .. tostring(exists))
+        logger:error("[self-update] fs.exists threw for backup dir " .. tostring(bdir) .. ": " .. tostring(exists))
         return "error", nil, "exists_check_failed"
     end
     if not exists then
+        local parent_dir, leaf_name = tostring(bdir):match("^(.*)[/\\]([^/\\]+)$")
+        if not parent_dir or parent_dir == "" or not leaf_name or leaf_name == "" then
+            return "error", nil, "invalid_parent_path"
+        end
+        local ok_p, p_entries = pcall(fs.list, parent_dir)
+        if not ok_p or type(p_entries) ~= "table" then
+            logger:error("[self-update] Cannot verify non-existence of " .. tostring(bdir) .. ": parent dir listing failed")
+            return "error", nil, "parent_dir_unreadable"
+        end
+        for _, p_entry in ipairs(p_entries) do
+            if type(p_entry) ~= "table" or type(p_entry.path) ~= "string" or p_entry.path == "" then
+                return "error", nil, "parent_unclassifiable_entry"
+            end
+            if icons.base_name(p_entry.path) == leaf_name then
+                logger:error("[self-update] fs.exists returned false for " .. tostring(bdir) .. " but entry exists in parent dir (permission denied)")
+                return "error", nil, "exists_permission_mismatch"
+            end
+        end
         return "missing", {}, nil
     end
     local ok_ls, entries = pcall(fs.list, bdir)
@@ -1235,9 +1253,11 @@ local function inspect_backup_dir(bdir)
     end
     local files = {}
     for _, entry in ipairs(entries) do
-        if entry and (entry.is_file or entry.is_directory) then
-            table.insert(files, entry)
+        if type(entry) ~= "table" or type(entry.path) ~= "string" or entry.path == "" or (not entry.is_file and not entry.is_directory) then
+            logger:error("[self-update] Unclassifiable entry in backup dir " .. tostring(bdir))
+            return "error", nil, "unclassifiable_entry"
         end
+        table.insert(files, entry)
     end
     if #files == 0 then
         return "empty", files, nil
