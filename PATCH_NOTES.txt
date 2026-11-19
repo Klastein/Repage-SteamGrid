@@ -1,3 +1,8 @@
+Repage SteamGrid 5.5.7 - Tapered Comet Loader & Redesigned About Hero Header
+-----------------------------------------------------------------------------
+* Tapered the Fluxuos loader comet arc into a 3-layer soft fade-in ribbon with sharp pointed tips instead of solid round caps.
+* Redesigned the About tab hero header with the matching stacked REPAGE / STEAMGRID brand wordmark, action buttons always aligned cleanly below the description, and a large featured Fluxuos emblem on the right.
+
 Repage SteamGrid 5.5.6 - Elastic Comet-Chase Fluxuos Loader Animation
 --------------------------------------------------------------------
 * Split the Fluxuos loader comet arc and leading star into paired same-period orbits (1.95s) with distinct ease curves plus a gentle star bloom pulse, so the comet bar smoothly accelerates in pursuit of the star without ever overtaking or crossing it.
