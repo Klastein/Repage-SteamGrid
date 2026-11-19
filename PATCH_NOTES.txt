@@ -1,3 +1,7 @@
+Repage SteamGrid 5.5.6 - Elastic Comet-Chase Fluxuos Loader Animation
+--------------------------------------------------------------------
+* Split the Fluxuos loader comet arc and leading star into paired same-period orbits (1.95s) with distinct ease curves plus a gentle star bloom pulse, so the comet bar smoothly accelerates in pursuit of the star without ever overtaking or crossing it.
+
 Repage SteamGrid 5.5.5 - Smooth Fluxuos Orbit Fix & Zero-Lag Circular Apply Medallion
 --------------------------------------------------------------------------------------
 * Fixed the frozen Fluxuos comet-star loader animation by removing the !important transform override that blocked @keyframes rclOrbit.
