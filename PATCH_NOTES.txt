@@ -1,3 +1,9 @@
+Repage SteamGrid 5.5.3 - Lock-Serialized Deferred Cleanup & Backend Duplicate Guard
+-----------------------------------------------------------------------------------
+* Serialized deferred artwork cleanup (egFlushPendingArtCleanups) through egWithApplyLock() with per-slot monotonic generation tracking (egSlotGen) so a stale cleanup can never run concurrently with or overwrite a newer apply or reset.
+* Added exponential backoff (8s -> 16s -> 32s -> 64s -> 120s, max 5 attempts) and re-entrancy protection to deferred artwork cleanup retries, and cleared pending cleanup timers on egRestartPlugin().
+* Rejected duplicate staged file paths inside backend/main.lua stage_update_file() ('duplicate_path') for full dual-layer defense in depth.
+
 Repage SteamGrid 5.5.2 - Strict Integrity, Updater Allowlist & Symlink-Safe Staging
 -----------------------------------------------------------------------------------
 * Removed the mismatched-size stability fallback in egWaitForArtwork() and added 12-byte media magic-header verification in backend artwork_file_size() so incomplete/stale artwork writes are never accepted as applied.

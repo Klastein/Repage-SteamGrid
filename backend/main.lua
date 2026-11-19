@@ -1240,6 +1240,7 @@ function stage_update_file(a_rel_path, b_b64_data)
     if rel == ".millennium/Dist/index.js" then rel = ".millennium/dist/index.js" end
     if not is_safe_rel_path(rel) then return "invalid_path" end
     if not ALLOWED_UPDATE_FILES[rel] then return "disallowed_path:" .. rel end
+    if STAGED_FILES[rel] ~= nil then return "duplicate_path:" .. rel end
     local dir = resolve_plugin_dir()
     if not dir then return "no_plugin_dir" end
     local sep = path_separator()
