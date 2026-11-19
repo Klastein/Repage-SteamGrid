@@ -822,7 +822,7 @@ function clear_artwork_files(a_appid, b_imagetype, c_keep_ext)
     return true
 end
 
--- Size in bytes of the artwork file for this slot and extension, or -1 if missing
+-- Size in bytes of the artwork file for this slot and extension, or -1 if missing/corrupt
 function artwork_file_size(a_appid, b_imagetype, c_ext, d_expected)
     local suffix = ARTWORK_STEM_SUFFIX[b_imagetype]
     local app = appid_string(a_appid)
@@ -835,12 +835,15 @@ function artwork_file_size(a_appid, b_imagetype, c_ext, d_expected)
         local f = io.open(fs.join(grid_dir, file_name), "rb")
         if f then
             local size = f:seek("end") or -1
+            local head = (size >= 12 and f:seek("set", 0)) and f:read(12) or nil
             f:close()
-            if expected and expected > 0 and size == expected then
-                return size
-            end
-            if first_size < 0 and size > 0 then
-                first_size = size
+            if size > 0 and detect_media_kind(head) then
+                if expected and expected > 0 and size == expected then
+                    return size
+                end
+                if first_size < 0 then
+                    first_size = size
+                end
             end
         end
     end
@@ -1117,17 +1120,75 @@ function cleanup_update_zip()
     return true
 end
 
+local ALLOWED_UPDATE_FILES = {
+    ["plugin.json"] = true,
+    ["metadata.json"] = true,
+    ["README.md"] = true,
+    [".gitignore"] = true,
+    ["CREDITS.md"] = true,
+    ["INSTALLATION.txt"] = true,
+    ["linux-fix.sh"] = true,
+    ["LICENSE"] = true,
+    ["PATCH_NOTES.txt"] = true,
+    ["backend/icons.lua"] = true,
+    ["backend/main.lua"] = true,
+    [".millennium/dist/index.js"] = true
+}
+
 local function shell_quote(s)
     return "'" .. tostring(s or ""):gsub("'", "'\\''") .. "'"
 end
 
+local function is_symlink_path(path, entry)
+    if not path or path == "" then return false end
+    if type(entry) == "table" and entry.is_symlink then return true end
+    if type(fs.is_symlink) == "function" then
+        local ok, res = pcall(fs.is_symlink, path)
+        if ok and res then return true end
+    end
+    if not is_windows then
+        local ok_ex, code = pcall(os.execute, "test -L " .. shell_quote(path))
+        if ok_ex and (code == 0 or code == true) then return true end
+    end
+    return false
+end
+
+local function path_exists_or_symlink(path)
+    if is_symlink_path(path) then return true end
+    local ok, ex = pcall(fs.exists, path)
+    if not ok then return true end
+    return ex and true or false
+end
+
+local function path_has_symlink_component(base_dir, rel)
+    if is_symlink_path(base_dir) then return true end
+    local sep = path_separator()
+    local cur = base_dir
+    for seg in tostring(rel or ""):gmatch("[^/]+") do
+        cur = cur .. sep .. seg
+        if is_symlink_path(cur) then return true end
+    end
+    return false
+end
+
 local function remove_tree_safe(path, depth)
-    if not path or path == "" or (depth or 0) > 8 then return end
+    if not path or path == "" or (depth or 0) > 8 then return false end
+    if is_symlink_path(path) then
+        pcall(os.remove, path)
+        pcall(fs.remove, path)
+        return not path_exists_or_symlink(path)
+    end
+    local ok_ex, exists = pcall(fs.exists, path)
+    if not ok_ex then return false end
+    if not exists then return true end
     local ok_ls, entries = pcall(fs.list, path)
     if ok_ls and type(entries) == "table" then
         for _, entry in ipairs(entries) do
             if type(entry) == "table" and type(entry.path) == "string" and entry.path ~= "" then
-                if entry.is_directory then
+                if is_symlink_path(entry.path, entry) then
+                    pcall(os.remove, entry.path)
+                    pcall(fs.remove, entry.path)
+                elseif entry.is_directory then
                     remove_tree_safe(entry.path, (depth or 0) + 1)
                 else
                     pcall(os.remove, entry.path)
@@ -1138,6 +1199,19 @@ local function remove_tree_safe(path, depth)
     end
     pcall(fs.remove, path)
     pcall(os.remove, path)
+    return not path_exists_or_symlink(path)
+end
+
+local function cleanup_stale_stage_dir()
+    local dir = resolve_plugin_dir()
+    if not dir then return end
+    local stage_dir = dir .. path_separator() .. ".repage_update_stage"
+    if path_exists_or_symlink(stage_dir) then
+        local ok = remove_tree_safe(stage_dir, 0)
+        if not ok then
+            logger:error("[self-update] Startup cleanup could not fully remove stale .repage_update_stage")
+        end
+    end
 end
 
 local STAGED_FILES = {}
@@ -1148,22 +1222,34 @@ function begin_update_stage()
     if not can_write_in(dir) then return "no_write_permission" end
     STAGED_FILES = {}
     local stage_dir = dir .. path_separator() .. ".repage_update_stage"
-    remove_tree_safe(stage_dir, 0)
+    if is_symlink_path(stage_dir) then
+        pcall(os.remove, stage_dir)
+        pcall(fs.remove, stage_dir)
+        if path_exists_or_symlink(stage_dir) then return "stage_symlink_blocked" end
+    elseif path_exists_or_symlink(stage_dir) then
+        if not remove_tree_safe(stage_dir, 0) then return "stage_cleanup_failed" end
+    end
     pcall(fs.create_directories, stage_dir)
+    if is_symlink_path(stage_dir) then return "stage_symlink_blocked" end
     if not can_write_in(stage_dir) then return "no_write_permission" end
     return "ok"
 end
 
 function stage_update_file(a_rel_path, b_b64_data)
     local rel = tostring(a_rel_path or ""):gsub("\\", "/")
+    if rel == ".millennium/Dist/index.js" then rel = ".millennium/dist/index.js" end
     if not is_safe_rel_path(rel) then return "invalid_path" end
+    if not ALLOWED_UPDATE_FILES[rel] then return "disallowed_path:" .. rel end
     local dir = resolve_plugin_dir()
     if not dir then return "no_plugin_dir" end
-    local bytes = base64_decode(b_b64_data)
     local sep = path_separator()
-    local stage_path = dir .. sep .. ".repage_update_stage" .. sep .. (is_windows and rel:gsub("/", "\\") or rel)
+    local stage_dir = dir .. sep .. ".repage_update_stage"
+    if path_has_symlink_component(stage_dir, rel) then return "stage_symlink_blocked:" .. rel end
+    local bytes = base64_decode(b_b64_data)
+    local stage_path = stage_dir .. sep .. (is_windows and rel:gsub("/", "\\") or rel)
     local parent = stage_path:match("^(.*)[/\\][^/\\]+$")
     if parent then pcall(fs.create_directories, parent) end
+    if path_has_symlink_component(stage_dir, rel) then return "stage_symlink_blocked:" .. rel end
     local f = io.open(stage_path, "wb")
     if not f then return "write_failed:" .. rel end
     local ok = f:write(bytes)
@@ -1718,10 +1804,18 @@ function commit_staged_update()
     local write_plan = {}
     local ordered_rels = {}
     local backups = {}
+    local stage_dir = dir .. sep .. ".repage_update_stage"
+    if is_symlink_path(stage_dir) then return "stage_symlink_blocked" end
     for rel, src_path in pairs(STAGED_FILES) do
         local target_rel = rel
         if target_rel == ".millennium/Dist/index.js" then
             target_rel = ".millennium/dist/index.js"
+        end
+        if not ALLOWED_UPDATE_FILES[target_rel] then
+            return "disallowed_path:" .. tostring(target_rel)
+        end
+        if path_has_symlink_component(stage_dir, target_rel) or is_symlink_path(src_path) then
+            return "stage_symlink_blocked:" .. tostring(target_rel)
         end
         local rf = io.open(src_path, "rb")
         if not rf then return "stage_open_failed:" .. target_rel end
@@ -1860,7 +1954,10 @@ function commit_staged_update()
 
     local clean_ok, clean_state = cleanup_backup_dir(bdir, sep, ordered_rels)
     STAGED_FILES = {}
-    remove_tree_safe(dir .. sep .. ".repage_update_stage", 0)
+    local stage_clean_ok = remove_tree_safe(dir .. sep .. ".repage_update_stage", 0)
+    if not stage_clean_ok then
+        logger:error("[self-update] Could not confirm removal of .repage_update_stage; cleanup deferred to next startup")
+    end
     if not is_windows then
         local lower_d = dir .. "/.millennium/dist"
         local upper_d = dir .. "/.millennium/Dist"
@@ -1878,6 +1975,9 @@ function commit_staged_update()
             return "commit_journal_finalize_failed"
         end
         logger:info("[self-update] Update committed and journal neutralized; backup file cleanup deferred to next startup")
+        return "ok_cleanup_pending"
+    end
+    if not stage_clean_ok then
         return "ok_cleanup_pending"
     end
     logger:info("Self-update committed cleanly to " .. dir)
@@ -1977,6 +2077,7 @@ end
 
 local function on_load()
     pcall(recover_interrupted_update)
+    pcall(cleanup_stale_stage_dir)
     cleanup_stale_temp_files()
     check_and_repair_linux_frontend()
     logger:info("Backend loaded on " .. platform_name .. " (temp dir: " .. tostring(temp_directory()) .. ")")

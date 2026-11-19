@@ -1,3 +1,11 @@
+Repage SteamGrid 5.5.2 - Strict Integrity, Updater Allowlist & Symlink-Safe Staging
+-----------------------------------------------------------------------------------
+* Removed the mismatched-size stability fallback in egWaitForArtwork() and added 12-byte media magic-header verification in backend artwork_file_size() so incomplete/stale artwork writes are never accepted as applied.
+* Enforced a strict 12-file allowlist (plus duplicate-path rejection) in both frontend egParseZipArchive() and backend stage_update_file() / commit_staged_update().
+* Added symlink detection and path-component verification for .repage_update_stage (never recursing into symlinks during cleanup), confirmed stage directory removal post-commit (reporting ok_cleanup_pending on failure), and added startup stale-stage cleanup in on_load().
+* Added tx.onabort, tx.onerror, and db.onclose/onversionchange pending-waiter settlement across all IndexedDB local artwork helpers.
+* Tracked clear_artwork_files() outcomes in egFinishApply() with explicit logging, deferred automatic retry, and user-facing notice when cleanup is pending.
+
 Repage SteamGrid 5.5.1 - Big Picture Overlay Scroll Lock & Compact Header Brand Fix
 -----------------------------------------------------------------------------------
 * Locked background scrolling and analog stick input (Big Picture and Desktop) while any dropdown menu, multiselect filter, context menu, virtual keyboard, or update modal is open, and replaced ancestor-bubbling scrollIntoView() inside menus with contained menu scrolling.
