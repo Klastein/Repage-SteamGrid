@@ -1,3 +1,12 @@
+Repage SteamGrid 5.3.7 - Verified Journal Finalization & Fail-Safe Backup Cleanup
+----------------------------------------------------------------------------------
+* Reworked mark_journal_committed_and_remove() to write and byte-verify a
+  temporary commit marker (journal.committed) and replace journal.txt via a
+  verified temporary file if direct removal is blocked.
+* Updated cleanup_backup_dir() to check mark_journal_committed_and_remove() and
+  abort .bak deletion immediately with a specific error log if journal
+  neutralization cannot be confirmed on disk.
+
 Repage SteamGrid 5.3.6 - Fail-Safe Journal Lifecycle & Continuous Session Heartbeat
 ------------------------------------------------------------------------------------
 * Verified update journal persistence by writing to journal.txt.tmp with
