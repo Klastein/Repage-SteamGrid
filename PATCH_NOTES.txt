@@ -1,3 +1,13 @@
+Repage SteamGrid 5.4.2 - Round-Trip List Probe, Unique Write Probe & Strict Retry
+-----------------------------------------------------------------------------------
+* Added a round-trip directory enumeration probe in inspect_backup_dir(): when
+  fs.list(bdir) returns empty, a unique probe file is written, enumerated via
+  fs.list(bdir) to prove actual directory read/list permission (+r), and removed.
+* Replaced the fixed '.sgdb_write_test' filename in can_write_in() with a
+  collision-checked unique temporary probe name.
+* Updated the second SetCustomArtworkForApp attempt to abort immediately with
+  'retry_fresh_read_failed' if fresh image bytes cannot be obtained.
+
 Repage SteamGrid 5.4.1 - Witness-Verified Directory Listing & Fresh-Data Apply Retry
 -------------------------------------------------------------------------------------
 * Hardened inspect_backup_dir() against silent fs.list() permission failures by

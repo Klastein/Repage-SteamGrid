@@ -42,14 +42,30 @@ local function path_separator()
     return is_windows and "\\" or "/"
 end
 
+local write_probe_seq = 0
 local function can_write_in(dir)
     if not dir then return false end
-    local probe = dir .. path_separator() .. ".sgdb_write_test"
+    local sep = path_separator()
+    local probe = nil
+    for _ = 1, 8 do
+        write_probe_seq = write_probe_seq + 1
+        local candidate = dir .. sep .. ".repage_wprobe_" .. tostring(os.time()) .. "_" .. tostring(math.random(100000, 999999)) .. "_" .. tostring(write_probe_seq)
+        local rf = io.open(candidate, "rb")
+        if rf then
+            rf:close()
+        else
+            probe = candidate
+            break
+        end
+    end
+    if not probe then return false end
     local f = io.open(probe, "wb")
     if not f then return false end
+    local ok_w = f:write("1")
+    local ok_f = f:flush()
     f:close()
-    os.remove(probe)
-    return true
+    local removed = os.remove(probe)
+    return ok_w ~= nil and ok_f ~= false and removed ~= nil
 end
 
 local function home_directory()
@@ -1273,9 +1289,62 @@ local function inspect_backup_dir(bdir)
     end
     if #files == 0 then
         local sep = path_separator()
-        if file_exists(bdir .. sep .. "journal.txt") or file_exists(bdir .. sep .. "journal.committed") or not can_write_in(bdir) then
-            logger:error("[self-update] fs.list returned 0 entries for " .. tostring(bdir) .. " but directory is locked or contains hidden journal files")
-            return "error", nil, "empty_list_permission_denied"
+        if file_exists(bdir .. sep .. "journal.txt") or file_exists(bdir .. sep .. "journal.committed") then
+            logger:error("[self-update] fs.list returned 0 entries for " .. tostring(bdir) .. " but journal file exists on disk")
+            return "error", nil, "empty_list_journal_hidden"
+        end
+        local probe_name = nil
+        local probe_path = nil
+        for _ = 1, 8 do
+            write_probe_seq = write_probe_seq + 1
+            local cname = ".repage_lprobe_" .. session_prefix .. "_" .. tostring(os.time()) .. "_" .. tostring(write_probe_seq)
+            local cpath = bdir .. sep .. cname
+            if not file_exists(cpath) then
+                probe_name = cname
+                probe_path = cpath
+                break
+            end
+        end
+        if not probe_path then
+            return "error", nil, "probe_allocation_failed"
+        end
+        local pf = io.open(probe_path, "wb")
+        if not pf then
+            logger:error("[self-update] Cannot create read/list probe in " .. tostring(bdir))
+            return "error", nil, "empty_list_write_denied"
+        end
+        local ok_pw = pf:write("probe")
+        local ok_pf = pf:flush()
+        pf:close()
+        if not ok_pw or ok_pf == false then
+            pcall(os.remove, probe_path)
+            return "error", nil, "empty_list_probe_flush_failed"
+        end
+        local ok_pls, p_entries = pcall(fs.list, bdir)
+        pcall(os.remove, probe_path)
+        if file_exists(probe_path) then
+            logger:error("[self-update] Failed to remove list probe in " .. tostring(bdir))
+            return "error", nil, "empty_list_probe_cleanup_failed"
+        end
+        if not ok_pls or type(p_entries) ~= "table" then
+            logger:error("[self-update] fs.list failed during read/list verification of " .. tostring(bdir))
+            return "error", nil, "empty_list_read_probe_failed"
+        end
+        local saw_probe = false
+        local extra_count = 0
+        for _, pe in ipairs(p_entries) do
+            if type(pe) ~= "table" or type(pe.path) ~= "string" or pe.path == "" or (not pe.is_file and not pe.is_directory) then
+                return "error", nil, "empty_list_probe_unclassifiable"
+            end
+            if icons.base_name(pe.path) == probe_name and pe.is_file then
+                saw_probe = true
+            else
+                extra_count = extra_count + 1
+            end
+        end
+        if not saw_probe or extra_count > 0 then
+            logger:error("[self-update] Read/list probe verification failed in " .. tostring(bdir) .. " (saw_probe=" .. tostring(saw_probe) .. ", extra=" .. tostring(extra_count) .. ")")
+            return "error", nil, "empty_list_read_probe_mismatch"
         end
         return "empty", files, nil
     end
