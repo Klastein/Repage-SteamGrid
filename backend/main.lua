@@ -1005,6 +1005,7 @@ local function resolve_plugin_dir()
     local ok_root, sroot = pcall(millennium.steam_path)
     if ok_root and type(sroot) == "string" and sroot ~= "" then
         local sr = strip_trailing_sep(sroot)
+        table.insert(candidates, sr .. sep .. "millennium" .. sep .. "plugins" .. sep .. "repage-steamgrid")
         table.insert(candidates, sr .. sep .. "plugins" .. sep .. "repage-steamgrid")
     end
     if not is_windows then

@@ -1,3 +1,8 @@
+Repage SteamGrid 5.6.0 - Millennium v3 Path Support & SHA-256 Self-Update Verification
+--------------------------------------------------------------------------------------
+* Added steam_path/millennium/plugins/repage-steamgrid to resolve_plugin_dir() in backend/main.lua so in-Steam self-updates work cleanly on Millennium v3 layouts.
+* Verified GitHub Release ZIP SHA-256 digests via WebCrypto in egInstallLatestUpdate() before unpacking or staging update files.
+
 Repage SteamGrid 5.5.9 - L3/R3 Filter Hint Bar Glyphs & 144px About Fluxuos Emblem
 ----------------------------------------------------------------------------------
 * Added L3/LS (Library top) and R3/RS (Library) controller glyphs to the editor hint bar below the filters across all artwork tabs.
