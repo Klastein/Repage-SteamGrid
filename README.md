@@ -24,15 +24,15 @@ Browse, filter, preview and apply SteamGridDB artwork for your entire library, w
 
 ## Overview
 
-Repage SteamGrid runs inside the Steam client through [Millennium](https://github.com/SteamClientHomebrew/Millennium) and uses [SteamGridDB](https://www.steamgriddb.com) as its artwork source. It was rebuilt from *Easy SteamGrid* with a focus on **powerful filtering**, large libraries, full controller support and a clean, themeable interface.
+Repage SteamGrid runs inside the Steam client through [Millennium](https://github.com/SteamClientHomebrew/Millennium) and uses [SteamGridDB](https://www.steamgriddb.com) as its artwork source. It is built around **detailed filtering and sorting**, large libraries, full controller support and a clean, themeable interface.
 
 | | |
 | :--- | :--- |
 | **One place for everything** | Browse, favorite, save, apply or reset all 5 artwork slots without leaving Steam. |
-| **Filters and sorting that actually work** | Only / Include / Exclude for NSFW, humor and epilepsy, plus type, format, style, dimensions, four sort orders and animated / resolution priority, all instant. [See how they work](#filters). |
+| **Detailed filters and sorting** | Only / Include / Exclude for NSFW, humor and epilepsy, plus type, format, style, dimensions, four sort orders and animated / resolution priority, all instant. [See how they work](#filters). |
 | **Built for big libraries** | Handles hundreds of games and thousands of artworks, with an optional **Performance Mode** for handhelds and low-spec PCs. |
 | **Same on every input** | Every feature works with mouse, keyboard, touch, and Xbox / PlayStation / Steam Deck controllers. |
-| **Optimized** | Tuned for low memory use and smooth scrolling, and built to coexist with Easy SteamGrid. Your API key and custom artwork stay on your machine. |
+| **Optimized** | Tuned for low memory use and smooth scrolling. Your API key and custom artwork stay on your machine. |
 
 ### Compatibility
 
@@ -138,7 +138,7 @@ What the installer takes care of:
 
 ### First launch
 
-Open Repage SteamGrid with **right-click on any game → Repage SteamGrid → Open**, a double-click on a banner, or `Ctrl + Shift + P`. Then open **Settings**, paste your **SteamGridDB API key** and click **Apply key**.
+Open Repage SteamGrid with **right-click on any game → Repage SteamGrid → Open**, a double-click on a banner, or `Ctrl + Shift + R`. Then open **Settings**, paste your **SteamGridDB API key** and click **Apply key**.
 
 ### Updating and uninstalling
 
@@ -177,7 +177,7 @@ Repage gets every image from [SteamGridDB](https://www.steamgriddb.com), and Ste
 
 ## Filters
 
-Filtering and sorting were two of the main reasons Repage was created. Easy SteamGrid showed a long list and little else. In Repage, every filter and every sorting option below works **instantly on the results already loaded**, with no extra requests, and a counter bar tells you exactly what you are looking at.
+Filtering and sorting are at the heart of Repage. Every filter and every sorting option below works **instantly on the results already loaded**, with no extra requests, and a counter bar tells you exactly what you are looking at.
 
 <div align="center">
   <img src="docs/filters.png" alt="The filter panel and result counters in the Grid tab" width="900">
@@ -303,7 +303,7 @@ The same panel has a few more tools:
   - Right-click a vertical library cover → **Grid**
   - Right-click a horizontal cover (Recent, Featured, Big Picture) → **Wide Grid**
   - Right-click a game in the library sidebar → **Icon**
-  - `Ctrl + Shift + P` (or `R2/RT + L3 + R3`) anywhere → toggle the editor on the current game
+  - `Ctrl + Shift + R` (or `R2/RT + L3 + R3`) anywhere → toggle the editor on the current game
 - **Auto Replace and collection tools:** replace all artwork for one game in a click, or batch replace / reset whole Steam Collections by artwork type, skipping anything on your **Excluded APPIDs** list.
 - **Wrong match?** Search by name or type any numeric **SteamGridDB ID** straight into the toolbar.
 
@@ -345,16 +345,20 @@ The same panel has a few more tools:
 
 | Action | Keyboard / Mouse | Controller |
 | :--- | :--- | :--- |
-| **Open / close panel** | `Ctrl + Shift + P` or double-click a banner | `R2/RT + L3 + R3` |
+| **Open / close panel** | `Ctrl + Shift + R` (customizable from the menu) or double-click a banner | `R2/RT + L3 + R3` |
 | **Navigate** | Arrow keys / Mouse | D-Pad / Left Stick |
-| **Scroll gallery / page** | Mouse Wheel / `PageUp` / `PageDown` | Right Stick / `LT` / `RT` |
+| **Scroll gallery / page** | Mouse Wheel / `PageUp` / `PageDown` | Right Stick |
+| **Cycle NSFW mode** | Click the NSFW switch | `L2 / LT` |
+| **Cycle sort order** | Click the sort menu | `R2 / RT` |
 | **Apply artwork** | Left Click / `Enter` / `Space` | `A` (Cross) |
 | **Image menu / Save to disk** | Right Click / `Shift + F10` | `X` (Square) |
 | **Show / hide filters** | Click **Filters** | `Y` (Triangle) |
 | **Switch tabs** | `Ctrl + PageUp / PageDown` | `LB / RB` (`L1 / R1`) |
-| **Collapse / expand library** | `P` | `R3` (Right Stick Click) |
+| **Collapse / expand library** | `B` | `R3` (Right Stick Click) |
 | **Jump to library top** | `Home` (in list) | `L3` (Left Stick Click) |
 | **Back / close menu or panel** | `Esc` | `B` (Circle) |
+
+**Cycling with the triggers.** `L2 / LT` steps the NSFW filter through **Include → Only → Exclude** and back to Include. `R2 / RT` steps the sort order through **Score → Newest → Author → Resolution** and back to Score.
 
 ---
 
