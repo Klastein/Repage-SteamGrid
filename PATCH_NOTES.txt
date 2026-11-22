@@ -1,3 +1,11 @@
+Repage SteamGrid 5.9.5 - Controller-Only Focus Ring, Big Picture Scroll Focus Fix, Customizable Ctrl+Shift+R & B Shortcuts, and Clean Official Steam Assets Reset
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+* Scoped the high-contrast white double-ring focus indicator strictly to active controller input (pad modality), hiding it on mouse/keyboard and clearing stale Big Picture FocusRing overlays on mouse wheel scroll.
+* Changed the default panel shortcut from Ctrl+Shift+P to Ctrl+Shift+R and added a customizable shortcut recorder in Settings, with dynamic keycap badges in About & Help.
+* Changed the keyboard library toggle shortcut from P to B.
+* Updated 'Set to Steam Assets' in the game right-click menu to safely delete custom artwork files from userdata/config/grid and clear custom artwork pointers instead of downloading and freezing CDN images as custom files.
+* Removed Apple mentions from the About & Help What's new section across all 7 languages.
+
 Repage SteamGrid 5.9.0 - High-Contrast Controller Focus, Trigger Shortcuts (LT/RT), Full X Context Menu & Updated What's New
 ----------------------------------------------------------------------------------------------------------------------------
 * Added a universal high-contrast double-ring controller focus indicator (crisp inner white rim + outer theme glow) so focus never blends into theme borders.
