@@ -1,3 +1,20 @@
+Repage SteamGrid 6.0.0 - Surgical 1-by-1 Filter Unblocking (Preserving Custom Dimension/Style Filters) & Outside-Click Shortcut Cancel
+----------------------------------------------------------------------------------------------------------------------------------------
+* Upgraded 'Reset blocking filters' to test restoring single technical filters one at a time (Types -> Styles -> Formats -> Dimensions) and stop as soon as artwork appears, preserving custom dimension filters (such as hiding 920x430 on Grid) and NSFW/Author preferences.
+* Surfaced 'Reset blocking filters' whenever any multi-option filter has 0 options selected, even on empty catalogs.
+* Automatically cancelled keyboard shortcut recording in Settings when clicking outside the recorder control with the mouse.
+
+Repage SteamGrid 5.9.9 - 4-Stage Filter Unblocking (Preserving NSFW/Author Preferences), Accurate bgLoading & Instant Filter Reset
+-----------------------------------------------------------------------------------------------------------------------------------
+* Upgraded 'Reset blocking filters' to a 4-stage priority unblocker: technical filters (Types, Formats, Styles, Dimensions) are restored first while preserving NSFW/Humor Exclude and Excluded Authors unless 100% of the game's catalog requires unlocking them.
+* Fixed onFirstBatch bgLoading check to compare info.total against downloaded raw items (info.loaded) rather than filtered items, preventing false bgLoading states on 1-page games.
+* Prevented the Confused Fluxuos empty-state card from flashing while background pages are still downloading, and updated the filter panel's Reset Filters button to preserve Width Scale in 0ms.
+
+Repage SteamGrid 5.9.8 - Pure Post-Scan Local Filtering for All Artwork Types
+-----------------------------------------------------------------------------
+* Unified Static and Animated artwork scanning so N() always fetches the full unfiltered catalog into memory and applies Types strictly as an instant post-scan local filter alongside NSFW, Humor, Epilepsy, Formats, Styles, and Dimensions.
+* Fixed Filtered counts, total results, and the Confused Fluxuos 'Reset blocking filters' button when Static or Animated types are deselected.
+
 Repage SteamGrid 5.9.7 - Direct Big Picture B/Circle Context Menu Dismissal
 ---------------------------------------------------------------------------
 * Fixed B/Circle in Big Picture mode so it immediately closes the X/Square artwork context menu and restores controller focus to the origin artwork card without relying on synthetic Escape events.
