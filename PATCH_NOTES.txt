@@ -1,3 +1,13 @@
+Repage SteamGrid 5.9.7 - Direct Big Picture B/Circle Context Menu Dismissal
+---------------------------------------------------------------------------
+* Fixed B/Circle in Big Picture mode so it immediately closes the X/Square artwork context menu and restores controller focus to the origin artwork card without relying on synthetic Escape events.
+
+Repage SteamGrid 5.9.6 - Big Picture Context Menu D-Pad Lock & Fixed Shortcut Recorder with No-Modifier Warning
+-----------------------------------------------------------------------------------------------------------------
+* Fixed Big Picture D-pad navigation inside the X/Square artwork context menu by rendering menu items as Focusable elements inline within the Big Picture workspace tree and locking directional focus inside the menu.
+* Fixed the Settings keyboard shortcut recorder so key presses are captured directly inside the active Repage popup window before global navigation listeners.
+* Allowed recording single-key or right-shift shortcuts and added an amber warning notice whenever a shortcut is set without a modifier key (Ctrl, Shift, Alt).
+
 Repage SteamGrid 5.9.5 - Controller-Only Focus Ring, Big Picture Scroll Focus Fix, Customizable Ctrl+Shift+R & B Shortcuts, and Clean Official Steam Assets Reset
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 * Scoped the high-contrast white double-ring focus indicator strictly to active controller input (pad modality), hiding it on mouse/keyboard and clearing stale Big Picture FocusRing overlays on mouse wheel scroll.
