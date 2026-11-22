@@ -325,16 +325,18 @@ function call_api_backend(a_bearer, b_endpoint)
     })
 
     if not response then
-        logger:error(err)
-        return ""
+        local emsg = tostring(err or "network_or_timeout_error"):gsub("[%c]+", " "):sub(1, 160)
+        local full_err = "[api-error] Network/HTTP failure on " .. endpoint .. ": " .. emsg
+        logger:error(full_err)
+        logger:info(full_err)
+        return string.format("{ \"http_status\": 0, \"error\": %q }", emsg)
     end
 
     if response.status ~= 200 then
-        if response.status == 401 then
-            logger:error(string.format("Got HTTP %d, did you make sure to set an API key in the Repage SteamGrid configuration?", response.status))
-        else
-            logger:error(string.format("Got HTTP %d", response.status))
-        end
+        local body_snip = tostring(response.body or ""):gsub("[%c]+", " "):sub(1, 160)
+        local hmsg = string.format("[api-error] HTTP %d on %s (body: %s)", response.status, endpoint, body_snip ~= "" and body_snip or "empty")
+        logger:error(hmsg)
+        logger:info(hmsg)
         return string.format("{ \"http_status\": %d }", response.status)
     end
 

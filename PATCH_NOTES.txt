@@ -1,3 +1,69 @@
+Repage SteamGrid 5.8.4 - Clean Clear ID Flow, Redetect Game Button & HTTP 404 Confused Card
+-----------------------------------------------------------------------------------------------
+* Separated Clear ID (clears cached artwork/ID and shows the clean Confused Fluxuos empty card without re-detecting) from a new standalone Redetect game action in the SGDB popover.
+* Routed HTTP 404 (invalid/nonexistent SGDB ID) cleanly to the Confused Fluxuos card instead of the connection error screen, and cleared stale grid images immediately on load start and load errors so loaders and cards never overlap old artwork.
+* Pointed Open in browser directly to steamgriddb.com when no valid SGDB ID is linked.
+
+Repage SteamGrid 5.8.3 - Error/Empty Card Typography & Mascot Sizing Polish
+-----------------------------------------------------------------------------
+* Switched primary action button labels on the error, empty-state, and SGDB ID cards to crisp white with subtle drop-shadow for high contrast across all themes.
+* Enlarged the Sad and Confused Fluxuos artwork inside error/empty cards to 268px (224px in Big Picture) with balanced card padding.
+
+Repage SteamGrid 5.8.2 - Eye-Level Enlarged Error/Empty Cards & Auto-Discovery for Confused Fluxuos Asset
+------------------------------------------------------------------------------------------------------------
+* Enlarged the error and empty-artwork cards to 880px width with 224px Fluxuos artwork and lifted vertical centering slightly to sit comfortably at eye level below the header/filter bar.
+* Expanded scripts/build.mjs asset lookup so fluxuos_confused.png/.webp/.txt is automatically discovered in src/assets/, src/assets/fluxuos/, or adjacent version folders and cached to src/assets/fluxuos_confused.txt.
+
+Repage SteamGrid 5.8.1 - Enlarged Error & Empty-State Cards with Sad/Confused Fluxuos
+--------------------------------------------------------------------------------------
+* Enlarged both the connection/API error card (Sad Fluxuos) and the redesigned empty-artwork card (Confused Fluxuos) to 780px centered panels with 184px mascot art.
+* Added Open in browser and Copy error log (capturing full runtime + recent [api-error]/[load-error] history) directly on the error card.
+* Added Set ID, Open in browser, hidden-count pills, and smart Reset blocking filters (resetting only the filters actually hiding results) to the empty-artwork card across all 7 languages.
+
+Repage SteamGrid 5.8.0 - Sad Fluxuos Error Screen, Fixed SGDB ID Flow & About & Help Overhaul
+----------------------------------------------------------------------------------------------
+* Fixed Set ID and Clear ID across Desktop and Big Picture (safe TextField onChange extraction, full URL/numeric ID parsing, complete catalog/logo cache reset, and instant feedback toasts).
+* Redesigned the error view into a centered Apple-style card featuring Sad Fluxuos artwork, clear error guidance, and direct Retry / Change SGDB ID actions.
+* Highlighted the SGDB ID pill in the top bar for easy discovery and added a quick inline URL hint inside the SGDB popover.
+* Renamed the About tab to About & Help, added a dedicated SteamGridDB Game IDs guide, switched Performance & Loading to a distinct speedometer icon, and locked all About headings to crisp pure white across all themes and all 7 languages.
+
+Repage SteamGrid 5.7.2 - Millennium API Error Logging, Retry-Storm Guard & Clearer API Key Guidance
+---------------------------------------------------------------------------------------------------
+* Logged all HTTP status errors, network/timeout failures, and load exceptions directly to the Millennium console output ([api-error], [load-error], [load-warn]).
+* Eliminated duplicate retry loops on HTTP 401/403/404/429 responses to prevent request storms against SteamGridDB.
+* Surfaced clear error banners guiding users to verify their API key in Settings or check steamgriddb.com in their browser (even when the game's SGDB ID was already cached locally).
+
+Repage SteamGrid 5.7.1 - Grouped Desktop Filter Tiles & Dedicated Big Picture Filter Sheet
+------------------------------------------------------------------------------------------
+* Added clean Apple-style grouped tiles around each filter section on Desktop, switched 4+ option filters (such as Grid Styles) to sleek uniform-height multiselect pills, and fixed the horizontal left/right alignment of the priority switches and Reset Filters footer.
+* Built a dedicated centered Apple Filter Sheet for Big Picture / Steam Deck (toggled with Y/Triangle or Filters, closing on B/Y and restoring focus to the exact artwork card) using clean horizontal console rows with zero pill piling.
+* Fixed vertical and horizontal text centering across all Big Picture Focusable buttons (Set ID, Clear ID, Segmented Controls, and Chips) plus safe top-right padding for the Big Picture close button.
+
+Repage SteamGrid 5.7.0 - Apple-Inspired Header & Tactile Filter Redesign
+------------------------------------------------------------------------
+* Rebuilt the editor header into a clean single-row Apple-style command bar eliminating the overflow 'More' menu and duplicate language/version controls, with smooth icon-capsule compaction on narrow windows.
+* Introduced elevated SGDB and Display popovers (centered scroll-locked sheets in Big Picture / Steam Deck) featuring Apple Segmented Controls for Width Scale and Card Tags.
+* Replaced bulky filter dropdown boxes with tactile Segmented Controls (NSFW, Humor, Epilepsy), toggle capsules (Types, Mimes, Styles, compact Dimensions), inline priority switches, and a Reset Filters action.
+* Added smart responsive filter visibility: expanded on wide/maximized desktop windows, auto-folded to the Filters pill with an active-filter badge on smaller windows, and closed by default in Big Picture (Y/Triangle to toggle).
+* Enhanced intra-cell D-pad navigation inside segmented controls and filter chips plus full overlay focus management across all 7 languages.
+
+Repage SteamGrid 5.6.3 - Filtered & Excluded Counter Pills + Clean Diagnostics
+------------------------------------------------------------------------------
+* Added discrete 'Filtered' and 'Excluded' counter pills (localized in all 7 languages) to the summary bar whenever active filters or the Excluded Authors list hide items from the loaded catalog.
+* Removed verbose per-batch console diagnostic logs from the Millennium backend output while preserving concise ApiPages and FilterAudit summaries inside About -> Copy diagnostics.
+
+Repage SteamGrid 5.6.2 - Detailed API Page & Filter Drop Telemetry
+--------------------------------------------------------------------
+* Added per-page API fetch counts (api-diag), per-filter drop breakdown with rejected samples (filter-diag), and final load reconciliation telemetry (load-diag) to both About -> Copy diagnostics and Millennium logs.
+
+Repage SteamGrid 5.6.1 - Accurate Catalog Totals, Deleted Icon Respect, Language Width-Scale Lock & Hidden Game Opening
+--------------------------------------------------------------------------------------------------------------------------
+* Fixed premature page-0 stop in k() when SteamGridDB returns fewer than 'limit' items despite a higher total, updated frozen totalCount after background completion when raw length matches initial batch, and eliminated the lockedHead/batchViewVer race on sort/filter changes.
+* Added missing static/animated type filtering in egFilterAndSortRaw() during partial/cached updates.
+* Stopped egReapplyIcons() from re-downloading icons manually deleted from userdata/config/grid, cleanly forgetting them instead.
+* Cached EasyGridEditor per window in q() with appid-scoped tab keys so switching languages preserves Width Scale and loaded state without breaking game switching.
+* Preserved direct selection of Repage-hidden games when opening the panel via game context menu or banner double-click.
+
 Repage SteamGrid 5.6.0 - Millennium v3 Path Support & SHA-256 Self-Update Verification
 --------------------------------------------------------------------------------------
 * Added steam_path/millennium/plugins/repage-steamgrid to resolve_plugin_dir() in backend/main.lua so in-Steam self-updates work cleanly on Millennium v3 layouts.
