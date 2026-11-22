@@ -1,3 +1,10 @@
+Repage SteamGrid 5.9.0 - High-Contrast Controller Focus, Trigger Shortcuts (LT/RT), Full X Context Menu & Updated What's New
+----------------------------------------------------------------------------------------------------------------------------
+* Added a universal high-contrast double-ring controller focus indicator (crisp inner white rim + outer theme glow) so focus never blends into theme borders.
+* Remapped LT/L2 to cycle NSFW mode (Include -> Only -> Exclude) and RT/R2 to cycle Sort order (Score -> Newest -> Author -> Resolution) in a loop across both Desktop and Big Picture with live toast feedback.
+* Unlocked X/Square in Big Picture and added full D-pad navigation, immediate focus highlighting, background scroll-locking, and B/X card-focus restoration for the artwork context menu.
+* Updated EgPadHints, Quick start, Tips, and all 4 What's new categories in About & Help through version 5.9.0 across all 7 languages.
+
 Repage SteamGrid 5.8.4 - Clean Clear ID Flow, Redetect Game Button & HTTP 404 Confused Card
 -----------------------------------------------------------------------------------------------
 * Separated Clear ID (clears cached artwork/ID and shows the clean Confused Fluxuos empty card without re-detecting) from a new standalone Redetect game action in the SGDB popover.
