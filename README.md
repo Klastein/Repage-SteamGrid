@@ -142,7 +142,8 @@ Open Repage SteamGrid with **right-click on any game → Repage SteamGrid → Op
 
 ### Updating and uninstalling
 
-- **Update (recommended, any system):** open Repage, go to the **About** tab and click **Check for updates**. This works the same on Windows, Linux and Steam Deck, verifies the download, and needs no installer. Your settings live in Steam's own storage, not in the plugin folder, so updates keep them.
+- **Update (recommended, any system):** open Repage, go to **Settings → Account & Backup** and click **Check for updates**. If a new version exists, click **Update now** and restart Steam when asked. This works the same on Windows, Linux and Steam Deck, verifies the download, and needs no installer. Your settings, API key, themes and favorites are kept.
+- **Automatic check:** Repage also looks for new releases on GitHub when Steam starts and notifies you. You can turn this off with **Check for updates automatically** in the same section.
 - **Update via the installer (optional, Windows only):** run `Repage_SteamGrid_Setup.exe` again. It is completely optional and does the same job.
 - **Update manually:** extract the new zip over the `repage-steamgrid` folder.
 - **Uninstall:** use the installer's uninstall option, or delete the `repage-steamgrid` folder and remove it from Millennium's plugin list.
@@ -224,9 +225,15 @@ Two switches work **together with** the sort order instead of replacing it:
 
 ### Reading the results
 
-- **Counter bar:** shows the total **results**, how many are **shown**, and how many carry each tag (*NSFW*, *Humor*, *Epilepsy*) or type (*Static*, *Animated*). **Filtered** is the number of images your filters are currently hiding, so you always know what you are not seeing.
+- **Counter bar:** shows the total **results**, how many are **shown**, and how many carry each tag (*NSFW*, *Humor*, *Epilepsy*) or type (*Static*, *Animated*). **Filtered** is the number of images your filters are currently hiding, and **Excluded** is the number hidden by your Excluded Authors list, so you always know what you are not seeing.
 - **Tag chips:** every card shows chips such as `STATIC`, `PNG`, `ALTERNATE`, `MATERIAL` or `WHITE LOGO`, so you can judge an image without opening it.
 - **Card size:** the size menu in the toolbar (*Medium*, *Bigger* and so on) changes the card width, to see more images at once or inspect them closer.
+
+### When filters hide everything
+
+If SteamGridDB has images for a game but your filters or excluded authors hide all of them, Repage shows a friendly card saying so instead of an empty gallery. Click **Reset blocking filters** and it restores your filters **one at a time** (Types, then Styles, Formats, Dimensions) and stops as soon as artwork appears. Your NSFW and author preferences are kept whenever possible, and so are custom choices such as a hidden dimension.
+
+On Steam Deck and in Big Picture, filters open in their own sheet with large console-style rows: press `Y` (Triangle) to open it and `B` (Circle) to close it, and focus returns to the card you were on.
 
 ### Curating beyond filters
 
@@ -304,7 +311,7 @@ The same panel has a few more tools:
   - Right-click a horizontal cover (Recent, Featured, Big Picture) → **Wide Grid**
   - Right-click a game in the library sidebar → **Icon**
   - `Ctrl + Shift + R` (or `R2/RT + L3 + R3`) anywhere → toggle the editor on the current game
-- **Auto Replace and collection tools:** replace all artwork for one game in a click, or batch replace / reset whole Steam Collections by artwork type, skipping anything on your **Excluded APPIDs** list.
+- **Auto Replace and collection tools:** replace all artwork for one game in a click, or batch replace / reset whole Steam Collections by artwork type, skipping anything on your **Excluded APPIDs** list. Replacing never overwrites images you picked yourself: use **Reset** first if you want to redo them.
 - **Wrong match?** Search by name or type any numeric **SteamGridDB ID** straight into the toolbar.
 
 </details>
@@ -328,7 +335,7 @@ The same panel has a few more tools:
 <details>
 <summary><b>Themes, languages and accessibility</b></summary>
 
-- **12 curated themes plus custom presets:** *Fluxuos Core* (an OLED theme with a subtle café pattern and cozy audio), *Steam Blue*, *Midnight*, *Midnight OLED*, *Nordic Frost*, *Crimson Velvet*, *Night City Neon*, *Umbrella Kiss*, *Bonnie & Clyde*, *The Green Hero*, *Firefly Glow* and *Cassino Inkwell*. Tweak lights, surfaces and corners, and save up to 9 presets of your own.
+- **16 color presets plus your own:** *Fluxuos Core* (an OLED theme with a subtle café pattern and cozy audio), *Steam Blue*, *Midnight*, *Midnight OLED*, *Nordic Frost*, *Crimson Velvet*, *Night City Neon*, *Umbrella Kiss*, *Bonnie & Clyde*, *The Green Hero*, *Firefly Glow* and *Cassino Inkwell*, plus four game-inspired looks: *Cyberpunk 2077*, *Resident Evil*, *GTA VI* and *Zelda*. Tweak lights, surfaces and corners, and save up to 9 presets of your own.
 - **7 languages with auto-detection:** English, Portuguese (Brazil), Spanish, Japanese, Korean, Russian and French. The default is **Automatic**, which follows your Steam language, and you can pick another one in **Settings**.
 
 <div align="center">
@@ -339,13 +346,25 @@ The same panel has a few more tools:
 
 </details>
 
+<details>
+<summary><b>Settings and About &amp; Help</b></summary>
+
+- **Account &amp; Backup:** your API key (with an eye button to blur it on screen), automatic update checks, **Check for updates**, and backup export / import.
+- **Panel shortcut:** change the open / close shortcut with the built-in recorder. Use at least one modifier (Ctrl, Alt, Shift) or an F1 to F12 key; Repage warns you if the shortcut has no modifier.
+- **Interface &amp; Performance:** open the panel maximized or remember your window size, keep your own width scale, hide image tags, use the Repage keyboard instead of Steam's, show the SGDB button on Steam Collections, and turn on **Performance mode** for handhelds and low-spec PCs.
+- **Disable WEBP support:** a safety switch if animated WebP images ever crash Steam.
+- **Show Restart Steam button:** an optional shortcut in the header, handy for refreshing cached icons. Off by default.
+- **About &amp; Help:** a quick start guide, tips, troubleshooting, a SteamGridDB Game IDs guide, what's new in each version, credits and **Copy diagnostics** to attach to bug reports.
+
+</details>
+
 ---
 
 ## Controls & Shortcuts
 
 | Action | Keyboard / Mouse | Controller |
 | :--- | :--- | :--- |
-| **Open / close panel** | `Ctrl + Shift + R` (customizable from the menu) or double-click a banner | `R2/RT + L3 + R3` |
+| **Open / close panel** | `Ctrl + Shift + R` (customizable in Settings) or double-click a banner | `R2/RT + L3 + R3` |
 | **Navigate** | Arrow keys / Mouse | D-Pad / Left Stick |
 | **Scroll gallery / page** | Mouse Wheel / `PageUp` / `PageDown` | Right Stick |
 | **Cycle NSFW mode** | Click the NSFW switch | `L2 / LT` |
@@ -375,6 +394,34 @@ Almost always a missing or incomplete [SteamGridDB API key](#steamgriddb-api-key
 <summary><b>A non-Steam game shows the wrong artwork, or nothing</b></summary>
 
 Non-Steam shortcuts are matched by name, which can miss. Find the game on [steamgriddb.com](https://www.steamgriddb.com), copy the number at the end of its URL (for example `.../game/38652`), click the **SGDB ID** chip at the top left of the toolbar, enter the number and click **Set ID**. See [Non-Steam games and the SteamGridDB ID](#non-steam-games-and-the-steamgriddb-id).
+
+</details>
+
+<details>
+<summary><b>An image fails to load, or the screen shows an error card</b></summary>
+
+Check your [SteamGridDB API key](#steamgriddb-api-key) in **Settings**, make sure [steamgriddb.com](https://www.steamgriddb.com) opens in your browser, then use **Retry now**. If the game's ID looks wrong, use **Change SGDB ID**. The **Purge cache** action in the SGDB ID panel also clears stale data. The error card has **Open in browser** and **Copy error log** buttons to help when you report a problem.
+
+</details>
+
+<details>
+<summary><b>Steam crashes or freezes with animated images</b></summary>
+
+Turn on **Disable WEBP support** in **Settings** and restart Steam.
+
+</details>
+
+<details>
+<summary><b>An icon still looks the same in some places</b></summary>
+
+Restart Steam once so it refreshes its cached icons.
+
+</details>
+
+<details>
+<summary><b>Everything is hidden even though the game has artwork</b></summary>
+
+Your filters or excluded authors are hiding every image. Use **Reset blocking filters** on the card, or **Reset filters** in the filter panel. See [When filters hide everything](#when-filters-hide-everything).
 
 </details>
 
@@ -430,6 +477,7 @@ repage-steamgrid/
 ├── plugin.json                 # Millennium plugin manifest
 ├── metadata.json               # Plugin version metadata
 ├── linux-fix.sh                # Linux / Steam Deck first-install helper
+├── docs/                       # Screenshots used by this README (repository only)
 ├── README.md                   # Overview and documentation
 ├── INSTALLATION.txt            # Quick installation and controls guide
 ├── PATCH_NOTES.txt             # Version history

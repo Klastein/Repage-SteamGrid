@@ -5,40 +5,54 @@ Requirements:
 - Steam client with Millennium installed (https://github.com/SteamClientHomebrew/Millennium)
 - A free SteamGridDB API key (https://www.steamgriddb.com/profile/preferences/api)
 - Supported platforms: Windows and Linux / Steam Deck (native Steam installation; Flatpak and Snap are not supported by Millennium).
+- Tested on Windows 10, Windows 11 and Linux (Ubuntu). Steam Deck support is prepared but not tested yet (alpha).
+
+Easiest way on Windows (optional):
+- Download Repage_SteamGrid_Setup.exe from the Releases page and run it. It finds Steam and Millennium automatically and installs, repairs or uninstalls the plugin. Windows SmartScreen may warn about an unsigned file; compare its SHA-256 with the one in the release notes.
 
 Installation Steps:
 1. Extract this archive into a folder named "repage-steamgrid".
 2. Move the "repage-steamgrid" folder into your Millennium plugins directory:
 
    Windows:
-     <Steam folder>\plugins\repage-steamgrid
-     (Default: C:\Program Files (x86)\Steam\plugins\repage-steamgrid)
+     <Steam folder>\millennium\plugins\repage-steamgrid
+     (Default: C:\Program Files (x86)\Steam\millennium\plugins\repage-steamgrid)
+     (Older Millennium versions use <Steam folder>\plugins\repage-steamgrid)
 
    Linux / Steam Deck (Desktop Mode):
      ~/.local/share/millennium/plugins/repage-steamgrid
 
-3. Restart Steam, open Millennium Settings -> Plugins, and enable "Repage SteamGrid".
-4. Open Repage SteamGrid (right-click any game -> Repage SteamGrid -> Open, double-click a game banner, or press Ctrl+Shift+P).
-5. Go to the Settings tab, paste your SteamGridDB API key, and click "Apply key".
+3. Linux / Steam Deck only: run the helper script once (in testing this was practically required):
+     bash ~/.local/share/millennium/plugins/repage-steamgrid/linux-fix.sh
+4. Restart Steam, open Millennium Settings -> Plugins, and enable "Repage SteamGrid".
+5. Open Repage SteamGrid (right-click any game -> Repage SteamGrid -> Open, double-click a game banner, or press Ctrl+Shift+R).
+6. Go to the Settings tab, paste your SteamGridDB API key, and click "Apply key".
+
+Updating:
+- Recommended: open Repage -> Settings -> Account & Backup -> "Check for updates", then "Update now" and restart Steam. Repage also checks for updates when Steam starts (can be turned off in the same section).
+- Optional: run the Windows installer again, or extract the new zip over the repage-steamgrid folder.
 
 Folder Structure:
   repage-steamgrid/
     .millennium/dist/index.js
     backend/main.lua
     backend/icons.lua
+    linux-fix.sh
     plugin.json
     metadata.json
     README.md, INSTALLATION.txt, PATCH_NOTES.txt, CREDITS.md, LICENSE
 
 Quick Controls & Shortcuts:
-- Open / Close Panel: Ctrl + Shift + P (Keyboard) | R2/RT + L3 + R3 (Controller) | Double-click game banner
+- Open / Close Panel: Ctrl + Shift + R (Keyboard, customizable in Settings) | R2/RT + L3 + R3 (Controller) | Double-click game banner
 - Navigate: Arrow keys / Mouse | D-Pad / Left Stick
-- Scroll Gallery: Mouse Wheel / PageUp / PageDown | Right Stick / LT / RT
+- Scroll Gallery: Mouse Wheel / PageUp / PageDown | Right Stick
+- Cycle NSFW mode (Include -> Only -> Exclude): LT / L2
+- Cycle sort order (Score -> Newest -> Author -> Resolution): RT / R2
 - Apply Artwork: Left Click / Enter / Space | A (Cross)
 - Image Context Menu / Save to Disk: Right Click / Shift + F10 | X (Square)
 - Show / Hide Filters: Y (Triangle)
 - Switch Tabs: Ctrl + PageUp / PageDown | LB / RB (L1 / R1)
-- Toggle Library Sidebar: P | R3 (Right Stick Click)
+- Toggle Library Sidebar: B | R3 (Right Stick Click)
 - Jump to Library Top: Home | L3 (Left Stick Click)
 - Back / Close: Esc | B (Circle)
 
