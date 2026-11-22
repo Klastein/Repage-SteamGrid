@@ -335,7 +335,7 @@ The same panel has a few more tools:
 <details>
 <summary><b>Themes, languages and accessibility</b></summary>
 
-- **16 color presets plus your own:** *Fluxuos Core* (an OLED theme with a subtle café pattern and cozy audio), *Steam Blue*, *Midnight*, *Midnight OLED*, *Nordic Frost*, *Crimson Velvet*, *Night City Neon*, *Umbrella Kiss*, *Bonnie & Clyde*, *The Green Hero*, *Firefly Glow* and *Cassino Inkwell*, plus four game-inspired looks: *Cyberpunk 2077*, *Resident Evil*, *GTA VI* and *Zelda*. Tweak lights, surfaces and corners, and save up to 9 presets of your own.
+- **12 color presets plus your own:** *Fluxuos Core* (an OLED theme with a subtle café pattern and cozy audio), *Steam Blue*, *Midnight*, *Midnight OLED*, *Nordic Frost* and *Crimson Velvet*, plus six game-inspired looks: *Night City Neon* (Cyberpunk 2077), *Umbrella Kiss* (Resident Evil), *Bonnie & Clyde* (GTA VI), *The Green Hero* (Zelda), *Firefly Glow* (The Last of Us) and *Cassino Inkwell* (Cuphead). Tweak lights, surfaces and corners, and save up to 9 presets of your own.
 - **7 languages with auto-detection:** English, Portuguese (Brazil), Spanish, Japanese, Korean, Russian and French. The default is **Automatic**, which follows your Steam language, and you can pick another one in **Settings**.
 
 <div align="center">
