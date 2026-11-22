@@ -119,9 +119,9 @@ local function temp_directory()
     else
         local tmpdir = env("TMPDIR")  -- macOS: per-user /var/folders/... (ends with "/")
         if tmpdir then table.insert(candidates, strip_trailing_sep(tmpdir)) end
-        table.insert(candidates, "/tmp")
         local runtime = env("XDG_RUNTIME_DIR")
         if runtime then table.insert(candidates, strip_trailing_sep(runtime)) end
+        table.insert(candidates, "/tmp")
         local home = home_directory()
         if home then
             table.insert(candidates, home .. "/.cache")
@@ -974,11 +974,18 @@ local GITHUB_LATEST_API = "https://api.github.com/repos/Klastein/Repage-SteamGri
 local UPDATE_ZIP_CACHE = nil
 
 local function is_allowed_github_url(url)
+    if type(url) ~= "string" then return false end
+    local lower = url:lower()
+    if not lower:match("^https://") or lower:find("[%c%s\\@]") then return false end
     local host = url_host(url)
     if not host then return false end
-    return host == "api.github.com"
-        or host_in_domain(host, "github.com")
-        or host_in_domain(host, "githubusercontent.com")
+    if host == "github.com" then
+        return lower:match("^https://github%.com/klastein/repage%-steamgrid/releases/download/[^/]+/repage_steamgrid_[%w%.%-_]+%.zip$") ~= nil
+    end
+    if host == "api.github.com" then
+        return lower:match("^https://api%.github%.com/repos/klastein/repage%-steamgrid/") ~= nil
+    end
+    return false
 end
 
 local function verify_plugin_dir(dir)

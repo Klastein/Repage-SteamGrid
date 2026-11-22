@@ -1,3 +1,10 @@
+Repage SteamGrid 6.0.1 - Fail-Closed SHA-256 Updater, Backup URL Allowlist & Bundle Asset Optimization
+------------------------------------------------------------------------------------------------------
+* Enforced fail-closed SHA-256 digest verification and strict Repage_SteamGrid_*.zip asset matching in the in-plugin updater, plus repository-scoped GitHub download URL validation in backend/main.lua.
+* Hardened backup profile import (egImportProfile) to require steamgriddb.com HTTPS URLs on both url and thumb fields and strict slotKey format validation.
+* Prioritized XDG_RUNTIME_DIR before /tmp on Linux and surfaced the (.repage_update_backup) folder name on recovery lock errors.
+* Automatically downscaled oversized embedded mascot PNG assets during build, cutting ~1.85 MB from .millennium/dist/index.js.
+
 Repage SteamGrid 6.0.0 - Surgical 1-by-1 Filter Unblocking (Preserving Custom Dimension/Style Filters) & Outside-Click Shortcut Cancel
 ----------------------------------------------------------------------------------------------------------------------------------------
 * Upgraded 'Reset blocking filters' to test restoring single technical filters one at a time (Types -> Styles -> Formats -> Dimensions) and stop as soon as artwork appears, preserving custom dimension filters (such as hiding 920x430 on Grid) and NSFW/Author preferences.
