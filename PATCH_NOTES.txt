@@ -1,3 +1,21 @@
+Repage SteamGrid 6.1.2 - Fixed Custom Preset Confirm-Delete & Art-Safe Card Text Layout
+--------------------------------------------------------------------------------------
+* Fixed custom preset deletion confirmation ('Confirm?') across mouse, keyboard, and controller in both Desktop and Big Picture by removing premature onBlur resets and preventing mouse-modality blur from firing mid-click.
+* Structured preset card text padding on cards with right-corner focal art (Steam Blue, Midnight OLED, Umbrella Kiss, Bonnie & Clyde, Firefly Glow, Cassino Inkwell) so descriptions never overlap stickers, mascots, or emblems, with theme-tinted title highlights.
+
+Repage SteamGrid 6.1.1 - Sculpted 3D Theme Card Bezels, Realistic Moss & Anti-Overlap Polish
+---------------------------------------------------------------------------------------------
+* Added subtle sculpted 3D beveled borders across all 12 Personalization preset cards and crisp rim rings on color swatch dots so dark OLED swatches remain clearly visible.
+* Added smooth anti-overlap backdrop masks behind focal artwork on Steam Blue, Umbrella Kiss, Midnight OLED, Bonnie & Clyde, and Cassino Inkwell.
+* Upgraded Umbrella Kiss with a realistic curved 3D peeling lab sticker revealing an opaque biohazard breach underneath, and enriched Firefly Glow with dense multi-tone moss borders, glowing fireflies, acoustic guitar, and mushrooms.
+* Refined Nordic Frost with intricate geometric rune crystal corners and anchored Miami sunset palms (Bonnie & Clyde) and the 1930s rubber-hose devil motif (Cassino Inkwell) cleanly on the right side.
+
+Repage SteamGrid 6.1.0 - Bespoke Artistic Cards & Borders for All 12 Theme Presets
+----------------------------------------------------------------------------------
+* Crafted unique themed borders, corner details, and lightweight inline SVG background motifs for all 12 Personalization preset cards across Desktop and Big Picture (while keeping the full-panel café texture and cozy audio exclusive to Fluxuos Core).
+* Featured custom visual storytelling per theme: official Steam Blue mechanical motif, Midnight 8 PM moonlight vs deep 3 AM Midnight OLED eclipse, Nordic Frost ice runes, Crimson Velvet damask, Night City Neon cyber-HUD, Umbrella Kiss peeling lab sticker revealing biohazard contamination behind the facade, Bonnie & Clyde Vice sunset, The Green Hero golden triangles & rupees, Firefly Glow overgrown moss border with fireflies/guitar/mushrooms, and Cassino Inkwell 1930s rubber-hose parlor.
+* Increased safe preset grid spacing, responsive breakpoints, and multi-layer text contrast protection to guarantee crisp readability and full high-contrast controller focus support.
+
 Repage SteamGrid 6.0.1 - Fail-Closed SHA-256 Updater, Backup URL Allowlist & Bundle Asset Optimization
 ------------------------------------------------------------------------------------------------------
 * Enforced fail-closed SHA-256 digest verification and strict Repage_SteamGrid_*.zip asset matching in the in-plugin updater, plus repository-scoped GitHub download URL validation in backend/main.lua.
