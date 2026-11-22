@@ -70,7 +70,10 @@ namespace RepageInstaller {
     internal static Stopwatch Clock = Stopwatch.StartNew();
     internal static StringBuilder LogBuf = new StringBuilder();
     internal static object LogLock = new object();
-    internal static readonly string UserAgentStr = "RepageSteamGrid-Setup/4.6";
+    internal const long MaxZipDownloadBytes = 32L * 1024L * 1024L;
+    internal const long MaxZipExtractedBytes = 64L * 1024L * 1024L;
+    internal const int MaxZipEntries = 64;
+    internal static readonly string UserAgentStr = "RepageSteamGrid-Setup/4.7";
     internal static object InstallLock = new object();
     internal static bool PickingFolder = false;
     internal static bool RestartingSteam = false;
@@ -111,7 +114,7 @@ namespace RepageInstaller {
       try { SetProcessDPIAware(); } catch {}
       try { File.WriteAllText(LogFilePath, "", Encoding.UTF8); } catch {}
       HtmlPayload = HtmlPayload.Replace("__SESSION_TOKEN__", SessionToken);
-      Log("BOOT", "Repage SteamGrid Setup v4.6 starting (OS=" + Environment.OSVersion + ", 64Bit=" + Environment.Is64BitProcess + ", Culture=" + OsLocale + ", Log=" + LogFilePath + ")");
+      Log("BOOT", "Repage SteamGrid Setup v4.7 starting (OS=" + Environment.OSVersion + ", 64Bit=" + Environment.Is64BitProcess + ", Culture=" + OsLocale + ", Log=" + LogFilePath + ")");
       AppDomain.CurrentDomain.AssemblyResolve += ResolveEmbeddedAssembly;
       try { ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072 | (SecurityProtocolType)12288 | SecurityProtocolType.Tls; }
       catch { try { ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; } catch {} }
@@ -510,6 +513,11 @@ namespace RepageInstaller {
         string wTag, wZip, wErr;
         if (TryGithubWebRedirect(out wTag, out wZip, out wErr)) {
           tag = wTag; zip = wZip; apiErr = "";
+          try {
+            string tagJson = HttpGetString("https://api.github.com/repos/" + RepoOwner + "/" + RepoName + "/releases/tags/" + Uri.EscapeDataString(wTag));
+            string tagSha = ExtractDigestForUrl(tagJson, wZip);
+            if (IsValidSha256Hex(tagSha)) ExpectedZipSha256 = tagSha;
+          } catch {}
         } else if (string.IsNullOrEmpty(apiErr)) {
           apiErr = wErr;
         }
@@ -700,28 +708,102 @@ namespace RepageInstaller {
       }
     }
 
+    static bool IsValidSha256Hex(string sha) {
+      if (string.IsNullOrEmpty(sha) || sha.Length != 64) return false;
+      for (int i = 0; i < sha.Length; i++) {
+        char c = sha[i];
+        bool ok = (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+        if (!ok) return false;
+      }
+      return true;
+    }
+
+    static bool IsReparsePoint(string path) {
+      try {
+        if (string.IsNullOrEmpty(path)) return false;
+        if (File.Exists(path) || Directory.Exists(path)) {
+          return (File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0;
+        }
+      } catch { return true; }
+      return false;
+    }
+
+    static bool IsAllowedGithubDownloadUrl(string url, bool allowAssetHost) {
+      try {
+        Uri u;
+        if (!Uri.TryCreate(url, UriKind.Absolute, out u)) return false;
+        if (!string.Equals(u.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)) return false;
+        string host = (u.Host ?? "").ToLowerInvariant();
+        if (host == "github.com") {
+          return u.AbsolutePath.StartsWith("/" + RepoOwner + "/" + RepoName + "/releases/download/", StringComparison.OrdinalIgnoreCase);
+        }
+        if (allowAssetHost && host.EndsWith(".githubusercontent.com", StringComparison.OrdinalIgnoreCase)) return true;
+      } catch {}
+      return false;
+    }
+
+    static bool IsValidElevatedPluginTarget(string dstTarget, string steamRoot, out string reason) {
+      reason = "";
+      try {
+        if (string.IsNullOrEmpty(dstTarget) || string.IsNullOrEmpty(steamRoot)) { reason = "empty_arg"; return false; }
+        string fullTarget = Path.GetFullPath(dstTarget).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        string fullSteam = Path.GetFullPath(steamRoot).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        string folderName = Path.GetFileName(fullTarget);
+        if (!string.Equals(folderName, "repage-steamgrid", StringComparison.OrdinalIgnoreCase)) { reason = "invalid_folder_name"; return false; }
+        string parentDir = Path.GetDirectoryName(fullTarget);
+        if (string.IsNullOrEmpty(parentDir) || !string.Equals(Path.GetFileName(parentDir), "plugins", StringComparison.OrdinalIgnoreCase)) { reason = "invalid_parent_dir"; return false; }
+        string grandParent = Path.GetDirectoryName(parentDir) ?? "";
+        if (string.IsNullOrEmpty(grandParent) || string.Equals(grandParent.TrimEnd(Path.DirectorySeparatorChar), Path.GetPathRoot(fullTarget).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase)) {
+          reason = "drive_root_blocked"; return false;
+        }
+        string lowTarget = fullTarget.ToLowerInvariant();
+        string winDir = (Environment.GetFolderPath(Environment.SpecialFolder.Windows) ?? "").ToLowerInvariant();
+        string progData = (Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) ?? "").ToLowerInvariant();
+        if ((!string.IsNullOrEmpty(winDir) && lowTarget.StartsWith(winDir)) || (!string.IsNullOrEmpty(progData) && lowTarget.StartsWith(progData)) || lowTarget.Contains("\\system32\\") || lowTarget.Contains("\\syswow64\\")) {
+          reason = "system_dir_blocked"; return false;
+        }
+        if (IsReparsePoint(fullSteam) || IsReparsePoint(parentDir) || IsReparsePoint(fullTarget)) { reason = "reparse_point_blocked"; return false; }
+        if (!Directory.Exists(fullSteam) || !File.Exists(Path.Combine(fullSteam, "steam.exe"))) { reason = "steam_exe_missing"; return false; }
+        string allowed1 = Path.GetFullPath(Path.Combine(fullSteam, "plugins")).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        string allowed2 = Path.GetFullPath(Path.Combine(fullSteam, "millennium", "plugins")).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        bool underSteam = string.Equals(parentDir, allowed1, StringComparison.OrdinalIgnoreCase) || string.Equals(parentDir, allowed2, StringComparison.OrdinalIgnoreCase);
+        bool hasRealCtx = Directory.Exists(parentDir) && (File.Exists(Path.Combine(grandParent, "steam.exe")) || File.Exists(Path.Combine(grandParent, "millennium.dll")) || File.Exists(Path.Combine(grandParent, "config", "config.json")));
+        if (!underSteam && !hasRealCtx) { reason = "outside_steam_plugins"; return false; }
+        return true;
+      } catch (Exception ex) {
+        reason = ex.Message;
+        return false;
+      }
+    }
+
     static int ExtractAndVerifyZipToDir(string zipPath, string expectedSha256, string destDir, out string outZipSha256) {
+      if (!IsValidSha256Hex(expectedSha256)) {
+        Log("SHA256_MISSING", "Refusing unverified ZIP extraction: official release SHA-256 digest unavailable.");
+        throw new Exception("ERR_SHA256_MISSING");
+      }
+      if (IsReparsePoint(zipPath)) throw new Exception("ERR_INVALID_ZIP");
       byte[] headBytes = new byte[4];
       using (FileStream pfs = new FileStream(zipPath, FileMode.Open, FileAccess.Read)) {
+        if (pfs.Length > MaxZipDownloadBytes) throw new Exception("ERR_DOWNLOAD_TOO_LARGE");
         if (pfs.Length < 10240 || pfs.Read(headBytes, 0, 4) < 4 || headBytes[0] != 0x50 || headBytes[1] != 0x4B || headBytes[2] != 0x03 || headBytes[3] != 0x04) {
           throw new Exception("ERR_INVALID_ZIP");
         }
       }
       outZipSha256 = ComputeFileSha256(zipPath);
-      if (!string.IsNullOrEmpty(expectedSha256)) {
-        if (!string.Equals(outZipSha256, expectedSha256, StringComparison.OrdinalIgnoreCase)) {
-          throw new Exception("ERR_SHA256_MISMATCH");
-        }
-        Log("SHA256_OK", "Verified SHA-256: " + outZipSha256);
-      } else {
-        Log("SHA256_SKIP", "No GitHub release digest; computed local SHA-256=" + outZipSha256);
+      if (!string.Equals(outZipSha256, expectedSha256, StringComparison.OrdinalIgnoreCase)) {
+        throw new Exception("ERR_SHA256_MISMATCH");
       }
+      Log("SHA256_OK", "Verified SHA-256: " + outZipSha256);
       if (Directory.Exists(destDir)) { SafeCleanDirectoryContents(destDir); try { Directory.Delete(destDir, true); } catch {} }
       Directory.CreateDirectory(destDir);
       string fullPrefix = Path.GetFullPath(destDir).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
       int extractedCount = 0;
+      int entryCount = 0;
+      long actualExtractedTotal = 0;
       using (ZipArchive za = ZipFile.OpenRead(zipPath)) {
         foreach (ZipArchiveEntry entry in za.Entries) {
+          if (++entryCount > MaxZipEntries) throw new Exception("ERR_INVALID_ZIP");
+          if (entry.Length < 0 || entry.Length > MaxZipExtractedBytes) throw new Exception("ERR_DOWNLOAD_TOO_LARGE");
           string fullName = entry.FullName.Replace('\\', '/').TrimStart('/');
           if (string.IsNullOrEmpty(fullName) || fullName.EndsWith("/")) continue;
           if (fullName.StartsWith("repage-steamgrid/", StringComparison.OrdinalIgnoreCase)) {
@@ -734,7 +816,16 @@ namespace RepageInstaller {
           }
           string destParent = Path.GetDirectoryName(destPath);
           if (!string.IsNullOrEmpty(destParent)) Directory.CreateDirectory(destParent);
-          entry.ExtractToFile(destPath, true);
+          using (Stream es = entry.Open())
+          using (FileStream outFs = new FileStream(destPath, FileMode.Create, FileAccess.Write)) {
+            byte[] xBuf = new byte[16384];
+            int xr;
+            while ((xr = es.Read(xBuf, 0, xBuf.Length)) > 0) {
+              actualExtractedTotal += xr;
+              if (actualExtractedTotal > MaxZipExtractedBytes) throw new Exception("ERR_DOWNLOAD_TOO_LARGE");
+              outFs.Write(xBuf, 0, xr);
+            }
+          }
           extractedCount++;
         }
       }
@@ -758,8 +849,10 @@ namespace RepageInstaller {
       string backupDir = "";
       Log("INSTALL", "Starting transactional install worker (cleanFirst=" + cleanFirst + ", tx=" + txId + ")");
       try {
-        if (string.IsNullOrEmpty(ZipDownloadUrl)) CheckGithubLatest();
+        if (string.IsNullOrEmpty(ZipDownloadUrl) || !IsValidSha256Hex(ExpectedZipSha256)) CheckGithubLatest();
         if (!IsOnline || string.IsNullOrEmpty(ZipDownloadUrl)) throw new Exception("Could not fetch release package URL from GitHub.");
+        if (!IsValidSha256Hex(ExpectedZipSha256)) throw new Exception("ERR_SHA256_MISSING");
+        if (!IsAllowedGithubDownloadUrl(ZipDownloadUrl, false)) throw new Exception("ERR_UNTRUSTED_TARGET");
         string basePlugins = !string.IsNullOrEmpty(PluginsDir) ? PluginsDir : Path.Combine(SteamDir, "plugins");
         if (string.IsNullOrEmpty(SteamDir) || !Directory.Exists(SteamDir)) throw new Exception("ERR_INVALID_STEAM");
 
@@ -767,22 +860,35 @@ namespace RepageInstaller {
         HttpWebRequest req = (HttpWebRequest)WebRequest.Create(ZipDownloadUrl);
         req.UserAgent = UserAgentStr;
         req.AllowAutoRedirect = true;
+        req.MaximumAutomaticRedirections = 5;
         req.Timeout = 35000;
-        using (HttpWebResponse resp = (HttpWebResponse)req.GetResponse())
-        using (Stream rs = resp.GetResponseStream())
-        using (FileStream fs = new FileStream(tmpZip, FileMode.Create, FileAccess.Write)) {
-          long total = resp.ContentLength > 0 ? resp.ContentLength : 450000;
-          byte[] buf = new byte[16384];
-          long readSum = 0;
-          int r;
-          while ((r = rs.Read(buf, 0, buf.Length)) > 0) {
-            fs.Write(buf, 0, r);
-            readSum += r;
-            DownloadedKb = readSum / 1024;
-            InstallStepCode = "downloading";
-            InstallPercent = 8 + (int)Math.Min(66, (readSum * 66) / Math.Max(1, total));
+        using (HttpWebResponse resp = (HttpWebResponse)req.GetResponse()) {
+          if (resp.ResponseUri == null || !IsAllowedGithubDownloadUrl(resp.ResponseUri.AbsoluteUri, true)) {
+            throw new Exception("ERR_UNTRUSTED_TARGET");
           }
-          Log("DOWNLOAD_OK", "Downloaded " + readSum + " bytes");
+          if (resp.ContentLength > MaxZipDownloadBytes) {
+            Log("DOWNLOAD_ERR", "ContentLength exceeds 32 MB limit: " + resp.ContentLength);
+            throw new Exception("ERR_DOWNLOAD_TOO_LARGE");
+          }
+          using (Stream rs = resp.GetResponseStream())
+          using (FileStream fs = new FileStream(tmpZip, FileMode.Create, FileAccess.Write)) {
+            long total = resp.ContentLength > 0 ? resp.ContentLength : 450000;
+            byte[] buf = new byte[16384];
+            long readSum = 0;
+            int r;
+            while ((r = rs.Read(buf, 0, buf.Length)) > 0) {
+              if (readSum + r > MaxZipDownloadBytes) {
+                Log("DOWNLOAD_ERR", "Streaming download exceeded 32 MB limit.");
+                throw new Exception("ERR_DOWNLOAD_TOO_LARGE");
+              }
+              fs.Write(buf, 0, r);
+              readSum += r;
+              DownloadedKb = readSum / 1024;
+              InstallStepCode = "downloading";
+              InstallPercent = 8 + (int)Math.Min(66, (readSum * 66) / Math.Max(1, total));
+            }
+            Log("DOWNLOAD_OK", "Downloaded " + readSum + " bytes");
+          }
         }
 
         InstallPercent = 82;
@@ -988,10 +1094,24 @@ namespace RepageInstaller {
       string elevBak = Path.Combine(Path.GetTempPath(), "Repage_ElevBak_" + elevId);
       try {
         if (string.IsNullOrEmpty(zipPath) || !File.Exists(zipPath)) return 2;
-        SteamDir = steamRoot ?? "";
-        string expectedSha = (shaArg == "none") ? "" : (shaArg ?? "");
+        string fullZip = Path.GetFullPath(zipPath);
+        string zipName = Path.GetFileName(fullZip);
+        if (IsReparsePoint(fullZip) || !zipName.StartsWith("Repage_Install_", StringComparison.OrdinalIgnoreCase) || !zipName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) {
+          Log("ELEVATED_ERR", "Rejected untrusted zipPath: " + fullZip);
+          return 2;
+        }
+        string targetReason;
+        if (!IsValidElevatedPluginTarget(dstTarget, steamRoot, out targetReason)) {
+          Log("ELEVATED_ERR", "Rejected untrusted dstTarget (" + targetReason + "): " + (dstTarget ?? ""));
+          return 2;
+        }
+        if (!IsValidSha256Hex(shaArg)) {
+          Log("ELEVATED_ERR", "Rejected missing or invalid SHA-256 argument in elevated install.");
+          return 2;
+        }
+        SteamDir = Path.GetFullPath(steamRoot).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         string unusedSha = "";
-        ExtractAndVerifyZipToDir(zipPath, expectedSha, elevStage, out unusedSha);
+        ExtractAndVerifyZipToDir(fullZip, shaArg, elevStage, out unusedSha);
         bool hadExisting = Directory.Exists(dstTarget);
         if (hadExisting && CheckDirectoryLocks(dstTarget) > 0) {
           Log("ELEVATED_PRECHECK_LOCKED", "Locked files detected before clean/copy in " + dstTarget);
@@ -1034,17 +1154,30 @@ namespace RepageInstaller {
 
     static int ExecuteElevatedUninstall(string steamRoot, string pluginsRoot) {
       try {
-        SteamDir = steamRoot ?? "";
-        PluginsDir = pluginsRoot ?? "";
-        var candidateBases = new System.Collections.Generic.List<string>();
-        if (!string.IsNullOrEmpty(PluginsDir)) candidateBases.Add(PluginsDir);
-        if (!string.IsNullOrEmpty(SteamDir)) {
-          string p1 = Path.Combine(SteamDir, "plugins");
-          string p2 = Path.Combine(SteamDir, "millennium", "plugins");
-          if (!candidateBases.Contains(p1)) candidateBases.Add(p1);
-          if (!candidateBases.Contains(p2)) candidateBases.Add(p2);
+        if (string.IsNullOrEmpty(steamRoot)) return 2;
+        string fullSteam = Path.GetFullPath(steamRoot).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        if (IsReparsePoint(fullSteam) || !Directory.Exists(fullSteam) || !File.Exists(Path.Combine(fullSteam, "steam.exe"))) {
+          Log("ELEVATED_UNINSTALL_ERR", "Rejected untrusted steamRoot: " + fullSteam);
+          return 2;
         }
+        SteamDir = fullSteam;
+        var candidateBases = new System.Collections.Generic.List<string>();
+        if (!string.IsNullOrEmpty(pluginsRoot)) {
+          string normP = Path.GetFullPath(pluginsRoot).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+          string uninstReason;
+          if (IsValidElevatedPluginTarget(Path.Combine(normP, "repage-steamgrid"), SteamDir, out uninstReason)) {
+            candidateBases.Add(normP);
+          } else {
+            Log("ELEVATED_UNINSTALL_ERR", "Rejected untrusted pluginsRoot (" + uninstReason + "): " + normP);
+          }
+        }
+        string p1 = Path.GetFullPath(Path.Combine(SteamDir, "plugins")).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        string p2 = Path.GetFullPath(Path.Combine(SteamDir, "millennium", "plugins")).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        if (!candidateBases.Contains(p1)) candidateBases.Add(p1);
+        if (!candidateBases.Contains(p2)) candidateBases.Add(p2);
+        PluginsDir = candidateBases.Count > 0 ? candidateBases[0] : p2;
         foreach (string bDir in candidateBases) {
+          if (IsReparsePoint(bDir) || IsReparsePoint(Path.Combine(bDir, "repage-steamgrid"))) continue;
           if (string.IsNullOrEmpty(bDir)) continue;
           string target = Path.Combine(bDir, "repage-steamgrid");
           if (Directory.Exists(target) && CheckDirectoryLocks(target) > 0) {

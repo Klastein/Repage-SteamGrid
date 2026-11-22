@@ -755,12 +755,58 @@ function applyThemeAndLayoutPresets() {
   document.body.setAttribute("data-layout", STUDIO.layoutPreset || "classicLeft");
   document.body.setAttribute("data-icons", STUDIO.iconStyle || "minimalWhite");
 }
+(function injectExtraErrorStrings() {
+  const extra = {
+    "pt-BR": {
+      errInstallFailed: "Falha ao copiar os arquivos do plugin. Verifique as permissões ou consulte o log em %TEMP%\\Repage_SteamGrid_Setup.log.",
+      errSha256Missing: "Não foi possível obter o hash SHA-256 oficial na API do GitHub. Por segurança, a instalação foi bloqueada. Tente novamente em instantes ou instale manualmente pelo GitHub.",
+      errDownloadTooLarge: "O arquivo excedeu o limite máximo de segurança (32 MB) e o download foi interrompido.",
+      errUntrustedTarget: "Caminho de origem ou destino inválido bloqueado pela validação de segurança."
+    },
+    "en": {
+      errInstallFailed: "Failed while copying plugin files. Check permissions or inspect the log at %TEMP%\\Repage_SteamGrid_Setup.log.",
+      errSha256Missing: "Could not retrieve the official SHA-256 digest from the GitHub API. Installation was blocked for security. Please try again shortly or install manually from GitHub.",
+      errDownloadTooLarge: "The package exceeded the 32 MB security size cap and was aborted.",
+      errUntrustedTarget: "Untrusted source URL or target directory blocked by security validation."
+    },
+    "es": {
+      errInstallFailed: "Error al copiar los archivos del plugin. Revisa los permisos o consulta %TEMP%\\Repage_SteamGrid_Setup.log.",
+      errSha256Missing: "No se pudo obtener el hash SHA-256 oficial desde la API de GitHub. Por seguridad, se bloqueó la instalación. Inténtalo de nuevo en un momento o instala manualmente desde GitHub.",
+      errDownloadTooLarge: "El paquete superó el límite de seguridad de 32 MB y la descarga fue cancelada.",
+      errUntrustedTarget: "URL de origen o carpeta de destino inválida bloqueada por la validación de seguridad."
+    },
+    "ja": {
+      errSha256Missing: "GitHub APIから公式SHA-256ダイジェストを取得できなかったため、安全のためインストールを中止しました。しばらくして再試行するか、GitHubから手動でインストールしてください。",
+      errDownloadTooLarge: "パッケージがセキュリティ上限（32 MB）を超えたため、ダウンロードを中止しました。",
+      errUntrustedTarget: "信頼されていないURLまたはインストール先パスがセキュリティ検証によってブロックされました。"
+    },
+    "ko": {
+      errSha256Missing: "GitHub API에서 공식 SHA-256 해시를 가져오지 못해 보안을 위해 설치를 차단했습니다. 잠시 후 다시 시도하거나 GitHub에서 수동 설치해 주세요.",
+      errDownloadTooLarge: "패키지가 보안 최대 용량(32 MB)을 초과하여 다운로드를 중단했습니다.",
+      errUntrustedTarget: "신뢰할 수 없는 URL 또는 대상 경로가 보안 검증에 의해 차단되었습니다."
+    },
+    "ru": {
+      errSha256Missing: "Не удалось получить официальный SHA-256 хеш из GitHub API. В целях безопасности установка заблокирована. Повторите попытку позже или установите вручную с GitHub.",
+      errDownloadTooLarge: "Размер файла превысил лимит безопасности (32 МБ), загрузка прервана.",
+      errUntrustedTarget: "Недоверенный URL или путь назначения заблокирован проверкой безопасности."
+    },
+    "fr": {
+      errSha256Missing: "Impossible de récupérer l’empreinte SHA-256 officielle depuis l’API GitHub. L’installation a été bloquée par sécurité. Réessayez dans un instant ou installez manuellement depuis GitHub.",
+      errDownloadTooLarge: "Le fichier a dépassé la limite de sécurité de 32 Mo et le téléchargement a été interrompu.",
+      errUntrustedTarget: "URL source ou dossier cible non fiable bloqué par la validation de sécurité."
+    }
+  };
+  for (const [k, v] of Object.entries(extra)) { if (typeof EXTRA_I18N !== "undefined" && EXTRA_I18N[k]) Object.assign(EXTRA_I18N[k], v); }
+})();
 function formatServerError(raw) {
   const s = String(raw || "");
   if (s.includes("ERR_UNINSTALL_LOCKED")) return t("errUninstallLocked");
   if (s.includes("ERR_ELEVATION_CANCELLED")) return t("errUacCancelled");
   if (s.includes("ERR_INVALID_ZIP")) return t("errInvalidZip");
+  if (s.includes("ERR_SHA256_MISSING")) return t("errSha256Missing");
   if (s.includes("ERR_SHA256_MISMATCH")) return t("errSha256");
+  if (s.includes("ERR_DOWNLOAD_TOO_LARGE")) return t("errDownloadTooLarge");
+  if (s.includes("ERR_UNTRUSTED_TARGET")) return t("errUntrustedTarget");
   if (s.includes("ERR_INSTALL_LOCKED")) return t("errInstallLocked");
   if (s.includes("ERR_INSTALL_FAILED")) return t("errInstallFailed");
   if (s.includes("ERR_UNINSTALL_FAILED")) return t("errUninstallFailed");
