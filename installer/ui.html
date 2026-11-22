@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Repage SteamGrid Setup</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<style>
+:root{--bg:7,7,12;--pt:18,16,28;--pb:9,8,15;--ac:#5E4B86;--ach:#8B74B8;--ac-rgb:94,75,134;--ach-rgb:139,116,184;--ok:#6de3ab;--warn:#f5c75e;--err:#ff8e9e;--txt:#f2effa;--mut:#a79ec0}
+*{box-sizing:border-box;user-select:none;-webkit-user-drag:none}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:rgb(var(--bg));color:var(--txt);font-family:"Segoe UI Variable Display","Segoe UI","Yu Gothic UI","Malgun Gothic",system-ui,sans-serif}
+@keyframes amb{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.76;transform:scale(1.04) translate3d(1%,1.5%,0)}}
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes shm{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.stage{position:relative;width:100vw;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:18px 24px 20px;isolation:isolate}
+.stage::before{content:"";position:absolute;inset:-18%;z-index:0;pointer-events:none;background:radial-gradient(ellipse 62% 52% at 50% 0%,rgba(94,75,134,.36),transparent 72%),radial-gradient(ellipse 52% 58% at 0% 48%,rgba(143,102,181,.25),transparent 72%),radial-gradient(ellipse 56% 54% at 96% 100%,rgba(201,150,186,.2),transparent 72%);filter:blur(34px);animation:amb 11s ease-in-out infinite}
+.stage::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='112' viewBox='0 0 112 112'%3E%3Cg fill='none'%3E%3Cpath d='M18 14l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z' fill='%23b9c0f0' fill-opacity='.11'/%3E%3Cg fill='%239299cc' fill-opacity='.095'%3E%3Cellipse cx='76' cy='35' rx='4.4' ry='3.5'/%3E%3Ccircle cx='71.2' cy='29.2' r='1.7'/%3E%3Ccircle cx='76' cy='27.4' r='1.8'/%3E%3Ccircle cx='80.8' cy='29.2' r='1.7'/%3E%3C/g%3E%3Cg stroke='%23b9c0f0' stroke-opacity='.095' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 76h10v5.5a4.5 4.5 0 0 1-4.5 4.5h-1A4.5 4.5 0 0 1 22 81.5z'/%3E%3Cpath d='M32 77.5h2a2.2 2.2 0 0 1 0 4.4h-2'/%3E%3Cpath d='M25 73c0-1.4 1.2-1.8 1.2-3M28.8 73c0-1.4 1.2-1.8 1.2-3'/%3E%3C/g%3E%3Ccircle cx='88' cy='88' r='1.2' fill='%23d6a5c4' fill-opacity='.095'/%3E%3C/g%3E%3C/svg%3E") 0 0/112px 112px repeat,repeating-linear-gradient(135deg,rgba(146,153,204,.02) 0 1px,transparent 1px 16px),linear-gradient(155deg,rgba(var(--pt),.42),rgba(var(--pb),.36))}
+.stage>*{position:relative;z-index:2}
+.top-bar{position:relative;z-index:50!important;display:flex;align-items:center;justify-content:space-between;gap:12px;transform-origin:left center}
+.brand-lockup{display:inline-flex;align-items:center;gap:10px}
+.brand-logo{width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.65)) drop-shadow(0 0 6px rgba(var(--ac-rgb),.45))}
+.brand-words{display:flex;flex-direction:column;gap:2px;line-height:1}
+.brand-words b{font-size:16px;font-weight:850;letter-spacing:1.5px;color:#f6f3ff}
+.brand-words span{font-size:9px;font-weight:750;letter-spacing:1.6px;color:var(--ach)}
+.top-tools{display:flex;align-items:center;gap:7px}
+.pill-badge{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 11px;border-radius:999px;background:rgba(var(--ac-rgb),.18);border:1px solid rgba(var(--ach-rgb),.38);color:#e2daf8;font-size:11px;font-weight:700}
+.icon-btn{height:28px;padding:0 10px;border-radius:999px;border:1px solid rgba(180,165,220,.25);background:rgba(18,16,28,.75);color:#d7cef0;font-family:inherit;font-size:11.5px;font-weight:650;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:.16s;outline:none}
+.icon-btn:hover{border-color:var(--ach);background:rgba(var(--ac-rgb),.28);color:#fff}
+.icon-btn:active{transform:scale(.95)}
+.dd-wrap{position:relative;display:inline-flex}
+.dd-btn{height:28px;padding:0 9px 0 8px;border-radius:999px;border:1px solid rgba(180,165,220,.28);background:rgba(18,16,28,.82);color:#e4dcf8;font-family:inherit;font-size:11.5px;font-weight:650;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.16s;outline:none}
+.dd-btn:hover,.dd-wrap.is-open .dd-btn{border-color:var(--ach);background:rgba(var(--ac-rgb),.32);color:#fff;box-shadow:0 0 12px rgba(var(--ach-rgb),.24)}
+.dd-chev{width:12px;height:12px;color:#b2a6cf;transition:transform .18s}
+.dd-wrap.is-open .dd-chev{transform:rotate(180deg);color:#fff}
+.dd-flag{display:inline-flex;align-items:center;justify-content:center;border-radius:3px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.16);line-height:0;flex:0 0 auto}
+@keyframes ddPop{from{opacity:0;transform:translateY(-5px) scale(.97)}to{opacity:1;transform:none}}
+.dd-menu{display:none;position:absolute;top:calc(100% + 7px);right:0;min-width:215px;padding:6px;border-radius:14px;background:linear-gradient(160deg,rgba(22,19,35,.98),rgba(10,9,17,.99));border:1px solid rgba(155,134,201,.44);box-shadow:0 18px 46px rgba(0,0,0,.72),0 0 0 1px rgba(var(--ac-rgb),.18);z-index:9999;flex-direction:column;gap:2px;animation:ddPop .14s ease-out}
+.dd-wrap.is-open .dd-menu{display:flex}
+.dd-opt{display:flex;align-items:center;gap:9px;width:100%;padding:7px 9px;border:0;border-radius:9px;background:transparent;color:#d6cef0;font-family:inherit;font-size:12px;font-weight:550;text-align:left;cursor:pointer;transition:.13s}
+.dd-opt:hover{background:rgba(var(--ach-rgb),.22);color:#fff}
+.dd-opt.is-sel{background:rgba(var(--ac-rgb),.26);color:#e4d9ff;font-weight:750}
+.dd-code{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:18px;padding:0 5px;border-radius:6px;background:rgba(255,255,255,.07);color:#a79ec0;font-family:"Cascadia Code",Consolas,monospace;font-size:9.5px;font-weight:700;letter-spacing:.4px}
+.dd-opt.is-sel .dd-code{background:rgba(var(--ach-rgb),.3);color:#efeaff}
+.dd-lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-chk{color:var(--ach);font-weight:800;font-size:12px;margin-left:auto}
+.ui-ic{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;line-height:0;color:#f6f3ff}
+.ui-ic svg{display:block}
+@keyframes icSpin{to{transform:rotate(360deg)}}
+.ui-ic-spin svg{animation:icSpin 1.15s linear infinite}
+.boot-splash{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:radial-gradient(ellipse 65% 55% at 50% 30%,rgba(94,75,134,.22),transparent 72%),rgb(var(--bg));transition:opacity .38s cubic-bezier(.22,1,.36,1),transform .38s cubic-bezier(.22,1,.36,1)}
+.boot-splash.is-hidden{opacity:0;transform:scale(1.03);pointer-events:none}
+.boot-ring{position:relative;width:112px;height:112px;display:grid;place-items:center}
+.boot-ring svg{position:absolute;inset:0;width:100%;height:100%}
+.boot-orb{animation:icSpin 1.85s cubic-bezier(.5,.08,.42,.95) infinite;transform-origin:50% 50%}
+.boot-logo{width:62px;height:62px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,.6)) drop-shadow(0 0 8px rgba(var(--ach-rgb),.4));animation:flt 2.6s ease-in-out infinite}
+.boot-title{font-size:15px;font-weight:800;letter-spacing:1.4px;color:#f4f0ff}
+.boot-sub{font-size:12px;font-weight:600;color:#b2a6cf;letter-spacing:.3px}
+body[data-theme="midnightOled"]{--bg:2,2,4;--pt:10,9,16;--pb:3,3,6}
+body[data-theme="midnightOled"] .stage::before{background:radial-gradient(ellipse 58% 48% at 50% 0%,rgba(94,75,134,.2),transparent 72%),radial-gradient(ellipse 46% 52% at 0% 50%,rgba(120,86,162,.12),transparent 72%),radial-gradient(ellipse 50% 48% at 96% 100%,rgba(145,105,155,.09),transparent 72%)}
+body[data-theme="midnightOled"] .stage::after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='112' viewBox='0 0 112 112'%3E%3Cg fill='none'%3E%3Cpath d='M18 14l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z' fill='%23b9c0f0' fill-opacity='.055'/%3E%3Cg fill='%239299cc' fill-opacity='.05'%3E%3Cellipse cx='76' cy='35' rx='4.4' ry='3.5'/%3E%3Ccircle cx='71.2' cy='29.2' r='1.7'/%3E%3Ccircle cx='76' cy='27.4' r='1.8'/%3E%3Ccircle cx='80.8' cy='29.2' r='1.7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") 0 0/112px 112px repeat,linear-gradient(155deg,rgba(8,7,14,.62),rgba(2,2,5,.72))}
+body[data-theme="midnightOled"] .info-card{background:linear-gradient(155deg,rgba(13,12,20,.9),rgba(5,5,9,.94));border-color:rgba(139,116,184,.26)}
+body[data-theme="velvetNoir"]{--bg:4,4,7;--pt:13,12,19;--pb:6,5,10}
+body[data-theme="velvetNoir"] .stage::before{background:radial-gradient(ellipse 68% 45% at 50% -6%,rgba(94,75,134,.22),transparent 74%)}
+body[data-theme="velvetNoir"] .stage::after{background:linear-gradient(160deg,rgba(12,11,18,.58),rgba(4,4,8,.76))}
+body[data-theme="velvetNoir"] .info-card{background:linear-gradient(160deg,rgba(16,15,24,.9),rgba(8,8,13,.94));border-color:rgba(155,140,196,.22);box-shadow:0 16px 40px rgba(0,0,0,.62)}
+body[data-theme="velvetNoir"] .mascot-halo{opacity:.45}
+body[data-layout="mirroredRight"] .hero-body{grid-template-columns:minmax(0,1fr) 244px}
+body[data-layout="mirroredRight"] .mascot-stage{order:2;width:244px}
+body[data-layout="mirroredRight"] .info-card{order:1}
+body[data-layout="centeredHero"] .hero-body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin:2px 0}
+body[data-layout="centeredHero"] .mascot-stage{width:170px;height:142px}
+body[data-layout="centeredHero"] .mascot-halo{width:136px;height:136px}
+body[data-layout="centeredHero"] .mascot-img{max-width:162px;max-height:138px}
+body[data-layout="centeredHero"] .info-card{width:100%;max-width:640px;padding:15px 19px;gap:8px}
+body[data-layout="centeredHero"] .state-title{font-size:18px}
+.hero-body{flex:1;display:grid;grid-template-columns:235px minmax(0,1fr);align-items:center;gap:22px;min-height:0;margin:8px 0}
+.mascot-stage{position:relative;width:235px;height:265px;display:flex;align-items:center;justify-content:center;transform-origin:center center;transition:transform .34s cubic-bezier(.22,1,.36,1)}
+body.is-dragging .mascot-stage{transition:none}
+.mascot-halo{position:absolute;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,rgba(var(--ach-rgb),.24) 0%,rgba(var(--ac-rgb),.06) 58%,transparent 74%);pointer-events:none}
+.mascot-float{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;animation:flt 3.4s ease-in-out infinite}
+.mascot-img{position:absolute;max-width:225px;max-height:250px;width:auto;height:auto;object-fit:contain;pointer-events:none;filter:drop-shadow(0 8px 18px rgba(0,0,0,.62)) drop-shadow(0 0 8px rgba(var(--ac-rgb),.28));opacity:0;transform:translateY(10px) scale(.94);transition:opacity .42s cubic-bezier(.22,1,.36,1),transform .42s cubic-bezier(.22,1,.36,1)}
+.mascot-img.is-active{opacity:1;transform:none}
+.info-card{display:flex;flex-direction:column;gap:11px;padding:19px 21px;border-radius:18px;background:linear-gradient(155deg,rgba(24,21,38,.78),rgba(11,10,18,.84));border:1.5px solid rgba(139,116,184,.38);box-shadow:0 18px 44px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(20px) saturate(135%);transform-origin:center center}
+.state-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--ach)}
+.state-title{margin:0;font-size:19.5px;font-weight:800;color:#f7f4ff;line-height:1.22}
+.state-desc{margin:0;font-size:12.5px;line-height:1.5;color:var(--mut)}
+.path-box{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:12px;background:rgba(6,5,11,.62);border:1px solid rgba(139,116,184,.24)}
+.path-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.path-label{font-size:10px;font-weight:700;color:#9c92b8;text-transform:uppercase;letter-spacing:.6px}
+.status-chip{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:999px;font-size:10.5px;font-weight:750}
+.status-chip.ok{background:rgba(109,227,171,.14);border:1px solid rgba(109,227,171,.42);color:var(--ok)}
+.status-chip.warn{background:rgba(245,199,94,.14);border:1px solid rgba(245,199,94,.42);color:var(--warn)}
+.status-chip.err{background:rgba(255,142,158,.14);border:1px solid rgba(255,142,158,.42);color:var(--err)}
+.path-val-row{display:flex;align-items:center;gap:8px}
+.path-val{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:"Cascadia Code",Consolas,monospace;font-size:11.5px;color:#ddd6f3}
+.prog-wrap{display:none;flex-direction:column;gap:6px;margin-top:2px}
+.prog-wrap.is-visible{display:flex}
+.prog-head{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;font-weight:650;color:#d5ccf0}
+.prog-track{width:100%;height:9px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.08);border:1px solid rgba(139,116,184,.25)}
+.prog-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,#5E4B86 0%,#9B82CF 50%,#D6A5C4 100%);background-size:200% 100%;animation:shm 2.2s linear infinite;box-shadow:0 0 12px rgba(139,116,184,.65);transition:width .22s ease}
+.bottom-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:8px;border-top:1px solid rgba(139,116,184,.18);transform-origin:center bottom}
+.ver-meta{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--mut)}
+.ver-meta strong{color:#eae4fc;font-size:12.5px}
+.btn-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.btn{height:38px;padding:0 16px;border-radius:11px;border:1px solid rgba(155,134,201,.34);background:linear-gradient(160deg,rgba(35,29,54,.85),rgba(20,17,32,.9));color:#ece6ff;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);transition:.16s}
+.btn:hover:not(:disabled){border-color:var(--ach);background:linear-gradient(160deg,rgba(52,43,80,.92),rgba(28,23,44,.95));box-shadow:0 0 16px rgba(var(--ach-rgb),.22);transform:translateY(-1px)}
+.btn:active:not(:disabled){transform:scale(.96)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{border-color:rgba(196,178,240,.65);background:linear-gradient(145deg,#6E589C 0%,#4F3D75 100%);color:#fff;box-shadow:0 6px 20px rgba(94,75,134,.45),inset 0 1px 0 rgba(255,255,255,.22)}
+.btn.primary:hover:not(:disabled){border-color:#d4c6fa;background:linear-gradient(145deg,#8269B5 0%,#5E4B86 100%);box-shadow:0 8px 26px rgba(139,116,184,.6)}
+.btn.success-btn{border-color:rgba(109,227,171,.6);background:linear-gradient(145deg,rgba(42,118,84,.9),rgba(24,76,54,.95));color:#eafff4}
+.btn.danger-btn{border-color:rgba(255,130,150,.55);background:linear-gradient(145deg,rgba(128,36,54,.86),rgba(78,20,34,.94));color:#ffeaf0}
+.btn.danger-btn:hover:not(:disabled){border-color:#ffa8b8;background:linear-gradient(145deg,rgba(160,44,68,.94),rgba(98,25,42,.98));box-shadow:0 0 18px rgba(255,110,138,.32)}
+.confirm-backdrop{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(4,4,9,.72);backdrop-filter:blur(8px)}
+.confirm-backdrop.is-open{display:flex;animation:ddPop .16s ease-out}
+.confirm-box{width:min(440px,100%);padding:20px 22px;border-radius:16px;background:linear-gradient(160deg,rgba(24,20,38,.98),rgba(11,10,18,.99));border:1.5px solid rgba(155,134,201,.48);box-shadow:0 22px 54px rgba(0,0,0,.78);display:flex;flex-direction:column;gap:12px}
+.confirm-head{display:flex;align-items:center;gap:9px;font-size:15.5px;font-weight:800;color:#fff}
+.confirm-body{margin:0;font-size:12.5px;line-height:1.52;color:#c2b8dc}
+.confirm-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:4px}
+.devlog-backdrop{position:fixed;inset:0;z-index:100000;display:none;flex-direction:column;padding:16px 20px;background:rgba(6,5,12,.96);backdrop-filter:blur(12px)}
+.devlog-backdrop.is-open{display:flex;animation:ddPop .14s ease-out}
+.devlog-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:10px;border-bottom:1px solid rgba(155,134,201,.3)}
+.devlog-title{font-size:12.5px;font-weight:800;letter-spacing:.8px;color:#d6c8ff;text-transform:uppercase}
+.devlog-box{flex:1;margin:10px 0 0;padding:12px;border-radius:10px;background:#05040a;border:1px solid rgba(139,116,184,.32);color:#9ef0c8;font-family:"Cascadia Code",Consolas,monospace;font-size:11.5px;line-height:1.45;overflow:auto;white-space:pre-wrap;user-select:text}
+body.is-edit-mode [data-drag-key]{outline:1.5px dashed rgba(196,178,240,.55);outline-offset:4px;cursor:grab!important}
+body.is-edit-mode [data-drag-key].is-selected-drag{outline:2px solid #d4c6fa;box-shadow:0 0 18px rgba(139,116,184,.35)}
+</style>
+</head>
+<body>
+<div class="boot-splash" id="bootSplash">
+  <div class="boot-ring">
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="2.6"/></svg>
+    <svg class="boot-orb" viewBox="0 0 100 100">
+      <path d="M10.45 69.29A42.4 42.4 0 0 1 44.64 6.33A46.2 46.2 0 0 0 10.45 69.29Z" fill="#5E4B86" fill-opacity=".35"/>
+      <path d="M15.33 22.91A33.5 33.5 0 0 1 42.74 6.6A66 66 0 0 0 15.33 22.91Z" fill="#8B74B8" fill-opacity=".95"/>
+      <path d="M50 1.4l1.35 3.25L54.6 6l-3.25 1.35L50 10.6l-1.35-3.25L45.4 6l3.25-1.35z" fill="#d8ccf8"/>
+    </svg>
+    <img id="bootLogoImg" class="boot-logo" alt="" style="display:none" />
+  </div>
+  <div class="boot-title">REPAGE STEAMGRID</div>
+  <div class="boot-sub" id="bootSub">Preparing installer...</div>
+</div>
+<div class="stage" id="appStage">
+  <header class="top-bar" id="elHeader" data-drag-key="header">
+    <div class="brand-lockup">
+      <img id="brandLogo" class="brand-logo" alt="" style="display:none" />
+      <div class="brand-words"><b>REPAGE</b><span>STEAMGRID</span></div>
+    </div>
+    <div class="top-tools">
+      <span class="pill-badge" id="pillRelease">✦ Fluxuos Setup</span>
+      <div class="dd-wrap" id="langDd">
+        <button type="button" class="dd-btn" id="langBtn" onclick="toggleLangMenu(event)">
+          <span class="dd-flag" id="langBtnFlag"></span>
+          <span id="langBtnTxt">Auto</span>
+          <svg class="dd-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dd-menu" id="langMenu" role="listbox"></div>
+      </div>
+      <button type="button" class="icon-btn" id="btnSound" onclick="toggleMute()">🔊</button>
+    </div>
+  </header>
+  <div class="hero-body">
+    <div class="mascot-stage" id="elMascotStage" data-drag-key="pose">
+      <div class="mascot-halo"></div>
+      <div class="mascot-float" id="mascotHolder">
+        <img id="pose_welcome" class="mascot-img is-active" alt="" />
+        <img id="pose_no_millennium" class="mascot-img" alt="" />
+        <img id="pose_installing" class="mascot-img" alt="" />
+        <img id="pose_success" class="mascot-img" alt="" />
+        <img id="pose_offline" class="mascot-img" alt="" />
+        <img id="pose_uninstall" class="mascot-img" alt="" />
+        <img id="pose_error" class="mascot-img" alt="" />
+      </div>
+    </div>
+    <section class="info-card" id="elCard" data-drag-key="card">
+      <span class="state-eyebrow" id="uiEyebrow">✦</span>
+      <h1 class="state-title" id="uiTitle">...</h1>
+      <p class="state-desc" id="uiDesc">...</p>
+      <div class="path-box" id="uiPathBox">
+        <div class="path-row">
+          <span class="path-label" id="uiPathLabel">Steam & Millennium</span>
+          <span class="status-chip ok" id="uiMillChip">...</span>
+        </div>
+        <div class="path-val-row">
+          <span class="path-val" id="uiSteamPath">...</span>
+          <button type="button" class="icon-btn" id="btnResetFolder" onclick="resetFolderAuto()" style="display:none">Auto</button>
+          <button type="button" class="icon-btn" id="btnPickFolder" onclick="pickFolder()">📁</button>
+        </div>
+      </div>
+      <div class="prog-wrap" id="uiProgWrap">
+        <div class="prog-head"><span id="uiProgStep">...</span><strong id="uiProgPct">0%</strong></div>
+        <div class="prog-track"><div class="prog-fill" id="uiProgFill"></div></div>
+      </div>
+    </section>
+  </div>
+  <div class="confirm-backdrop" id="steamConfirmModal">
+    <div class="confirm-box">
+      <div class="confirm-head" id="cmTitle"></div>
+      <p class="confirm-body" id="cmBody"></p>
+      <div class="confirm-actions" id="cmActions"></div>
+    </div>
+  </div>
+
+  <footer class="bottom-bar" id="elActions" data-drag-key="actions">
+    <div class="ver-meta">
+      <strong id="uiVerMain">Repage SteamGrid</strong>
+      <span id="uiVerSub">...</span>
+    </div>
+    <div class="btn-row" id="uiBtnRow"></div>
+  </footer>
+</div>
+<script>
+const STUDIO = /* __STUDIO_CONFIG__ */;
+const SESSION_TOKEN = "__SESSION_TOKEN__";
+function apiFetch(url, opts) {
+  const o = opts ? { ...opts } : {};
+  o.headers = { ...(o.headers || {}), "X-Repage-Token": SESSION_TOKEN };
+  return fetch(url, o);
+}
+const I18N = {
+  "pt-BR": {
+    soundOn: "🔊 Som", soundOff: "🔇 Mudo",
+    pathLabel: "Pasta da Steam & Millennium", folderBtn: "📁 Pasta...",
+    checking: "Verificando...", detectingPath: "Detectando automaticamente...", steamMissing: "Pasta da Steam não encontrada",
+    millOk: "✓ Millennium Detectado", millWarn: "⚠ Millennium Ausente",
+    verSubInstalled: "Instalado atualmente: v{v}", verSubClean: "Pronto para instalação limpa", verSubConnecting: "Conectando ao GitHub Releases...",
+    chkEyebrow: "✦ INSTALADOR AUTOMÁTICO", chkTitle: "Verificando ambiente...", chkDesc: "Procurando sua instalação da Steam, o framework Millennium e a versão mais recente do Repage SteamGrid no GitHub.",
+    welEyebrowNew: "✦ PRONTO PARA INSTALAR", welEyebrowUpd: "✦ ATUALIZAÇÃO DISPONÍVEL",
+    welTitleNew: "Bem-vindo ao Repage SteamGrid!", welTitleUpd: "Atualizar para Repage SteamGrid v{v}",
+    welDesc: "Tudo prontinho! A pasta da Steam e o Millennium foram confirmados. Clique abaixo para baixar a versão mais recente do GitHub e instalar automaticamente.",
+    btnRefresh: "🔄 Atualizar", btnInstall: "✦ Instalar Agora", btnUpdate: "✦ Atualizar Agora",
+    noMillEyebrow: "✦ PRÉ-REQUISITO NECESSÁRIO", noMillTitle: "Instale o Millennium para continuar",
+    noMillDesc: "Encontramos a sua pasta da Steam, mas o Millennium ainda não está instalado nela. Baixe o Millennium no site oficial e clique em Verificar Novamente.",
+    btnGetMill: "🌐 Baixar Millennium", btnRecheck: "🔄 Verificar Novamente",
+    insEyebrow: "✦ CONFIGURANDO SEU REPAGE", insTitle: "Baixando e instalando arquivos...",
+    insDesc: "O Fluxuos está preparando a cafeteria e instalando a versão mais recente direto na pasta de plugins do seu Millennium.",
+    stepConnect: "Conectando ao GitHub Releases...", stepDownload: "Baixando Repage SteamGrid v{v} ({kb} KB)...",
+    stepExtract: "Extraindo em Steam/plugins/repage-steamgrid...", stepDone: "Instalação concluída!", btnInstalling: "⏳ Instalando...",
+    sucEyebrow: "✦ INSTALAÇÃO CONCLUÍDA", sucTitle: "Repage SteamGrid instalado com sucesso!",
+    sucDesc: "Todos os arquivos foram instalados em 'Steam/plugins/repage-steamgrid'. Reinicie a sua Steam para carregar o Repage!",
+    btnOpenFolder: "📂 Abrir Pasta", btnRestartSteam: "🚀 Reiniciar Steam", btnFinish: "✓ Concluir",
+    offEyebrow: "✦ SEM CONEXÃO COM A INTERNET", offTitle: "Não foi possível conectar ao GitHub",
+    offDesc: "O Fluxuos não conseguiu buscar a versão mais recente no GitHub Releases. Verifique sua conexão e tente novamente.",
+    btnRetry: "🔄 Tentar Novamente",
+    errEyebrow: "✦ OPS, ALGO DEU ERRADO", errTitle: "A instalação não pôde ser concluída",
+    errDesc: "Ocorreu um erro ao gravar os arquivos na pasta da Steam. Verifique permissões ou escolha outra pasta.",
+    btnChangeFolder: "📁 Trocar Pasta"
+  },
+  "en": {
+    soundOn: "🔊 Sound", soundOff: "🔇 Mute",
+    pathLabel: "Steam & Millennium Folder", folderBtn: "📁 Browse...",
+    checking: "Checking...", detectingPath: "Detecting automatically...", steamMissing: "Steam folder not found",
+    millOk: "✓ Millennium Detected", millWarn: "⚠ Millennium Missing",
+    verSubInstalled: "Currently installed: v{v}", verSubClean: "Ready for clean installation", verSubConnecting: "Connecting to GitHub Releases...",
+    chkEyebrow: "✦ AUTOMATIC INSTALLER", chkTitle: "Checking environment...", chkDesc: "Looking for your Steam installation, Millennium framework, and the latest Repage SteamGrid release on GitHub.",
+    welEyebrowNew: "✦ READY TO INSTALL", welEyebrowUpd: "✦ UPDATE AVAILABLE",
+    welTitleNew: "Welcome to Repage SteamGrid!", welTitleUpd: "Update to Repage SteamGrid v{v}",
+    welDesc: "Everything is ready! Your Steam folder and Millennium were confirmed. Click below to download the latest release from GitHub and install it automatically.",
+    btnRefresh: "🔄 Refresh", btnInstall: "✦ Install Now", btnUpdate: "✦ Update Now",
+    noMillEyebrow: "✦ PREREQUISITE REQUIRED", noMillTitle: "Install Millennium to continue",
+    noMillDesc: "We found your Steam folder, but Millennium is not installed yet. Download Millennium from the official site and click Check Again.",
+    btnGetMill: "🌐 Get Millennium", btnRecheck: "🔄 Check Again",
+    insEyebrow: "✦ SETTING UP REPAGE", insTitle: "Downloading and installing files...",
+    insDesc: "Fluxuos is warming up the café and installing the latest version straight into your Millennium plugins folder.",
+    stepConnect: "Connecting to GitHub Releases...", stepDownload: "Downloading Repage SteamGrid v{v} ({kb} KB)...",
+    stepExtract: "Extracting to Steam/plugins/repage-steamgrid...", stepDone: "Installation complete!", btnInstalling: "⏳ Installing...",
+    sucEyebrow: "✦ INSTALLATION COMPLETE", sucTitle: "Repage SteamGrid installed successfully!",
+    sucDesc: "All files were installed into 'Steam/plugins/repage-steamgrid'. Restart Steam to load Repage!",
+    btnOpenFolder: "📂 Open Folder", btnRestartSteam: "🚀 Restart Steam", btnFinish: "✓ Finish",
+    offEyebrow: "✦ NO INTERNET CONNECTION", offTitle: "Could not connect to GitHub",
+    offDesc: "Fluxuos could not fetch the latest release from GitHub Releases. Please check your connection and try again.",
+    btnRetry: "🔄 Try Again",
+    errEyebrow: "✦ OOPS, SOMETHING WENT WRONG", errTitle: "Installation could not be completed",
+    errDesc: "An error occurred while writing files to the Steam folder. Check permissions or choose another folder.",
+    btnChangeFolder: "📁 Change Folder"
+  },
+  "es": {
+    soundOn: "🔊 Sonido", soundOff: "🔇 Silencio",
+    pathLabel: "Carpeta de Steam y Millennium", folderBtn: "📁 Carpeta...",
+    checking: "Comprobando...", detectingPath: "Detectando automáticamente...", steamMissing: "Carpeta de Steam no encontrada",
+    millOk: "✓ Millennium Detectado", millWarn: "⚠ Millennium Ausente",
+    verSubInstalled: "Instalado actualmente: v{v}", verSubClean: "Listo para instalación limpia", verSubConnecting: "Conectando con GitHub Releases...",
+    chkEyebrow: "✦ INSTALADOR AUTOMÁTICO", chkTitle: "Comprobando entorno...", chkDesc: "Buscando tu instalación de Steam, Millennium y la versión más reciente de Repage SteamGrid en GitHub.",
+    welEyebrowNew: "✦ LISTO PARA INSTALAR", welEyebrowUpd: "✦ ACTUALIZACIÓN DISPONIBLE",
+    welTitleNew: "¡Bienvenido a Repage SteamGrid!", welTitleUpd: "Actualizar a Repage SteamGrid v{v}",
+    welDesc: "¡Todo listo! Se confirmaron tu carpeta de Steam y Millennium. Haz clic abajo para descargar la última versión de GitHub e instalarla automáticamente.",
+    btnRefresh: "🔄 Actualizar", btnInstall: "✦ Instalar Ahora", btnUpdate: "✦ Actualizar Ahora",
+    noMillEyebrow: "✦ REQUISITO NECESARIO", noMillTitle: "Instala Millennium para continuar",
+    noMillDesc: "Encontramos tu carpeta de Steam, pero Millennium aún no está instalado. Descárgalo del sitio oficial y pulsa Comprobar de Nuevo.",
+    btnGetMill: "🌐 Descargar Millennium", btnRecheck: "🔄 Comprobar de Nuevo",
+    insEyebrow: "✦ CONFIGURANDO REPAGE", insTitle: "Descargando e instalando archivos...",
+    insDesc: "Fluxuos está preparando la cafetería e instalando la versión más reciente en tu carpeta de plugins de Millennium.",
+    stepConnect: "Conectando con GitHub Releases...", stepDownload: "Descargando Repage SteamGrid v{v} ({kb} KB)...",
+    stepExtract: "Extrayendo en Steam/plugins/repage-steamgrid...", stepDone: "¡Instalación completada!", btnInstalling: "⏳ Instalando...",
+    sucEyebrow: "✦ INSTALACIÓN COMPLETADA", sucTitle: "¡Repage SteamGrid instalado con éxito!",
+    sucDesc: "Todos los archivos se instalaron en 'Steam/plugins/repage-steamgrid'. ¡Reinicia Steam para cargar Repage!",
+    btnOpenFolder: "📂 Abrir Carpeta", btnRestartSteam: "🚀 Reiniciar Steam", btnFinish: "✓ Finalizar",
+    offEyebrow: "✦ SIN CONEXIÓN A INTERNET", offTitle: "No se pudo conectar con GitHub",
+    offDesc: "Fluxuos no pudo obtener la última versión desde GitHub Releases. Comprueba tu conexión e inténtalo de nuevo.",
+    btnRetry: "🔄 Reintentar",
+    errEyebrow: "✦ ALGO SALIÓ MAL", errTitle: "No se pudo completar la instalación",
+    errDesc: "Ocurrió un error al escribir en la carpeta de Steam. Comprueba los permisos o elige otra carpeta.",
+    btnChangeFolder: "📁 Cambiar Carpeta"
+  },
+  "ja": {
+    soundOn: "🔊 サウンド", soundOff: "🔇 消音",
+    pathLabel: "Steam & Millennium フォルダー", folderBtn: "📁 参照...",
+    checking: "確認中...", detectingPath: "自動検出中...", steamMissing: "Steamフォルダーが見つかりません",
+    millOk: "✓ Millennium 検出済み", millWarn: "⚠ Millennium 未検出",
+    verSubInstalled: "現在のバージョン: v{v}", verSubClean: "新規インストール準備完了", verSubConnecting: "GitHub Releases に接続中...",
+    chkEyebrow: "✦ 自動インストーラー", chkTitle: "環境を確認しています...", chkDesc: "Steam、Millennium、およびGitHub上の最新のRepage SteamGridを確認しています。",
+    welEyebrowNew: "✦ インストール準備完了", welEyebrowUpd: "✦ アップデート利用可能",
+    welTitleNew: "Repage SteamGrid へようこそ！", welTitleUpd: "Repage SteamGrid v{v} へ更新",
+    welDesc: "準備が整いました！SteamとMillenniumが確認されました。下のボタンから最新版を自動インストールできます。",
+    btnRefresh: "🔄 再確認", btnInstall: "✦ 今すぐインストール", btnUpdate: "✦ 今すぐ更新",
+    noMillEyebrow: "✦ 前提ソフトが必要です", noMillTitle: "Millennium をインストールしてください",
+    noMillDesc: "Steamフォルダーは見つかりましたが、Millenniumが未導入です。公式サイトから導入後「再確認」を押してください。",
+    btnGetMill: "🌐 Millennium 公式", btnRecheck: "🔄 再確認",
+    insEyebrow: "✦ セットアップ中", insTitle: "ダウンロードとインストール中...",
+    insDesc: "FluxuosがMillenniumのpluginsフォルダーに最新版をインストールしています。",
+    stepConnect: "GitHub Releases に接続中...", stepDownload: "Repage SteamGrid v{v} をダウンロード中 ({kb} KB)...",
+    stepExtract: "Steam/plugins/repage-steamgrid に展開中...", stepDone: "インストール完了！", btnInstalling: "⏳ インストール中...",
+    sucEyebrow: "✦ インストール完了", sucTitle: "Repage SteamGrid の導入が完了しました！",
+    sucDesc: "'Steam/plugins/repage-steamgrid' に配置されました。Steamを再起動してRepageを読み込んでください！",
+    btnOpenFolder: "📂 フォルダーを開く", btnRestartSteam: "🚀 Steamを再起動", btnFinish: "✓ 完了",
+    offEyebrow: "✦ オフライン", offTitle: "GitHub に接続できませんでした",
+    offDesc: "GitHub Releasesから最新版を取得できませんでした。通信環境を確認して再試行してください。",
+    btnRetry: "🔄 再試行",
+    errEyebrow: "✦ エラーが発生しました", errTitle: "インストールを完了できませんでした",
+    errDesc: "Steamフォルダーへの書き込み中にエラーが発生しました。権限またはフォルダーを確認してください。",
+    btnChangeFolder: "📁 フォルダー変更"
+  },
+  "ko": {
+    soundOn: "🔊 소리", soundOff: "🔇 음소거",
+    pathLabel: "Steam 및 Millennium 폴더", folderBtn: "📁 폴더...",
+    checking: "확인 중...", detectingPath: "자동 감지 중...", steamMissing: "Steam 폴더를 찾을 수 없음",
+    millOk: "✓ Millennium 감지됨", millWarn: "⚠ Millennium 미설치",
+    verSubInstalled: "현재 설치된 버전: v{v}", verSubClean: "새 설치 준비 완료", verSubConnecting: "GitHub Releases 연결 중...",
+    chkEyebrow: "✦ 자동 설치 도구", chkTitle: "환경 확인 중...", chkDesc: "Steam 설치 경로, Millennium 및 GitHub의 최신 Repage SteamGrid 버전을 확인하고 있습니다.",
+    welEyebrowNew: "✦ 설치 준비 완료", welEyebrowUpd: "✦ 업데이트 가능",
+    welTitleNew: "Repage SteamGrid에 오신 것을 환영합니다!", welTitleUpd: "Repage SteamGrid v{v} 업데이트",
+    welDesc: "모든 준비가 끝났습니다! Steam 폴더와 Millennium이 확인되었습니다. 아래를 눌러 최신 버전을 자동 설치하세요.",
+    btnRefresh: "🔄 새로고침", btnInstall: "✦ 지금 설치", btnUpdate: "✦ 지금 업데이트",
+    noMillEyebrow: "✦ 필수 구성 요소", noMillTitle: "계속하려면 Millennium을 설치하세요",
+    noMillDesc: "Steam 폴더를 찾았지만 Millennium이 아직 설치되지 않았습니다. 공식 사이트에서 설치 후 다시 확인을 누르세요.",
+    btnGetMill: "🌐 Millennium 다운로드", btnRecheck: "🔄 다시 확인",
+    insEyebrow: "✦ REPAGE 설치 중", insTitle: "파일 다운로드 및 설치 중...",
+    insDesc: "Fluxuos가 Millennium plugins 폴더에 최신 버전을 설치하고 있습니다.",
+    stepConnect: "GitHub Releases 연결 중...", stepDownload: "Repage SteamGrid v{v} 다운로드 중 ({kb} KB)...",
+    stepExtract: "Steam/plugins/repage-steamgrid에 압축 해제 중...", stepDone: "설치 완료!", btnInstalling: "⏳ 설치 중...",
+    sucEyebrow: "✦ 설치 완료", sucTitle: "Repage SteamGrid가 성공적으로 설치되었습니다!",
+    sucDesc: "'Steam/plugins/repage-steamgrid' 폴더에 설치되었습니다. Steam을 다시 시작하여 Repage를 불러오세요!",
+    btnOpenFolder: "📂 폴더 열기", btnRestartSteam: "🚀 Steam 다시 시작", btnFinish: "✓ 완료",
+    offEyebrow: "✦ 인터넷 연결 없음", offTitle: "GitHub에 연결할 수 없습니다",
+    offDesc: "GitHub Releases에서 최신 버전을 가져오지 못했습니다. 네트워크 연결을 확인하고 다시 시도하세요.",
+    btnRetry: "🔄 다시 시도",
+    errEyebrow: "✦ 오류 발생", errTitle: "설치를 완료할 수 없습니다",
+    errDesc: "Steam 폴더에 파일을 기록하는 중 오류가 발생했습니다. 권한을 확인하거나 다른 폴더를 선택하세요.",
+    btnChangeFolder: "📁 폴더 변경"
+  },
+  "ru": {
+    soundOn: "🔊 Звук", soundOff: "🔇 Без звука",
+    pathLabel: "Папка Steam и Millennium", folderBtn: "📁 Обзор...",
+    checking: "Проверка...", detectingPath: "Автоопределение...", steamMissing: "Папка Steam не найдена",
+    millOk: "✓ Millennium найден", millWarn: "⚠ Millennium не найден",
+    verSubInstalled: "Установлено: v{v}", verSubClean: "Готово к чистой установке", verSubConnecting: "Подключение к GitHub Releases...",
+    chkEyebrow: "✦ АВТОУСТАНОВЩИК", chkTitle: "Проверка системы...", chkDesc: "Поиск Steam, Millennium и последней версии Repage SteamGrid на GitHub.",
+    welEyebrowNew: "✦ ГОТОВО К УСТАНОВКЕ", welEyebrowUpd: "✦ ДОСТУПНО ОБНОВЛЕНИЕ",
+    welTitleNew: "Добро пожаловать в Repage SteamGrid!", welTitleUpd: "Обновить до Repage SteamGrid v{v}",
+    welDesc: "Всё готово! Папка Steam и Millennium подтверждены. Нажмите ниже для автоматической установки с GitHub.",
+    btnRefresh: "🔄 Обновить", btnInstall: "✦ Установить", btnUpdate: "✦ Обновить сейчас",
+    noMillEyebrow: "✦ ТРЕБУЕТСЯ MILLENNIUM", noMillTitle: "Установите Millennium для продолжения",
+    noMillDesc: "Папка Steam найдена, но Millennium ещё не установлен. Скачайте его с официального сайта и нажмите «Проверить снова».",
+    btnGetMill: "🌐 Скачать Millennium", btnRecheck: "🔄 Проверить снова",
+    insEyebrow: "✦ УСТАНОВКА REPAGE", insTitle: "Загрузка и установка файлов...",
+    insDesc: "Fluxuos устанавливает свежую версию прямо в папку plugins вашего Millennium.",
+    stepConnect: "Подключение к GitHub Releases...", stepDownload: "Загрузка Repage SteamGrid v{v} ({kb} КБ)...",
+    stepExtract: "Распаковка в Steam/plugins/repage-steamgrid...", stepDone: "Установка завершена!", btnInstalling: "⏳ Установка...",
+    sucEyebrow: "✦ УСТАНОВКА ЗАВЕРШЕНА", sucTitle: "Repage SteamGrid успешно установлен!",
+    sucDesc: "Все файлы установлены в 'Steam/plugins/repage-steamgrid'. Перезапустите Steam!",
+    btnOpenFolder: "📂 Открыть папку", btnRestartSteam: "🚀 Перезапустить Steam", btnFinish: "✓ Готово",
+    offEyebrow: "✦ НЕТ СОЕДИНЕНИЯ С СЕТЬЮ", offTitle: "Не удалось подключиться к GitHub",
+    offDesc: "Не удалось получить последний релиз с GitHub. Проверьте интернет и повторите попытку.",
+    btnRetry: "🔄 Повторить",
+    errEyebrow: "✦ ОШИБКА УСТАНОВКИ", errTitle: "Не удалось завершить установку",
+    errDesc: "Ошибка записи в папку Steam. Проверьте права доступа или выберите другую папку.",
+    btnChangeFolder: "📁 Сменить папку"
+  },
+  "fr": {
+    soundOn: "🔊 Son", soundOff: "🔇 Muet",
+    pathLabel: "Dossier Steam & Millennium", folderBtn: "📁 Dossier...",
+    checking: "Vérification...", detectingPath: "Détection automatique...", steamMissing: "Dossier Steam introuvable",
+    millOk: "✓ Millennium Détecté", millWarn: "⚠ Millennium Absent",
+    verSubInstalled: "Version installée : v{v}", verSubClean: "Prêt pour une installation propre", verSubConnecting: "Connexion à GitHub Releases...",
+    chkEyebrow: "✦ INSTALLATEUR AUTOMATIQUE", chkTitle: "Vérification de l’environnement...", chkDesc: "Recherche de votre installation Steam, de Millennium et de la dernière version de Repage SteamGrid sur GitHub.",
+    welEyebrowNew: "✦ PRÊT À INSTALLER", welEyebrowUpd: "✦ MISE À JOUR DISPONIBLE",
+    welTitleNew: "Bienvenue sur Repage SteamGrid !", welTitleUpd: "Mettre à jour vers Repage SteamGrid v{v}",
+    welDesc: "Tout est prêt ! Votre dossier Steam et Millennium sont confirmés. Cliquez ci-dessous pour télécharger et installer automatiquement la dernière version.",
+    btnRefresh: "🔄 Actualiser", btnInstall: "✦ Installer Maintenant", btnUpdate: "✦ Mettre à Jour",
+    noMillEyebrow: "✦ PRÉREQUIS NÉCESSAIRE", noMillTitle: "Installez Millennium pour continuer",
+    noMillDesc: "Dossier Steam trouvé, mais Millennium n’est pas encore installé. Téléchargez Millennium sur le site officiel puis cliquez sur Vérifier à Nouveau.",
+    btnGetMill: "🌐 Télécharger Millennium", btnRecheck: "🔄 Vérifier à Nouveau",
+    insEyebrow: "✦ CONFIGURATION DE REPAGE", insTitle: "Téléchargement et installation...",
+    insDesc: "Fluxuos prépare le café et installe la dernière version dans votre dossier plugins Millennium.",
+    stepConnect: "Connexion à GitHub Releases...", stepDownload: "Téléchargement de Repage SteamGrid v{v} ({kb} Ko)...",
+    stepExtract: "Extraction dans Steam/plugins/repage-steamgrid...", stepDone: "Installation terminée !", btnInstalling: "⏳ Installation...",
+    sucEyebrow: "✦ INSTALLATION TERMINÉE", sucTitle: "Repage SteamGrid installé avec succès !",
+    sucDesc: "Tous les fichiers ont été installés dans 'Steam/plugins/repage-steamgrid'. Redémarrez Steam pour charger Repage !",
+    btnOpenFolder: "📂 Ouvrir le Dossier", btnRestartSteam: "🚀 Redémarrer Steam", btnFinish: "✓ Terminer",
+    offEyebrow: "✦ AUCUNE CONNEXION INTERNET", offTitle: "Impossible de se connecter à GitHub",
+    offDesc: "Fluxuos n’a pas pu récupérer la dernière version sur GitHub Releases. Vérifiez votre connexion et réessayez.",
+    btnRetry: "🔄 Réessayer",
+    errEyebrow: "✦ OUPS, UNE ERREUR EST SURVENUE", errTitle: "L’installation n’a pas pu aboutir",
+    errDesc: "Une erreur s’est produite lors de l’écriture dans le dossier Steam. Vérifiez les permissions ou choisissez un autre dossier.",
+    btnChangeFolder: "📁 Changer de Dossier"
+  }
+};
+
+let IS_PREVIEW = false, EDIT_MODE = false, soundMuted = false, audioCtx = null;
+let currentPose = "welcome", currentStateMode = "checking", currentStateDetail = "";
+let langMode = "auto", detectedOsLocale = "";
+let envStatus = { online: true, steamPath: "", hasMillennium: false, installedVersion: "", latestVersion: "" };
+
+function mapLocaleCode(raw) {
+  const s = String(raw || "").trim().toLowerCase().replace(/_/g, "-");
+  if (!s) return "";
+  const base = s.split("-")[0];
+  return ({ pt: "pt-BR", en: "en", es: "es", ja: "ja", ko: "ko", ru: "ru", fr: "fr" })[base] || "";
+}
+function activeLang() {
+  if (langMode !== "auto" && I18N[langMode]) return langMode;
+  return mapLocaleCode(detectedOsLocale) || mapLocaleCode(navigator.language) || "en";
+}
+const EXTRA_I18N = {
+  "pt-BR": {
+    btnUninstall: "Desinstalar", btnReinstall: "Reinstalar / Reparar", btnStartSteam: "Iniciar Steam", btnCancel: "Cancelar",
+    btnConfirmUninstall: "Confirmar Desinstalação", btnConfirmRestart: "Reiniciar Agora", btnInstallAgain: "Instalar Novamente",
+    upToDateEyebrow: "REPAGE ATUALIZADO", upToDateTitle: "Repage SteamGrid v{v} já está atualizado!",
+    upToDateDesc: "A versão mais recente já está instalada no seu Millennium. Você pode fazer uma reinstalação limpa para reparar arquivos ou desinstalar o plugin.",
+    uninstEyebrow: "DESINSTALAR PLUGIN", uninstTitle: "Tem certeza que deseja desinstalar?",
+    uninstDesc: "O Fluxuos vai sentir sua falta... Os arquivos do Repage SteamGrid serão removidos da pasta de plugins (suas artes já aplicadas na Steam continuarão intactas).",
+    uninstDoneEyebrow: "PLUGIN REMOVIDO", uninstDoneTitle: "Repage SteamGrid foi desinstalado",
+    uninstDoneDesc: "Todos os arquivos do plugin foram removidos com segurança. Reinicie a Steam se ela estiver aberta para concluir a remoção.",
+    rstModalTitle: "Reiniciar a Steam agora?",
+    rstModalDesc: "A Steam está aberta no momento. Reiniciá-la encerrará o cliente com segurança e fechará quaisquer jogos ou aplicativos em execução na Steam antes de iniciá-la novamente.",
+    verSubUpToDate: "Instalado: v{v} (mais recente)",
+    sucDescClosed: "Todos os arquivos foram instalados com sucesso. Clique em Iniciar Steam para abrir a Steam com o Repage carregado!",
+    btnAutoFolder: "Auto",
+    sucAutoNote: " O plugin já foi ativado automaticamente no Millennium!",
+    errUninstallLocked: "Não foi possível remover todos os arquivos do plugin porque a Steam está usando alguns deles. Feche a Steam e tente novamente.",
+    errUacCancelled: "Permissão de administrador necessária para modificar esta pasta do sistema.",
+    errInvalidZip: "O pacote baixado não é um arquivo ZIP válido.",
+    errSha256: "Falha na verificação de integridade (SHA-256) do pacote baixado.",
+    errMissingFiles: "O pacote extraído está incompleto ou corrompido.",
+    errInvalidSteam: "A pasta da Steam selecionada é inválida.",
+    errInstallLocked: "Não foi possível concluir porque alguns arquivos do plugin estão em uso pela Steam. Feche a Steam e tente novamente.",
+    errInstallFailed: "Falha ao copiar os arquivos do plugin. Verifique as permissões ou consulte o log (Ctrl Dir + Shift Dir + O).",
+    errUninstallFailed: "Não foi possível concluir a desinstalação. Consulte o log ou feche a Steam e tente novamente.",
+    btnCloseSteamRetry: "Fechar Steam e Tentar de Novo",
+    closingSteam: "Fechando Steam...",
+    btnCopyLog: "Copiar log",
+    logCopied: "Copiado!"
+  },
+  "en": {
+    btnUninstall: "Uninstall", btnReinstall: "Clean Reinstall / Repair", btnStartSteam: "Launch Steam", btnCancel: "Cancel",
+    btnConfirmUninstall: "Confirm Uninstall", btnConfirmRestart: "Restart Now", btnInstallAgain: "Install Again",
+    upToDateEyebrow: "UP TO DATE", upToDateTitle: "Repage SteamGrid v{v} is already up to date!",
+    upToDateDesc: "The latest version is already installed in your Millennium folder. You can run a clean reinstall to repair files or uninstall the plugin.",
+    uninstEyebrow: "UNINSTALL PLUGIN", uninstTitle: "Are you sure you want to uninstall?",
+    uninstDesc: "Fluxuos will miss you... Repage SteamGrid plugin files will be removed from Millennium (artwork already applied to your Steam games stays untouched).",
+    uninstDoneEyebrow: "PLUGIN REMOVED", uninstDoneTitle: "Repage SteamGrid was uninstalled",
+    uninstDoneDesc: "All plugin files were removed safely. Restart Steam if it is currently running to finish unloading it.",
+    rstModalTitle: "Restart Steam now?",
+    rstModalDesc: "Steam is currently running. Restarting it will safely shut down Steam and close any running Steam games or apps before launching it again.",
+    verSubUpToDate: "Installed: v{v} (latest)",
+    sucDescClosed: "All files were installed successfully. Click Launch Steam to open Steam with Repage loaded!",
+    btnAutoFolder: "Auto",
+    sucAutoNote: " Repage was also automatically enabled in Millennium!",
+    errUninstallLocked: "Could not remove all plugin files because Steam is locking them. Close Steam and try again.",
+    errUacCancelled: "Administrator permission is required to modify this system folder.",
+    errInvalidZip: "The downloaded package is not a valid ZIP archive.",
+    errSha256: "SHA-256 integrity verification failed for the downloaded archive.",
+    errMissingFiles: "The extracted package is missing required Repage SteamGrid files.",
+    errInvalidSteam: "The selected Steam directory is invalid.",
+    errInstallLocked: "Could not finish because some plugin files are currently locked by Steam. Close Steam and try again.",
+    errInstallFailed: "Failed while copying plugin files. Check permissions or inspect the log (Right Ctrl + Right Shift + O).",
+    errUninstallFailed: "Uninstallation could not be completed. Check the log or close Steam and try again.",
+    btnCloseSteamRetry: "Close Steam & Try Again",
+    closingSteam: "Closing Steam...",
+    btnCopyLog: "Copy log",
+    logCopied: "Copied!"
+  },
+  "es": {
+    btnUninstall: "Desinstalar", btnReinstall: "Reinstalar / Reparar", btnStartSteam: "Iniciar Steam", btnCancel: "Cancelar",
+    btnConfirmUninstall: "Confirmar Desinstalación", btnConfirmRestart: "Reiniciar Ahora", btnInstallAgain: "Instalar de Nuevo",
+    upToDateEyebrow: "ACTUALIZADO", upToDateTitle: "¡Repage SteamGrid v{v} ya está actualizado!",
+    upToDateDesc: "La última versión ya está instalada en tu Millennium. Puedes hacer una reinstalación limpia para reparar archivos o desinstalar el plugin.",
+    uninstEyebrow: "DESINSTALAR PLUGIN", uninstTitle: "¿Seguro que deseas desinstalar?",
+    uninstDesc: "Fluxuos te extrañará... Los archivos de Repage SteamGrid se eliminarán de Millennium (las artes ya aplicadas en Steam seguirán intactas).",
+    uninstDoneEyebrow: "PLUGIN ELIMINADO", uninstDoneTitle: "Repage SteamGrid fue desinstalado",
+    uninstDoneDesc: "Todos los archivos del plugin se eliminaron de forma segura. Reinicia Steam si está abierto.",
+    rstModalTitle: "¿Reiniciar Steam ahora?",
+    rstModalDesc: "Steam está en ejecución. Reiniciarlo cerrará Steam de forma segura junto con cualquier juego o aplicación abierta en Steam antes de iniciarlo de nuevo.",
+    verSubUpToDate: "Instalado: v{v} (más reciente)",
+    sucDescClosed: "Todos los archivos se instalaron correctamente. ¡Haz clic en Iniciar Steam para abrir Steam con Repage!",
+    btnAutoFolder: "Auto",
+    sucAutoNote: " ¡El plugin también se activó automáticamente en Millennium!",
+    errUninstallLocked: "No se pudieron eliminar todos los archivos porque Steam los está usando. Cierra Steam e inténtalo de nuevo.",
+    errUacCancelled: "Se requiere permiso de administrador para modificar esta carpeta del sistema.",
+    errInvalidZip: "El paquete descargado no es un archivo ZIP válido.",
+    errSha256: "Falló la verificación de integridad SHA-256 del paquete descargado.",
+    errMissingFiles: "El paquete extraído está incompleto o dañado.",
+    errInvalidSteam: "La carpeta de Steam seleccionada no es válida.",
+    errInstallLocked: "Algunos archivos del plugin están siendo usados por Steam. Cierra Steam e inténtalo de nuevo.",
+    errInstallFailed: "Error al copiar los archivos del plugin. Revisa los permisos o consulta el registro (Ctrl Der + Shift Der + O).",
+    errUninstallFailed: "No se pudo completar la desinstalación. Cierra Steam e inténtalo de nuevo.",
+    btnCloseSteamRetry: "Cerrar Steam y Reintentar",
+    closingSteam: "Cerrando Steam...",
+    btnCopyLog: "Copiar registro",
+    logCopied: "¡Copiado!"
+  },
+  "ja": {
+    btnUninstall: "アンインストール", btnReinstall: "クリーン再インストール / 修復", btnStartSteam: "Steamを起動", btnCancel: "キャンセル",
+    btnConfirmUninstall: "アンインストールを実行", btnConfirmRestart: "今すぐ再起動", btnInstallAgain: "もう一度インストール",
+    upToDateEyebrow: "最新バージョン", upToDateTitle: "Repage SteamGrid v{v} はすでに最新です！",
+    upToDateDesc: "最新版がMillenniumに導入済みです。クリーン再インストール（修復）またはアンインストールを選択できます。",
+    uninstEyebrow: "プラグインの削除", uninstTitle: "本当にアンインストールしますか？",
+    uninstDesc: "Fluxuosは寂しがります... MillenniumからRepageファイルを削除します（適用済みアートは残ります）。",
+    uninstDoneEyebrow: "削除完了", uninstDoneTitle: "Repage SteamGrid をアンインストールしました",
+    uninstDoneDesc: "プラグインファイルは安全に削除されました。Steamが起動中の場合は再起動してください。",
+    rstModalTitle: "Steamを今すぐ再起動しますか？",
+    rstModalDesc: "Steamが実行中です。再起動すると、Steam上で実行中のゲームやアプリがすべて終了されます。",
+    verSubUpToDate: "導入済み: v{v}（最新）",
+    sucDescClosed: "インストールが完了しました。「Steamを起動」からRepageを使い始めましょう！",
+    btnAutoFolder: "自動",
+    sucAutoNote: " Millenniumでの自動有効化も完了しました！",
+    errUninstallLocked: "Steamがファイルを使用中のため削除できませんでした。Steamを閉じて再試行してください。",
+    errUacCancelled: "このシステムフォルダーを変更するには管理者権限が必要です。",
+    errInvalidZip: "ダウンロードされたファイルは有効なZIPではありません。",
+    errSha256: "ダウンロードされたパッケージのSHA-256検証に失敗しました。",
+    errMissingFiles: "展開されたパッケージに必要なファイルが不足しています。",
+    errInvalidSteam: "選択されたSteamフォルダーが無効です。",
+    errInstallLocked: "Steamが一部のプラグインファイルを使用中のため完了できませんでした。Steamを閉じて再試行してください。",
+    errInstallFailed: "ファイルのコピー中にエラーが発生しました。権限またはログ（右Ctrl+右Shift+O）を確認してください。",
+    errUninstallFailed: "アンインストールを完了できませんでした。Steamを閉じて再試行してください。",
+    btnCloseSteamRetry: "Steamを閉じて再試行",
+    closingSteam: "Steamを終了中...",
+    btnCopyLog: "ログをコピー",
+    logCopied: "コピーしました!"
+  },
+  "ko": {
+    btnUninstall: "제거", btnReinstall: "클린 재설치 / 복구", btnStartSteam: "Steam 실행", btnCancel: "취소",
+    btnConfirmUninstall: "제거 확인", btnConfirmRestart: "지금 다시 시작", btnInstallAgain: "다시 설치",
+    upToDateEyebrow: "최신 버전", upToDateTitle: "Repage SteamGrid v{v}이(가) 이미 최신 상태입니다!",
+    upToDateDesc: "최신 버전이 이미 설치되어 있습니다. 파일 복구를 위해 클린 재설치하거나 플러그인을 제거할 수 있습니다.",
+    uninstEyebrow: "플러그인 제거", uninstTitle: "정말 제거하시겠습니까?",
+    uninstDesc: "Fluxuos가 아쉬워해요... Millennium에서 Repage 파일이 삭제됩니다 (이미 적용된 Steam 아트워크는 유지됩니다).",
+    uninstDoneEyebrow: "제거 완료", uninstDoneTitle: "Repage SteamGrid가 제거되었습니다",
+    uninstDoneDesc: "플러그인 파일이 안전하게 삭제되었습니다. Steam이 실행 중이라면 다시 시작하세요.",
+    rstModalTitle: "지금 Steam을 다시 시작할까요?",
+    rstModalDesc: "Steam이 실행 중입니다. 다시 시작하면 Steam에서 실행 중인 게임과 프로그램이 모두 종료된 후 다시 시작됩니다.",
+    verSubUpToDate: "설치됨: v{v} (최신)",
+    sucDescClosed: "설치가 완료되었습니다. Steam 실행을 눌러 Repage를 시작하세요!",
+    btnAutoFolder: "자동",
+    sucAutoNote: " Millennium에서도 자동으로 활성화되었습니다!",
+    errUninstallLocked: "Steam이 파일을 사용 중이라 삭제하지 못했습니다. Steam을 종료한 후 다시 시도하세요.",
+    errUacCancelled: "이 시스템 폴더를 수정하려면 관리자 권한이 필요합니다.",
+    errInvalidZip: "다운로드한 파일이 올바른 ZIP 형식이 아닙니다.",
+    errSha256: "다운로드한 패키지의 SHA-256 무결성 검증에 실패했습니다.",
+    errMissingFiles: "압축 해제된 패키지에 필수 파일이 누락되었습니다.",
+    errInvalidSteam: "선택한 Steam 폴더가 올바르지 않습니다.",
+    errInstallLocked: "Steam이 일부 플러그인 파일을 사용 중이라 완료할 수 없습니다. Steam을 종료한 후 다시 시도하세요.",
+    errInstallFailed: "파일 복사 중 오류가 발생했습니다. 권한이나 로그(오른쪽 Ctrl+Shift+O)를 확인하세요.",
+    errUninstallFailed: "제거를 완료할 수 없습니다. Steam을 종료한 후 다시 시도하세요.",
+    btnCloseSteamRetry: "Steam 종료 후 재시도",
+    closingSteam: "Steam 종료 중...",
+    btnCopyLog: "로그 복사",
+    logCopied: "복사됨!"
+  },
+  "ru": {
+    btnUninstall: "Удалить", btnReinstall: "Переустановить / Починить", btnStartSteam: "Запустить Steam", btnCancel: "Отмена",
+    btnConfirmUninstall: "Подтвердить удаление", btnConfirmRestart: "Перезапустить", btnInstallAgain: "Установить снова",
+    upToDateEyebrow: "АКТУАЛЬНАЯ ВЕРСИЯ", upToDateTitle: "Repage SteamGrid v{v} уже обновлён!",
+    upToDateDesc: "Последняя версия уже установлена. Вы можете выполнить чистую переустановку или удалить плагин.",
+    uninstEyebrow: "УДАЛЕНИЕ ПЛАГИНА", uninstTitle: "Точно удалить Repage SteamGrid?",
+    uninstDesc: "Fluxuos будет скучать... Файлы плагина будут удалены из Millennium (уже применённые обложки останутся).",
+    uninstDoneEyebrow: "ПЛАГИН УДАЛЁН", uninstDoneTitle: "Repage SteamGrid удалён",
+    uninstDoneDesc: "Файлы плагина безопасно удалены. Перезапустите Steam, если он открыт.",
+    rstModalTitle: "Перезапустить Steam сейчас?",
+    rstModalDesc: "Steam сейчас запущен. Перезапуск закроет Steam и все запущенные через него игры и программы.",
+    verSubUpToDate: "Установлено: v{v} (последняя)",
+    sucDescClosed: "Все файлы установлены. Нажмите «Запустить Steam»!",
+    btnAutoFolder: "Авто",
+    sucAutoNote: " Плагин также автоматически включён в Millennium!",
+    errUninstallLocked: "Не удалось удалить все файлы, так как они заняты Steam. Закройте Steam и повторите попытку.",
+    errUacCancelled: "Для изменения этой системной папки требуются права администратора.",
+    errInvalidZip: "Скачанный файл не является корректным ZIP-архивом.",
+    errSha256: "Проверка целостности SHA-256 скачанного архива не пройдена.",
+    errMissingFiles: "В распакованном пакете отсутствуют обязательные файлы Repage.",
+    errInvalidSteam: "Указана некорректная папка Steam.",
+    errInstallLocked: "Не удалось завершить операцию, так как некоторые файлы заняты Steam. Закройте Steam и повторите попытку.",
+    errInstallFailed: "Ошибка копирования файлов плагина. Проверьте права доступа или журнал (правый Ctrl+Shift+O).",
+    errUninstallFailed: "Не удалось завершить удаление. Закройте Steam и повторите попытку.",
+    btnCloseSteamRetry: "Закрыть Steam и повторить",
+    closingSteam: "Закрытие Steam...",
+    btnCopyLog: "Скопировать лог",
+    logCopied: "Скопировано!"
+  },
+  "fr": {
+    btnUninstall: "Désinstaller", btnReinstall: "Réinstaller / Réparer", btnStartSteam: "Lancer Steam", btnCancel: "Annuler",
+    btnConfirmUninstall: "Confirmer la désinstallation", btnConfirmRestart: "Redémarrer", btnInstallAgain: "Réinstaller",
+    upToDateEyebrow: "À JOUR", upToDateTitle: "Repage SteamGrid v{v} est déjà à jour !",
+    upToDateDesc: "La dernière version est déjà installée dans Millennium. Vous pouvez effectuer une réinstallation propre ou désinstaller le plugin.",
+    uninstEyebrow: "DÉSINSTALLER LE PLUGIN", uninstTitle: "Voulez-vous vraiment désinstaller ?",
+    uninstDesc: "Fluxuos va vous manquer... Les fichiers de Repage seront supprimés de Millennium (vos visuels déjà appliqués restent intacts).",
+    uninstDoneEyebrow: "PLUGIN SUPPRIMÉ", uninstDoneTitle: "Repage SteamGrid a été désinstallé",
+    uninstDoneDesc: "Tous les fichiers du plugin ont été supprimés. Redémarrez Steam s’il est ouvert.",
+    rstModalTitle: "Redémarrer Steam maintenant ?",
+    rstModalDesc: "Steam est en cours d’exécution. Le redémarrer fermera proprement Steam ainsi que tous les jeux ou logiciels lancés via Steam.",
+    verSubUpToDate: "Installé : v{v} (dernière)",
+    sucDescClosed: "Installation réussie ! Cliquez sur Lancer Steam pour démarrer Steam avec Repage.",
+    btnAutoFolder: "Auto",
+    sucAutoNote: " Le plugin a aussi été activé automatiquement dans Millennium !",
+    errUninstallLocked: "Impossible de supprimer tous les fichiers car Steam les utilise. Fermez Steam et réessayez.",
+    errUacCancelled: "Les droits administrateur sont requis pour modifier ce dossier système.",
+    errInvalidZip: "L’archive téléchargée n’est pas un fichier ZIP valide.",
+    errSha256: "La vérification d’intégrité SHA-256 a échoué.",
+    errMissingFiles: "Des fichiers requis de Repage sont manquants dans l’archive.",
+    errInvalidSteam: "Le dossier Steam sélectionné est invalide.",
+    errInstallLocked: "Impossible de terminer car certains fichiers du plugin sont verrouillés par Steam. Fermez Steam et réessayez.",
+    errInstallFailed: "Échec de la copie des fichiers. Vérifiez les permissions ou consultez le journal (Ctrl Droite + Maj Droite + O).",
+    errUninstallFailed: "La désinstallation n’a pas pu aboutir. Fermez Steam et réessayez.",
+    btnCloseSteamRetry: "Fermer Steam et réessayer",
+    closingSteam: "Fermeture de Steam...",
+    btnCopyLog: "Copier le journal",
+    logCopied: "Copié !"
+  }
+};
+function t(key, vars) {
+  const lg = activeLang();
+  const dict = I18N[lg] || I18N["en"];
+  const xdict = EXTRA_I18N[lg] || EXTRA_I18N["en"];
+  let str = xdict[key] || dict[key] || EXTRA_I18N["en"][key] || I18N["en"][key] || key;
+  if (vars) Object.keys(vars).forEach(k => { str = str.replaceAll("{" + k + "}", String(vars[k])); });
+  return str;
+}
+const LANG_LIST = [
+  { value: "auto",  code: "AUTO", label: "Auto (Windows)" },
+  { value: "pt-BR", code: "PT",   label: "Português (Brasil)" },
+  { value: "en",    code: "EN",   label: "English" },
+  { value: "es",    code: "ES",   label: "Español" },
+  { value: "ja",    code: "JA",   label: "日本語" },
+  { value: "ko",    code: "KO",   label: "한국어" },
+  { value: "ru",    code: "RU",   label: "Русский" },
+  { value: "fr",    code: "FR",   label: "Français" }
+];
+function isMinimalIcons() {
+  return (STUDIO.iconStyle || "minimalWhite") === "minimalWhite";
+}
+function uiIcon(name) {
+  if (!isMinimalIcons()) {
+    const em = {
+      soundOn: "🔊", soundOff: "🔇", folder: "📁", openFolder: "📂",
+      refresh: "🔄", install: "✦", globe: "🌐", loading: "⏳",
+      restart: "🚀", play: "▶", trash: "🗑", check: "✓", warn: "⚠", spark: "✦"
+    };
+    return '<span class="ui-ic">' + (em[name] || "") + '</span>';
+  }
+  const p = 'width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f6f3ff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"';
+  const map = {
+    soundOn: '<svg ' + p + '><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a9 9 0 0 1 0 12"/></svg>',
+    soundOff: '<svg ' + p + '><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>',
+    folder: '<svg ' + p + '><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+    openFolder: '<svg ' + p + '><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v2H5l-2 7z"/><path d="M3 18l2-7h16l-2 7z"/></svg>',
+    refresh: '<svg ' + p + '><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>',
+    install: '<svg ' + p + '><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M5 21h14"/></svg>',
+    globe: '<svg ' + p + '><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg>',
+    loading: '<svg ' + p + '><path d="M21 12a9 9 0 1 1-6.2-8.56"/></svg>',
+    restart: '<svg ' + p + '><path d="M12 3v8"/><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/></svg>',
+    check: '<svg ' + p + '><polyline points="20 6 9 17 4 12"/></svg>',
+    warn: '<svg ' + p + '><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    play: '<svg ' + p + '><polygon points="6 4 20 12 6 20 6 4"/></svg>',
+    trash: '<svg ' + p + '><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+    spark: '<svg width="12" height="12" viewBox="0 0 24 24" fill="#f6f3ff"><path d="M12 2l2.3 6.7L21 11l-6.7 2.3L12 20l-2.3-6.7L3 11l6.7-2.3z"/></svg>'
+  };
+  return '<span class="ui-ic' + (name === "loading" ? " ui-ic-spin" : "") + '">' + (map[name] || "") + '</span>';
+}
+function stripLeadEmoji(str) {
+  const s = String(str || "");
+  let i = 0;
+  while (i < s.length) {
+    const c = s.charCodeAt(i);
+    if ((c >= 0xD800 && c <= 0xDFFF) || (c >= 0x2300 && c <= 0x27BF) || c === 0xFE0F || c === 0x200D || c === 32) i++;
+    else break;
+  }
+  return s.slice(i).trim();
+}
+function icLabel(iconName, textKey, vars) {
+  return uiIcon(iconName) + '<span>' + stripLeadEmoji(t(textKey, vars)) + '</span>';
+}
+function flagSvg(code) {
+  const s = 'width="18" height="13" viewBox="0 0 24 17" style="display:block"';
+  if (code === "auto") return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + (isMinimalIcons() ? "#f6f3ff" : "#9B82CF") + '" stroke-width="2" style="display:block"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg>';
+  if (code === "pt-BR") return '<svg ' + s + '><rect width="24" height="17" fill="#009B3A"/><polygon points="12,2.2 21.5,8.5 12,14.8 2.5,8.5" fill="#FEDF00"/><circle cx="12" cy="8.5" r="3.4" fill="#002776"/><path d="M8.8 7.9c2.2-.8 4.4-.5 6.4.8" stroke="#fff" stroke-width=".9" fill="none"/></svg>';
+  if (code === "en") return '<svg ' + s + '><rect width="24" height="17" fill="#B22234"/><path d="M0 2.5h24M0 5.5h24M0 8.5h24M0 11.5h24M0 14.5h24" stroke="#fff" stroke-width="1.3"/><rect width="11" height="9.2" fill="#3C3B6E"/><path d="M2.2 2.4h.8M5.2 2.4h.8M8.2 2.4h.8M3.7 4.6h.8M6.7 4.6h.8M2.2 6.8h.8M5.2 6.8h.8M8.2 6.8h.8" stroke="#fff" stroke-width="1.1" stroke-linecap="round"/></svg>';
+  if (code === "es") return '<svg ' + s + '><rect width="24" height="17" fill="#AA151B"/><rect y="4.25" width="24" height="8.5" fill="#F1BF00"/><rect x="5.2" y="6.3" width="2.4" height="4.2" rx=".6" fill="#AA151B"/></svg>';
+  if (code === "ja") return '<svg ' + s + '><rect width="24" height="17" fill="#FFFFFF"/><circle cx="12" cy="8.5" r="4.5" fill="#BC002D"/></svg>';
+  if (code === "ko") return '<svg ' + s + '><rect width="24" height="17" fill="#FFFFFF"/><circle cx="12" cy="8.5" r="4" fill="#0047A0"/><path d="M8 8.5a4 4 0 0 1 8 0a2 2 0 0 1-4 0a2 2 0 0 0-4 0Z" fill="#CD2E3A"/><path d="M4.2 3.2l2 2M19.8 3.2l-2 2M4.2 13.8l2-2M19.8 13.8l-2-2" stroke="#111827" stroke-width="1.4" stroke-linecap="round"/></svg>';
+  if (code === "ru") return '<svg ' + s + '><rect width="24" height="5.7" fill="#FFFFFF"/><rect y="5.66" width="24" height="5.7" fill="#0039A6"/><rect y="11.33" width="24" height="5.7" fill="#D52B1E"/></svg>';
+  if (code === "fr") return '<svg ' + s + '><rect width="8" height="17" fill="#002395"/><rect x="8" width="8" height="17" fill="#FFFFFF"/><rect x="16" width="8" height="17" fill="#ED2939"/></svg>';
+  return "";
+}
+function buildLangMenu() {
+  const menu = document.getElementById("langMenu"), flagEl = document.getElementById("langBtnFlag"), txtEl = document.getElementById("langBtnTxt");
+  if (!menu) return;
+  const curCode = activeLang();
+  const activeItem = LANG_LIST.find(x => x.value === langMode) || LANG_LIST[0];
+  if (flagEl) flagEl.innerHTML = flagSvg(curCode);
+  if (txtEl) txtEl.textContent = langMode === "auto" ? "Auto" : activeItem.code;
+  menu.innerHTML = LANG_LIST.map(item => {
+    const sel = item.value === langMode;
+    return '<button type="button" class="dd-opt' + (sel ? ' is-sel' : '') + '" data-lang="' + item.value + '" onclick="changeLang(this.dataset.lang)">' +
+      '<span class="dd-flag">' + flagSvg(item.value) + '</span>' +
+      '<span class="dd-code">' + item.code + '</span>' +
+      '<span class="dd-lbl">' + item.label + '</span>' +
+      (sel ? '<span class="dd-chk">' + (isMinimalIcons() ? uiIcon("check") : "✓") + '</span>' : '') +
+      '</button>';
+  }).join("");
+}
+function toggleLangMenu(ev) {
+  if (ev) ev.stopPropagation();
+  const wrap = document.getElementById("langDd");
+  if (!wrap) return;
+  const next = !wrap.classList.contains("is-open");
+  wrap.classList.toggle("is-open", next);
+  if (next) { buildLangMenu(); playSound("click"); }
+}
+document.addEventListener("mousedown", (ev) => {
+  const wrap = document.getElementById("langDd");
+  if (wrap && !wrap.contains(ev.target)) wrap.classList.remove("is-open");
+});
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape") { const w = document.getElementById("langDd"); if (w) w.classList.remove("is-open"); }
+});
+function changeLang(val) {
+  langMode = val || "auto";
+  const wrap = document.getElementById("langDd");
+  if (wrap) wrap.classList.remove("is-open");
+  playSound("click");
+  buildLangMenu();
+  syncStaticTexts();
+  renderState(currentStateMode, currentStateDetail, true);
+}
+function applyThemeAndLayoutPresets() {
+  document.body.setAttribute("data-theme", STUDIO.themePreset || "fluxuosCafe");
+  document.body.setAttribute("data-layout", STUDIO.layoutPreset || "classicLeft");
+  document.body.setAttribute("data-icons", STUDIO.iconStyle || "minimalWhite");
+}
+function formatServerError(raw) {
+  const s = String(raw || "");
+  if (s.includes("ERR_UNINSTALL_LOCKED")) return t("errUninstallLocked");
+  if (s.includes("ERR_ELEVATION_CANCELLED")) return t("errUacCancelled");
+  if (s.includes("ERR_INVALID_ZIP")) return t("errInvalidZip");
+  if (s.includes("ERR_SHA256_MISMATCH")) return t("errSha256");
+  if (s.includes("ERR_INSTALL_LOCKED")) return t("errInstallLocked");
+  if (s.includes("ERR_INSTALL_FAILED")) return t("errInstallFailed");
+  if (s.includes("ERR_UNINSTALL_FAILED")) return t("errUninstallFailed");
+  if (s.includes("ERR_MISSING_FILES")) return t("errMissingFiles");
+  if (s.includes("ERR_INVALID_STEAM")) return t("errInvalidSteam");
+  return s;
+}
+function syncStaticTexts() {
+  document.getElementById("btnSound").innerHTML = soundMuted ? icLabel("soundOff", "soundOff") : icLabel("soundOn", "soundOn");
+  document.getElementById("uiPathLabel").textContent = t("pathLabel");
+  document.getElementById("btnPickFolder").innerHTML = icLabel("folder", "folderBtn");
+  const rb = document.getElementById("btnResetFolder");
+  if (rb) {
+    rb.innerHTML = icLabel("refresh", "btnAutoFolder");
+    rb.style.display = envStatus.customFolder ? "inline-flex" : "none";
+  }
+}
+
+function getAudio() {
+  if (soundMuted) return null;
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    if (!audioCtx || audioCtx.state === "closed") audioCtx = new AC();
+    if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+    return audioCtx;
+  } catch { return null; }
+}
+function playSound(kind) {
+  const ctx = getAudio();
+  if (!ctx) return;
+  try {
+    const t0 = ctx.currentTime, master = ctx.createBiquadFilter();
+    master.type = "lowpass"; master.frequency.setValueAtTime(2100, t0); master.connect(ctx.destination);
+    const tone = (f0, f1, dur, vol, type, delay) => {
+      const osc = ctx.createOscillator(), g = ctx.createGain(), st = t0 + (delay || 0);
+      osc.type = type || "sine"; osc.frequency.setValueAtTime(f0, st);
+      if (f1 && f1 !== f0) osc.frequency.exponentialRampToValueAtTime(Math.max(40, f1), st + dur);
+      g.gain.setValueAtTime(0.0001, st); g.gain.linearRampToValueAtTime(vol, st + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, st + dur);
+      osc.connect(g); g.connect(master); osc.start(st); osc.stop(st + dur + 0.01);
+    };
+    if (kind === "click") { tone(659.25, 783.99, 0.055, 0.026, "sine", 0); tone(987.77, 1046.5, 0.048, 0.012, "triangle", 0.018); }
+    else if (kind === "open") { tone(659.25, 659.25, 0.085, 0.022, "sine", 0); tone(830.61, 830.61, 0.095, 0.022, "sine", 0.05); tone(987.77, 1046.5, 0.16, 0.02, "triangle", 0.105); }
+    else if (kind === "success") { tone(523.25, 523.25, 0.09, 0.025, "sine", 0); tone(659.25, 659.25, 0.1, 0.025, "sine", 0.055); tone(783.99, 783.99, 0.11, 0.025, "sine", 0.11); tone(1046.5, 1046.5, 0.22, 0.028, "triangle", 0.165); }
+    else if (kind === "error") { tone(329.63, 293.66, 0.09, 0.026, "triangle", 0); tone(261.63, 220, 0.14, 0.022, "sine", 0.075); }
+  } catch {}
+}
+function toggleMute() {
+  soundMuted = !soundMuted;
+  syncStaticTexts();
+  if (!soundMuted) playSound("click");
+}
+function applyLayout(layout) {
+  if (!layout) return;
+  const setTf = (id, item) => {
+    const el = document.getElementById(id);
+    if (!el || !item) return;
+    el.style.transform = `translate(${Number(item.x)||0}px, ${Number(item.y)||0}px) scale(${Number(item.scale)||1})`;
+  };
+  setTf("elHeader", layout.header);
+  setTf("elCard", layout.card);
+  setTf("elActions", layout.actions);
+  setTf("elMascotStage", layout["pose_" + currentPose] || { x: 0, y: 0, scale: 1 });
+}
+function setPose(poseName) {
+  currentPose = poseName;
+  ["welcome", "no_millennium", "installing", "success", "uninstall", "offline", "error"].forEach(p => {
+    const el = document.getElementById("pose_" + p);
+    if (el) el.classList.toggle("is-active", p === poseName);
+  });
+  applyLayout(STUDIO.layout);
+}
+const PREP_I18N = {
+  "pt-BR": "Preparando instalador...", "en": "Preparing installer...", "es": "Preparando instalador...",
+  "ja": "インストーラーを準備中...", "ko": "설치 프로그램 준비 중...",
+  "ru": "Подготовка установщика...", "fr": "Préparation de l’installateur..."
+};
+function updateBootText() {
+  const b = document.getElementById("bootSub");
+  if (b) b.textContent = PREP_I18N[activeLang()] || "Preparing installer...";
+}
+function hideBootSplash() {
+  const sp = document.getElementById("bootSplash");
+  if (sp) sp.classList.add("is-hidden");
+}
+function showBootSplash() {
+  updateBootText();
+  const sp = document.getElementById("bootSplash");
+  if (sp) sp.classList.remove("is-hidden");
+}
+function initAssets() {
+  if (STUDIO.iconDataUrl) {
+    const logo = document.getElementById("brandLogo");
+    logo.src = STUDIO.iconDataUrl; logo.style.display = "block";
+    const blogo = document.getElementById("bootLogoImg");
+    if (blogo) { blogo.src = STUDIO.iconDataUrl; blogo.style.display = "block"; }
+  }
+  const fb = STUDIO.iconDataUrl || "";
+  ["welcome", "no_millennium", "installing", "success", "uninstall", "offline", "error"].forEach(p => {
+    const el = document.getElementById("pose_" + p);
+    const src = (STUDIO.poses && STUDIO.poses[p]) || (STUDIO.poses && STUDIO.poses.welcome) || fb;
+    if (el && src) el.src = src;
+  });
+  syncStaticTexts();
+  applyLayout(STUDIO.layout);
+}
+function formatStepText(stepCode, kb) {
+  if (stepCode === "connecting") return t("stepConnect");
+  if (stepCode === "downloading") return t("stepDownload", { v: envStatus.latestVersion || "", kb: kb || 0 });
+  if (stepCode === "extracting") return t("stepExtract");
+  if (stepCode === "done") return t("stepDone");
+  return stepCode || t("stepExtract");
+}
+const LATEST_LABEL = {
+  "pt-BR": "Mais recente: v{v}", "en": "Latest: v{v}", "es": "Más reciente: v{v}",
+  "ja": "最新: v{v}", "ko": "최신: v{v}", "ru": "Последняя: v{v}", "fr": "Dernière : v{v}"
+};
+function formatLatestPill(v) {
+  const tpl = LATEST_LABEL[activeLang()] || LATEST_LABEL["en"];
+  return tpl.replace("{v}", String(v || ""));
+}
+function parseSemverArr(v) {
+  const clean = String(v || "").trim().replace(/^[vV]/, "").split("-")[0];
+  const parts = clean.split(".");
+  return [parseInt(parts[0], 10) || 0, parseInt(parts[1], 10) || 0, parseInt(parts[2], 10) || 0];
+}
+function cmpVer(a, b) {
+  const pa = parseSemverArr(a), pb = parseSemverArr(b);
+  for (let i = 0; i < 3; i++) {
+    if (pa[i] !== pb[i]) return pa[i] - pb[i];
+  }
+  return 0;
+}
+function renderState(mode, detail, silent) {
+  const isUpToDate = Boolean(envStatus.installedVersion && envStatus.latestVersion && cmpVer(envStatus.installedVersion, envStatus.latestVersion) >= 0);
+  currentStateMode = mode;
+  currentStateDetail = detail || "";
+  syncStaticTexts();
+  const eyebrow = document.getElementById("uiEyebrow"), title = document.getElementById("uiTitle"), desc = document.getElementById("uiDesc");
+  const millChip = document.getElementById("uiMillChip"), steamPathEl = document.getElementById("uiSteamPath");
+  const progWrap = document.getElementById("uiProgWrap"), btnRow = document.getElementById("uiBtnRow");
+  steamPathEl.textContent = envStatus.steamPath || (mode === "checking" ? t("detectingPath") : t("steamMissing"));
+  millChip.className = "status-chip " + (mode === "checking" ? "ok" : (envStatus.hasMillennium ? "ok" : "warn"));
+  millChip.innerHTML = mode === "checking" ? t("checking") : (envStatus.hasMillennium ? icLabel("check", "millOk") : icLabel("warn", "millWarn"));
+  if (envStatus.latestVersion) {
+    document.getElementById("pillRelease").innerHTML = uiIcon("spark") + '<span>' + formatLatestPill(envStatus.latestVersion) + '</span>';
+    document.getElementById("uiVerMain").textContent = "Repage SteamGrid v" + envStatus.latestVersion;
+    document.getElementById("uiVerSub").textContent = envStatus.installedVersion ? (isUpToDate ? (I18N[activeLang()] && I18N[activeLang()].verSubUpToDate ? t("verSubUpToDate", { v: envStatus.installedVersion }) : (t("verSubInstalled", { v: envStatus.installedVersion }) + " (OK)")) : (t("verSubInstalled", { v: envStatus.installedVersion }) + " → v" + envStatus.latestVersion)) : t("verSubClean");
+  } else {
+    document.getElementById("uiVerSub").textContent = t("verSubConnecting");
+  }
+  progWrap.classList.remove("is-visible");
+  if (mode === "checking") {
+    setPose("welcome");
+    eyebrow.innerHTML = icLabel("spark", "chkEyebrow"); title.textContent = t("chkTitle"); desc.textContent = t("chkDesc");
+    btnRow.innerHTML = "";
+  } else if (mode === "offline") {
+    setPose("offline"); if (!silent) playSound("error");
+    eyebrow.innerHTML = icLabel("warn", "offEyebrow"); title.textContent = t("offTitle"); desc.textContent = detail || t("offDesc");
+    const localBtns = envStatus.installedVersion
+      ? ('<button type="button" class="btn danger-btn" onclick="playSound(\'click\');renderState(\'uninstall\')">' + icLabel("trash", "btnUninstall") + '</button><button type="button" class="btn" onclick="playSound(\'click\');openPluginFolder()">' + icLabel("openFolder", "btnOpenFolder") + '</button>')
+      : (envStatus.steamPath ? ('<button type="button" class="btn" onclick="playSound(\'click\');openPluginFolder()">' + icLabel("openFolder", "btnOpenFolder") + '</button>') : '');
+    btnRow.innerHTML = localBtns + '<button type="button" class="btn primary" onclick="playSound(\'click\');recheckStatus()">' + icLabel("refresh", "btnRetry") + '</button>';
+  } else if (mode === "no_millennium") {
+    setPose("no_millennium");
+    eyebrow.innerHTML = icLabel("warn", "noMillEyebrow"); title.textContent = t("noMillTitle"); desc.textContent = t("noMillDesc");
+    btnRow.innerHTML = '<button type="button" class="btn" onclick="playSound(\'click\');pickFolder()">' + icLabel("folder", "btnChangeFolder") + '</button><button type="button" class="btn primary" onclick="playSound(\'click\');recheckStatus()">' + icLabel("refresh", "btnRecheck") + '</button>';
+  } else if (mode === "welcome") {
+    setPose("welcome");
+    const hasInst = Boolean(envStatus.installedVersion);
+    if (isUpToDate) {
+      document.getElementById("uiVerSub").textContent = (I18N[activeLang()] && I18N[activeLang()].verSubUpToDate ? t("verSubUpToDate", { v: envStatus.installedVersion }) : (t("verSubInstalled", { v: envStatus.installedVersion }) + " (OK)"));
+      eyebrow.innerHTML = icLabel("check", "upToDateEyebrow");
+      title.textContent = t("upToDateTitle", { v: envStatus.installedVersion });
+      desc.textContent = t("upToDateDesc");
+      btnRow.innerHTML = '<button type="button" class="btn danger-btn" onclick="playSound(\'click\');renderState(\'uninstall\')">' + icLabel("trash", "btnUninstall") + '</button><button type="button" class="btn primary" onclick="playSound(\'click\');startInstall(true)">' + icLabel("refresh", "btnReinstall") + '</button>';
+    } else if (hasInst) {
+      eyebrow.innerHTML = icLabel("spark", "welEyebrowUpd");
+      title.textContent = t("welTitleUpd", { v: envStatus.latestVersion || "" });
+      desc.textContent = t("welDesc");
+      btnRow.innerHTML = '<button type="button" class="btn danger-btn" onclick="playSound(\'click\');renderState(\'uninstall\')">' + icLabel("trash", "btnUninstall") + '</button><button type="button" class="btn" onclick="playSound(\'click\');recheckStatus()">' + icLabel("refresh", "btnRefresh") + '</button><button type="button" class="btn primary" onclick="playSound(\'click\');startInstall(true)">' + icLabel("install", "btnUpdate") + '</button>';
+    } else {
+      eyebrow.innerHTML = icLabel("spark", "welEyebrowNew");
+      title.textContent = t("welTitleNew");
+      desc.textContent = t("welDesc");
+      btnRow.innerHTML = '<button type="button" class="btn" onclick="playSound(\'click\');recheckStatus()">' + icLabel("refresh", "btnRefresh") + '</button><button type="button" class="btn primary" onclick="playSound(\'click\');startInstall(false)">' + icLabel("install", "btnInstall") + '</button>';
+    }
+  } else if (mode === "uninstall") {
+    setPose("uninstall");
+    eyebrow.innerHTML = icLabel("trash", "uninstEyebrow");
+    title.textContent = t("uninstTitle");
+    desc.textContent = t("uninstDesc");
+    btnRow.innerHTML = '<button type="button" class="btn" onclick="playSound(\'click\');renderState(\'welcome\')">' + t("btnCancel") + '</button><button type="button" class="btn danger-btn" onclick="playSound(\'click\');confirmUninstall()">' + icLabel("trash", "btnConfirmUninstall") + '</button>';
+  } else if (mode === "uninstall_done") {
+    setPose("uninstall"); if (!silent) playSound("click");
+    eyebrow.innerHTML = icLabel("check", "uninstDoneEyebrow");
+    title.textContent = t("uninstDoneTitle");
+    desc.textContent = t("uninstDoneDesc");
+    const steamBtn = envStatus.steamRunning
+      ? '<button type="button" class="btn success-btn" onclick="playSound(\'click\');promptRestartSteam()">' + icLabel("restart", "btnRestartSteam") + '</button>'
+      : '<button type="button" class="btn success-btn" onclick="playSound(\'click\');launchSteamOnly()">' + icLabel("play", "btnStartSteam") + '</button>';
+    btnRow.innerHTML = '<button type="button" class="btn" onclick="playSound(\'click\');startInstall(false)">' + icLabel("install", "btnInstallAgain") + '</button>' + steamBtn + '<button type="button" class="btn primary" onclick="playSound(\'click\');closeInstaller()">' + icLabel("check", "btnFinish") + '</button>';
+  } else if (mode === "installing") {
+    setPose("installing");
+    eyebrow.innerHTML = icLabel("spark", "insEyebrow"); title.textContent = t("insTitle"); desc.textContent = t("insDesc");
+    progWrap.classList.add("is-visible");
+    document.getElementById("uiProgStep").textContent = formatStepText("connecting", 0);
+    btnRow.innerHTML = '<button type="button" class="btn" disabled>' + icLabel("loading", "btnInstalling") + '</button>';
+  } else if (mode === "success") {
+    setPose("success"); if (!silent) playSound("success");
+    const millEnableNote = {
+      "pt-BR": " Se não ativar sozinho, ative em: Steam → Millennium → Plugins → Repage SteamGrid.",
+      "en": " If not auto-enabled, enable it at: Steam → Millennium → Plugins → Repage SteamGrid.",
+      "es": " Si no se activa solo, actívalo en: Steam → Millennium → Plugins → Repage SteamGrid.",
+      "ja": " 自動有効化されない場合は Steam → Millennium → Plugins → Repage SteamGrid で有効にしてください。",
+      "ko": " 자동 활성화되지 않으면 Steam → Millennium → Plugins → Repage SteamGrid에서 켜주세요.",
+      "ru": " Если плагин не включился сам, включите его: Steam → Millennium → Plugins → Repage SteamGrid.",
+      "fr": " S’il ne s’active pas seul, activez-le dans : Steam → Millennium → Plugins → Repage SteamGrid."
+    };
+    eyebrow.innerHTML = icLabel("check", "sucEyebrow"); title.textContent = t("sucTitle");
+    const autoTxt = envStatus.autoEnabled ? t("sucAutoNote") : (millEnableNote[activeLang()] || millEnableNote["en"]);
+    desc.textContent = (envStatus.steamRunning ? t("sucDesc") : t("sucDescClosed")) + autoTxt;
+    const steamBtn = envStatus.steamRunning
+      ? '<button type="button" class="btn success-btn" onclick="playSound(\'click\');promptRestartSteam()">' + icLabel("restart", "btnRestartSteam") + '</button>'
+      : '<button type="button" class="btn success-btn" onclick="playSound(\'click\');launchSteamOnly()">' + icLabel("play", "btnStartSteam") + '</button>';
+    btnRow.innerHTML = '<button type="button" class="btn" onclick="playSound(\'click\');openPluginFolder()">' + icLabel("openFolder", "btnOpenFolder") + '</button>' + steamBtn + '<button type="button" class="btn primary" onclick="playSound(\'click\');closeInstaller()">' + icLabel("check", "btnFinish") + '</button>';
+  } else if (mode === "error") {
+    setPose("error"); if (!silent) playSound("error");
+    eyebrow.innerHTML = icLabel("warn", "errEyebrow"); title.textContent = t("errTitle"); desc.textContent = formatServerError(detail) || t("errDesc");
+    const isLock = String(detail || "").includes("ERR_INSTALL_LOCKED") || String(detail || "").includes("ERR_UNINSTALL_LOCKED");
+    const closeBtn = (isLock && envStatus.steamRunning) ? '<button type="button" class="btn danger-btn" id="btnCloseSteamRetry" onclick="playSound(\'click\');promptCloseSteamAndRetry()">' + icLabel("restart", "btnCloseSteamRetry") + '</button>' : '';
+    btnRow.innerHTML = '<button type="button" class="btn" id="btnCopyErrLog" onclick="playSound(\'click\');copyErrorLog()">' + copyIconHtml() + '<span>' + t("btnCopyLog") + '</span></button><button type="button" class="btn" onclick="playSound(\'click\');pickFolder()">' + icLabel("folder", "btnChangeFolder") + '</button>' + closeBtn + '<button type="button" class="btn primary" onclick="playSound(\'click\');retryFromError()">' + icLabel("refresh", "btnRetry") + '</button>';
+  }
+}
+let lastInstallWasClean = false;
+let lastFailedAction = "install";
+let clientLogLines = [];
+function addClientLog(msg) {
+  const ts = new Date().toISOString().slice(11, 23);
+  clientLogLines.push("[" + ts + "] [UI] " + msg);
+}
+async function retryFromError() {
+  addClientLog("User clicked Retry (action=" + lastFailedAction + ", hasMill=" + envStatus.hasMillennium + ", latest=" + envStatus.latestVersion + ")");
+  if (lastFailedAction === "uninstall") {
+    await confirmUninstall();
+  } else if (!envStatus.latestVersion || !envStatus.online || !envStatus.hasMillennium) {
+    await recheckStatus(false);
+  } else {
+    await startInstall(lastInstallWasClean);
+  }
+}
+function promptCloseSteamAndRetry() {
+  const m = document.getElementById("steamConfirmModal");
+  if (!m) { execCloseSteamAndRetry(); return; }
+  document.getElementById("cmTitle").innerHTML = icLabel("warn", "rstModalTitle");
+  document.getElementById("cmBody").textContent = t("rstModalDesc");
+  document.getElementById("cmActions").innerHTML =
+    '<button type="button" class="btn" onclick="playSound(\'click\');closeConfirmModal()">' + t("btnCancel") + '</button>' +
+    '<button type="button" class="btn danger-btn" onclick="playSound(\'click\');execCloseSteamAndRetry()">' + icLabel("restart", "btnCloseSteamRetry") + '</button>';
+  m.classList.add("is-open");
+}
+async function execCloseSteamAndRetry() {
+  closeConfirmModal();
+  const btn = document.getElementById("btnCloseSteamRetry");
+  if (btn) { btn.disabled = true; btn.innerHTML = uiIcon("loading") + "<span>" + stripLeadEmoji(t("closingSteam")) + "</span>"; }
+  addClientLog("Shutting down Steam safely before retrying " + lastFailedAction + "...");
+  try {
+    const r = await apiFetch("/api/shutdown-steam", { method: "POST" });
+    const d = await r.json();
+    if (typeof d.steamRunning === "boolean") envStatus.steamRunning = d.steamRunning;
+  } catch (e) { addClientLog("execCloseSteamAndRetry err: " + e.message); }
+  await retryFromError();
+}
+function copyIconHtml() {
+  return isMinimalIcons()
+    ? '<span class="ui-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f6f3ff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>'
+    : '<span class="ui-ic">📋</span>';
+}
+async function copyErrorLog() {
+  const btn = document.getElementById("btnCopyErrLog");
+  const NL = String.fromCharCode(10);
+  let fullText = "";
+  try {
+    if (!IS_PREVIEW) {
+      const r = await apiFetch("/api/log");
+      const d = await r.json();
+      fullText = d.log || "";
+    }
+  } catch (e) { fullText = "log fetch err: " + e.message; }
+  if (clientLogLines.length) fullText += NL + "--- UI LOG ---" + NL + clientLogLines.join(NL);
+  try { await navigator.clipboard.writeText(fullText || "(empty)"); } catch {}
+  if (btn) {
+    btn.innerHTML = icLabel("check", "logCopied");
+    setTimeout(() => {
+      const cur = document.getElementById("btnCopyErrLog");
+      if (cur) cur.innerHTML = copyIconHtml() + "<span>" + t("btnCopyLog") + "</span>";
+    }, 1800);
+  }
+}
+window.addEventListener("error", (ev) => { try { addClientLog("JS_ERR: " + (ev.message || ev.error)); } catch {} });
+async function recheckStatus(isFirstBoot) {
+  if (IS_PREVIEW) return;
+  const startedAt = Date.now();
+  try {
+    const r = await apiFetch("/api/check"); const d = await r.json();
+    if (d.osLocale) detectedOsLocale = d.osLocale;
+    updateBootText();
+    buildLangMenu();
+    envStatus = { ...envStatus, ...d };
+    if (isFirstBoot) {
+      const wait = Math.max(0, 480 - (Date.now() - startedAt));
+      if (wait > 0) await new Promise(res => setTimeout(res, wait));
+    }
+    if (!d.online) renderState("offline", d.error, isFirstBoot);
+    else if (!d.hasMillennium) renderState("no_millennium", "", isFirstBoot);
+    else renderState("welcome", "", isFirstBoot);
+    if (isFirstBoot) playSound("open");
+  } catch (e) {
+    try { addClientLog("recheckStatus error: " + e.message); } catch {}
+    try { renderState("offline", e.message, isFirstBoot); } catch {}
+  } finally {
+    if (isFirstBoot) hideBootSplash();
+  }
+}
+let pickingFolderBusy = false;
+async function pickFolder() {
+  playSound("click");
+  if (IS_PREVIEW || pickingFolderBusy) return;
+  pickingFolderBusy = true;
+  addClientLog("Opening native folder picker...");
+  try {
+    const r = await apiFetch("/api/pick-folder", { method: "POST" }); const d = await r.json();
+    addClientLog("Folder picker returned: picked=" + d.picked + ", path=" + (d.steamPath || "") + ", hasMill=" + d.hasMillennium);
+    if (d.picked) {
+      envStatus = { ...envStatus, ...d };
+      if (!envStatus.online) renderState("offline", d.error);
+      else if (!envStatus.hasMillennium) renderState("no_millennium");
+      else renderState("welcome");
+    }
+  } catch (e) {
+    addClientLog("pickFolder error: " + e.message);
+  } finally {
+    pickingFolderBusy = false;
+  }
+}
+async function resetFolderAuto() {
+  playSound("click");
+  if (IS_PREVIEW) return;
+  addClientLog("Resetting to automatic Steam/Millennium detection...");
+  try {
+    const r = await apiFetch("/api/reset-folder", { method: "POST" }); const d = await r.json();
+    envStatus = { ...envStatus, ...d };
+    if (!envStatus.online) renderState("offline", d.error);
+    else if (!envStatus.hasMillennium) renderState("no_millennium");
+    else renderState("welcome");
+  } catch (e) { addClientLog("resetFolderAuto error: " + e.message); }
+}
+async function startInstall(cleanMode) {
+  lastInstallWasClean = Boolean(cleanMode);
+  lastFailedAction = "install";
+  addClientLog("startInstall called (cleanMode=" + lastInstallWasClean + ")");
+  if (IS_PREVIEW) {
+    renderState("installing");
+    let p = 0;
+    const tmr = setInterval(() => {
+      p += 25;
+      document.getElementById("uiProgPct").textContent = Math.min(100, p) + "%";
+      document.getElementById("uiProgFill").style.width = Math.min(100, p) + "%";
+      document.getElementById("uiProgStep").textContent = p < 75 ? formatStepText("downloading", p * 4) : formatStepText("extracting", 0);
+      if (p >= 100) { clearInterval(tmr); renderState("success"); }
+    }, 280);
+    return;
+  }
+  renderState("installing");
+  try {
+    const r = await apiFetch("/api/install?clean=" + (cleanMode ? "1" : "0"), { method: "POST" }); const d = await r.json();
+    if (!d.ok) { renderState("error", d.error); return; }
+    const poll = setInterval(async () => {
+      try {
+        const pr = await apiFetch("/api/progress"); const pd = await pr.json();
+        document.getElementById("uiProgPct").textContent = (pd.percent || 0) + "%";
+        document.getElementById("uiProgFill").style.width = (pd.percent || 0) + "%";
+        document.getElementById("uiProgStep").textContent = formatStepText(pd.stepCode, pd.kb);
+        if (pd.status === "done") { clearInterval(poll); if (typeof pd.steamRunning === "boolean") envStatus.steamRunning = pd.steamRunning; envStatus.installedVersion = envStatus.latestVersion; try { const sr = await apiFetch("/api/check"); const sd = await sr.json(); envStatus = { ...envStatus, ...sd }; } catch {} renderState("success"); }
+        else if (pd.status === "error") { clearInterval(poll); renderState("error", pd.error); }
+      } catch { clearInterval(poll); renderState("error", ""); }
+    }, 180);
+  } catch (e) { renderState("error", e.message); }
+}
+function openPluginFolder() { if (!IS_PREVIEW) apiFetch("/api/open-folder", { method: "POST" }); }
+function closeConfirmModal() {
+  const m = document.getElementById("steamConfirmModal");
+  if (m) m.classList.remove("is-open");
+}
+function promptRestartSteam() {
+  const m = document.getElementById("steamConfirmModal");
+  if (!m) return;
+  document.getElementById("cmTitle").innerHTML = icLabel("warn", "rstModalTitle");
+  document.getElementById("cmBody").textContent = t("rstModalDesc");
+  document.getElementById("cmActions").innerHTML =
+    '<button type="button" class="btn" onclick="playSound(\'click\');closeConfirmModal()">' + t("btnCancel") + '</button>' +
+    '<button type="button" class="btn danger-btn" onclick="playSound(\'click\');execRestartSteam()">' + icLabel("restart", "btnConfirmRestart") + '</button>';
+  m.classList.add("is-open");
+}
+let steamActionBusy = false;
+function execRestartSteam() {
+  closeConfirmModal();
+  if (IS_PREVIEW || steamActionBusy) return;
+  steamActionBusy = true;
+  const sBtn = document.querySelector(".btn.success-btn");
+  if (sBtn) { sBtn.disabled = true; sBtn.innerHTML = uiIcon("loading") + "<span>" + stripLeadEmoji(t("btnRestartSteam")) + "...</span>"; }
+  apiFetch("/api/restart-steam?mode=restart", { method: "POST" }).catch(() => {}).finally(() => {
+    setTimeout(() => { steamActionBusy = false; if (sBtn) { sBtn.disabled = false; sBtn.innerHTML = icLabel("restart", "btnRestartSteam"); } }, 6500);
+  });
+}
+function launchSteamOnly() {
+  if (IS_PREVIEW || steamActionBusy) return;
+  steamActionBusy = true;
+  const sBtn = document.querySelector(".btn.success-btn");
+  if (sBtn) { sBtn.disabled = true; sBtn.innerHTML = uiIcon("loading") + "<span>" + stripLeadEmoji(t("btnStartSteam")) + "...</span>"; }
+  apiFetch("/api/restart-steam?mode=start", { method: "POST" }).catch(() => {}).finally(() => {
+    setTimeout(() => { steamActionBusy = false; if (sBtn) { sBtn.disabled = false; sBtn.innerHTML = icLabel("play", "btnStartSteam"); } }, 4500);
+  });
+}
+async function confirmUninstall() {
+  lastFailedAction = "uninstall";
+  if (IS_PREVIEW) { envStatus.installedVersion = ""; renderState("uninstall_done"); return; }
+  try {
+    const r = await apiFetch("/api/uninstall", { method: "POST" });
+    const d = await r.json();
+    if (!d.ok) { renderState("error", d.error); return; }
+    envStatus.installedVersion = "";
+    if (typeof d.steamRunning === "boolean") envStatus.steamRunning = d.steamRunning;
+    renderState("uninstall_done");
+  } catch (e) { renderState("error", e.message); }
+}
+function closeInstaller() { if (!IS_PREVIEW) { apiFetch("/api/quit", { method: "POST" }).catch(() => {}); setTimeout(() => { try { window.close(); } catch {} }, 40); } }
+
+let dragTargetKey = "", dragOrigin = null;
+function resolveLayoutKey(rawKey) { return rawKey === "pose" ? ("pose_" + currentPose) : rawKey; }
+document.addEventListener("pointerdown", (ev) => {
+  if (!IS_PREVIEW || !EDIT_MODE) return;
+  const box = ev.target.closest("[data-drag-key]");
+  if (!box || ev.target.closest("select,button")) return;
+  ev.preventDefault(); ev.stopPropagation();
+  document.querySelectorAll("[data-drag-key]").forEach(el => el.classList.remove("is-selected-drag"));
+  box.classList.add("is-selected-drag");
+  dragTargetKey = resolveLayoutKey(box.getAttribute("data-drag-key"));
+  const cur = (STUDIO.layout && STUDIO.layout[dragTargetKey]) || { x: 0, y: 0, scale: 1 };
+  document.body.classList.add("is-dragging");
+  dragOrigin = { startX: ev.clientX, startY: ev.clientY, x0: Number(cur.x) || 0, y0: Number(cur.y) || 0, scale: Number(cur.scale) || 1 };
+  window.parent.postMessage({ type: "studio-select-key", key: dragTargetKey, item: cur }, "*");
+}, true);
+document.addEventListener("pointermove", (ev) => {
+  if (!dragOrigin || !dragTargetKey) return;
+  const nx = Math.round(dragOrigin.x0 + (ev.clientX - dragOrigin.startX));
+  const ny = Math.round(dragOrigin.y0 + (ev.clientY - dragOrigin.startY));
+  STUDIO.layout[dragTargetKey] = { x: nx, y: ny, scale: dragOrigin.scale };
+  applyLayout(STUDIO.layout);
+  window.parent.postMessage({ type: "studio-layout-changed", key: dragTargetKey, layout: STUDIO.layout }, "*");
+}, true);
+document.addEventListener("pointerup", () => { dragOrigin = null; document.body.classList.remove("is-dragging"); }, true);
+document.addEventListener("wheel", (ev) => {
+  if (!IS_PREVIEW || !EDIT_MODE) return;
+  const box = ev.target.closest("[data-drag-key]");
+  if (!box) return;
+  ev.preventDefault();
+  const key = resolveLayoutKey(box.getAttribute("data-drag-key"));
+  const cur = (STUDIO.layout && STUDIO.layout[key]) || { x: 0, y: 0, scale: 1 };
+  const nextScale = Math.max(0.45, Math.min(1.85, Number(((Number(cur.scale) || 1) + (ev.deltaY < 0 ? 0.04 : -0.04)).toFixed(2))));
+  STUDIO.layout[key] = { ...cur, scale: nextScale };
+  applyLayout(STUDIO.layout);
+  window.parent.postMessage({ type: "studio-layout-changed", key, layout: STUDIO.layout }, "*");
+}, { passive: false });
+
+window.addEventListener("message", (ev) => {
+  const msg = ev.data;
+  if (!msg || typeof msg !== "object") return;
+  if (msg.type === "studio-update") {
+    IS_PREVIEW = true;
+    if (typeof msg.editMode === "boolean") {
+      EDIT_MODE = msg.editMode;
+      document.body.classList.toggle("is-edit-mode", EDIT_MODE);
+    }
+    if (msg.poses) STUDIO.poses = msg.poses;
+    if (msg.iconDataUrl !== undefined) STUDIO.iconDataUrl = msg.iconDataUrl;
+    if (msg.themePreset) STUDIO.themePreset = msg.themePreset;
+    if (msg.layoutPreset) STUDIO.layoutPreset = msg.layoutPreset;
+    if (msg.iconStyle) STUDIO.iconStyle = msg.iconStyle;
+    if (msg.layout) STUDIO.layout = msg.layout;
+    applyThemeAndLayoutPresets();
+    buildLangMenu();
+    initAssets();
+    if (msg.previewState === "splash") {
+      showBootSplash();
+    } else if (msg.previewState) {
+      hideBootSplash();
+      envStatus.latestVersion = "5.5.9";
+      envStatus.steamPath = "C:\\Program Files (x86)\\Steam\\millennium\\plugins";
+      envStatus.hasMillennium = msg.previewState !== "no_millennium";
+      envStatus.steamRunning = true;
+      envStatus.installedVersion = msg.previewState === "uptodate" ? "5.5.9" : "";
+      renderState(msg.previewState === "uptodate" ? "welcome" : msg.previewState, "", true);
+      if (msg.previewState === "installing") {
+        document.getElementById("uiProgPct").textContent = "68%";
+        document.getElementById("uiProgFill").style.width = "68%";
+        document.getElementById("uiProgStep").textContent = formatStepText("extracting", 0);
+      }
+    }
+  }
+});
+
+applyThemeAndLayoutPresets();
+initAssets();
+updateBootText();
+buildLangMenu();
+if (window.parent === window) {
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("keydown", e => {
+    if (e.key === "F5" || e.key === "F12" || ((e.ctrlKey || e.metaKey) && /^[rpus0+-=]$/i.test(e.key))) e.preventDefault();
+  });
+  document.addEventListener("wheel", e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+  setInterval(() => apiFetch("/api/ping").catch(() => {}), 1500);
+  setTimeout(() => { recheckStatus(true); }, 60);
+} else {
+  hideBootSplash();
+  renderState("welcome", "", true);
+}
+</script>
+</body>
+</html>
