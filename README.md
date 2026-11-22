@@ -10,14 +10,14 @@ Browse, filter, preview and apply SteamGridDB artwork for your entire library, w
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20Steam%20Deck%20(alpha)-2a475e?style=flat-square)
 [![License](https://img.shields.io/badge/license-MIT-49C695?style=flat-square)](LICENSE)
 
-[**Download**](../../releases/latest) · [Installation](#installation) · [API key](#steamgriddb-api-key) · [Filters](#filters) · [Features](#features) · [Controls](#controls--shortcuts) · [Troubleshooting](#troubleshooting)
+[**Download**](../../releases/latest) · [Installation](#installation) · [API key](#steamgriddb-api-key) · [Filters](#filters) · [Non-Steam games](#non-steam-games-and-the-steamgriddb-id) · [Features](#features) · [Controls](#controls--shortcuts) · [Troubleshooting](#troubleshooting)
 
 </div>
 
 <div align="center">
   <img src="docs/preview.png" alt="Repage SteamGrid editor open on the Grid tab, with the Steam library blurred in the background" width="900">
   <br>
-  <sub><i>The editor open on a game's Grid tab: filter bar, results and the live library behind it.</i></sub>
+  <sub><i>The editor open on a game's Grid tab, with the filter panel, result counters and your library alongside.</i></sub>
 </div>
 
 ---
@@ -55,23 +55,25 @@ Repage SteamGrid runs inside the Steam client through [Millennium](https://githu
   <sub><i>Batch replace on a whole Steam Collection: 13 games restyled in one pass.</i></sub>
 </div>
 
-<!--
-  Alternative transition (cross-fade instead of the wipe). To use it,
-  replace docs/before-after.gif above with docs/before-after-fade.gif.
-  <img src="docs/before-after-fade.gif" alt="A Resident Evil collection before and after a batch replace" width="800">
--->
+<br>
+
+<div align="center">
+  <img src="docs/hero-live.png" alt="Hero artwork applied in real time on a Steam game page, with the Repage editor open beside it" width="900">
+  <br>
+  <sub><i>Hero artwork applied in real time: the game page updates the moment you click an image.</i></sub>
+</div>
 
 <br>
 
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="docs/hero-tab.png" alt="Hero tab on a non-Steam game" width="100%">
+      <img src="docs/grid-live.png" alt="Grid artwork applied in real time on the Steam library, using the Aika theme" width="100%">
       <br>
-      <sub><i>Hero tab on a non-Steam shortcut. Shortcuts get the same tools as Steam games.</i></sub>
+      <sub><i>Grid artwork applied in real time, here running on the <a href="https://github.com/hatewxb/Aika/">Aika</a> theme.</i></sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/context-menu.png" alt="Context menu on an artwork card" width="100%">
+      <img src="docs/context-menu.png" alt="Right-click menu on an artwork card" width="100%">
       <br>
       <sub><i>Right-click menu: favorite, save to disk, prioritize or exclude an author, open on SGDB.</i></sub>
     </td>
@@ -178,14 +180,14 @@ Repage gets every image from [SteamGridDB](https://www.steamgriddb.com), and Ste
 Filtering and sorting were two of the main reasons Repage was created. Easy SteamGrid showed a long list and little else. In Repage, every filter and every sorting option below works **instantly on the results already loaded**, with no extra requests, and a counter bar tells you exactly what you are looking at.
 
 <div align="center">
-  <img src="docs/filters.png" alt="The filter bar and result counters in the Hero tab" width="900">
+  <img src="docs/filters.png" alt="The filter panel and result counters in the Grid tab" width="900">
   <br>
-  <sub><i>The filter bar sits right above the results. Hide it with <b>Hide filters</b> when you want more room.</i></sub>
+  <sub><i>The filter panel, opened with the <b>Filters</b> button. The number on the button shows how many filters are active.</i></sub>
 </div>
 
 ### Tag filters: NSFW, Humor and Epilepsy
 
-These three work the same way. Each one has three modes:
+These three work the same way. Each one is a switch with three modes:
 
 | Mode | What you see |
 | :--- | :--- |
@@ -195,44 +197,16 @@ These three work the same way. Each one has three modes:
 
 For example, **NSFW: Exclude** keeps adult artwork out of your gallery (and out of your pinned favorites), while **NSFW: Only** is a quick way to review just the flagged images.
 
-### Checkbox filters: Types, Mimes, Styles and Dimensions
+### Types, Mimes, Styles and Dimensions
 
-These four open a list of checkboxes. Everything starts checked, and you untick what you do not want to see.
+- **Types** and **Mimes** are toggle buttons: **Static** / **Animated**, and the file formats **WebP** / **PNG** / **JPEG**. Click one to turn it off or on.
+- **Styles** and **Dimensions** open a checklist. The label reads **All**, or shows how many options are selected (for example *6 of 7*). Everything starts checked, and you untick what you do not want to see.
 
-<table>
-  <tr>
-    <td align="center" valign="top">
-      <b>Types</b><br><br>
-      <img src="docs/filter-types.png" alt="Types filter: Static and Animated" width="320">
-      <br><sub><i>Static and animated artwork.</i></sub>
-    </td>
-    <td align="center" valign="top">
-      <b>Mimes</b><br><br>
-      <img src="docs/filter-mimes.png" alt="Mimes filter: WebP, PNG and JPEG" width="320">
-      <br><sub><i>File formats: WebP, PNG, JPEG.</i></sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" valign="top">
-      <b>Styles</b><br><br>
-      <img src="docs/filter-styles.png" alt="Styles filter: Alternate, Blurred and Material" width="320">
-      <br><sub><i>Alternate, Blurred, Material.</i></sub>
-    </td>
-    <td align="center" valign="top">
-      <b>Dimensions</b><br><br>
-      <img src="docs/filter-dims.png" alt="Dimensions filter: available image sizes" width="320">
-      <br><sub><i>The image sizes available (Hero tab shown).</i></sub>
-    </td>
-  </tr>
-</table>
+Use **Reset filters** to bring everything back to the defaults in one click.
 
 ### Sorting
 
-Sorting matters as much as filtering. **Sort by**, in the top right of the editor, sets the order of the **images** in the gallery. It does not sort the filters themselves, but the two work hand in hand: filters decide *which* images appear, and sorting decides *in what order*.
-
-<div align="center">
-  <img src="docs/filter-sort.png" alt="The Sort by menu: Score, Newest, Author, Resolution" width="230">
-</div>
+Sorting matters as much as filtering. The **sort menu** in the toolbar (it shows the current choice, such as *Score*) sets the order of the **images** in the gallery. It does not sort the filters themselves, but the two work hand in hand: filters decide *which* images appear, and sorting decides *in what order*.
 
 | Option | Order of the images |
 | :--- | :--- |
@@ -250,9 +224,9 @@ Two switches work **together with** the sort order instead of replacing it:
 
 ### Reading the results
 
-- **Counters:** a live bar shows the total **results**, how many are **shown** after filtering, and how many are *NSFW*, *Humor*, *Epilepsy*, *Static* and *Animated*. You see right away what a filter is hiding.
-- **Show tags:** each card can display chips such as `FAVORITE`, `STATIC`, `PNG` and `ALTERNATE`, so you can judge an image without opening it. Switch between the essential tags and the full set.
-- **Width scale:** change the card size to see more images at once or inspect them closer.
+- **Counter bar:** shows the total **results**, how many are **shown**, and how many carry each tag (*NSFW*, *Humor*, *Epilepsy*) or type (*Static*, *Animated*). **Filtered** is the number of images your filters are currently hiding, so you always know what you are not seeing.
+- **Tag chips:** every card shows chips such as `STATIC`, `PNG`, `ALTERNATE`, `MATERIAL` or `WHITE LOGO`, so you can judge an image without opening it.
+- **Card size:** the size menu in the toolbar (*Medium*, *Bigger* and so on) changes the card width, to see more images at once or inspect them closer.
 
 ### Curating beyond filters
 
@@ -261,6 +235,50 @@ Two switches work **together with** the sort order instead of replacing it:
 - **Pinned favorites:** favorite artwork per slot and it stays at the top regardless of sorting or filters.
 - **Local files first:** your own files stay pinned at the top of the slot.
 - **Portable:** filters and curation settings are included in the JSON backup, so you can move them between machines. Your API key never is.
+
+---
+
+## Non-Steam games and the SteamGridDB ID
+
+Steam games are matched to SteamGridDB by their Steam App ID, which is the same for everyone. **Non-Steam shortcuts** (emulators, games from other launchers, standalone executables) have no shared ID, so Repage **searches by the game's name automatically**.
+
+Most of the time that is all you need. But a name can match the wrong game, or nothing at all. If the artwork that appears is not from the right game, or the **SGDB ID** is empty, set the ID yourself.
+
+<div align="center">
+  <img src="docs/game-panel.png" alt="The Game and SteamGridDB panel with the SGDB ID field, Set ID and Clear ID buttons" width="360">
+  <br>
+  <sub><i>The <b>Game &amp; SteamGridDB</b> panel. Open it from the <b>SGDB ID</b> chip at the top left of the toolbar.</i></sub>
+</div>
+
+### How to find the ID
+
+1. Open [steamgriddb.com](https://www.steamgriddb.com) in your browser and search for the game.
+2. Open the page of the **correct** game.
+3. Look at the address bar. The **number at the end of the URL is the game's ID**.
+
+```text
+https://www.steamgriddb.com/game/38652
+                                 └─ 38652 is the game ID
+```
+
+### How to use it
+
+1. In Repage, select the game and click the **SGDB ID** chip at the top left of the toolbar.
+2. Type the ID into the **SGDB ID** field and click **Set ID**.
+3. The gallery reloads with that game's artwork.
+
+Your choice is saved as an override for that game, and it is included in your JSON backup. To go back to automatic matching, click **Clear ID**, and if you lose track of the number, **Redetect game** brings back the right one.
+
+The same panel has a few more tools:
+
+| Action | What it does |
+| :--- | :--- |
+| **Redetect game** | Gets the ID again automatically: by the game's **name** for non-Steam shortcuts, or by its **Steam App ID** for Steam games. Handy if you cleared or changed the number and do not remember what it was. |
+| **Open SGDB** | Opens the game's page on the official SteamGridDB site, in your browser. |
+| **Library page** | Takes you to the game's page in your Steam library, the one with the banner, the Play button and the rest. |
+| **Purge cache** | Clears the cached data related to this game, so it is fetched again. |
+
+> **Tip:** this also fixes the occasional Steam game whose artwork is mixed up or missing. Find the right page on SteamGridDB and set its ID the same way.
 
 ---
 
@@ -311,7 +329,12 @@ Two switches work **together with** the sort order instead of replacing it:
 <summary><b>Themes, languages and accessibility</b></summary>
 
 - **12 curated themes plus custom presets:** *Fluxuos Core* (an OLED theme with a subtle café pattern and cozy audio), *Steam Blue*, *Midnight*, *Midnight OLED*, *Nordic Frost*, *Crimson Velvet*, *Night City Neon*, *Umbrella Kiss*, *Bonnie & Clyde*, *The Green Hero*, *Firefly Glow* and *Cassino Inkwell*. Tweak lights, surfaces and corners, and save up to 9 presets of your own.
-- **7 languages with auto-detection:** English, Portuguese (Brazil), Spanish, Japanese, Korean, Russian and French, matched to your Steam language or chosen manually.
+- **7 languages with auto-detection:** English, Portuguese (Brazil), Spanish, Japanese, Korean, Russian and French. The default is **Automatic**, which follows your Steam language, and you can pick another one in **Settings**.
+
+<div align="center">
+  <img src="docs/languages.png" alt="The language menu: Automatic (Steam language) and the seven available languages" width="260">
+</div>
+
 - **Adaptive keyboard and audio:** uses Steam's keyboard in Big Picture and on Steam Deck, Repage's own controller keyboard on desktop, plus subtle UI sounds you can turn off.
 
 </details>
@@ -327,7 +350,7 @@ Two switches work **together with** the sort order instead of replacing it:
 | **Scroll gallery / page** | Mouse Wheel / `PageUp` / `PageDown` | Right Stick / `LT` / `RT` |
 | **Apply artwork** | Left Click / `Enter` / `Space` | `A` (Cross) |
 | **Image menu / Save to disk** | Right Click / `Shift + F10` | `X` (Square) |
-| **Show / hide filters** | Click *Show/Hide filters* | `Y` (Triangle) |
+| **Show / hide filters** | Click **Filters** | `Y` (Triangle) |
 | **Switch tabs** | `Ctrl + PageUp / PageDown` | `LB / RB` (`L1 / R1`) |
 | **Collapse / expand library** | `P` | `R3` (Right Stick Click) |
 | **Jump to library top** | `Home` (in list) | `L3` (Left Stick Click) |
@@ -341,6 +364,13 @@ Two switches work **together with** the sort order instead of replacing it:
 <summary><b>No artwork loads / the gallery is empty</b></summary>
 
 Almost always a missing or incomplete [SteamGridDB API key](#steamgriddb-api-key). Open **Settings**, paste the full key with no extra spaces and click **Apply key**.
+
+</details>
+
+<details>
+<summary><b>A non-Steam game shows the wrong artwork, or nothing</b></summary>
+
+Non-Steam shortcuts are matched by name, which can miss. Find the game on [steamgriddb.com](https://www.steamgriddb.com), copy the number at the end of its URL (for example `.../game/38652`), click the **SGDB ID** chip at the top left of the toolbar, enter the number and click **Set ID**. See [Non-Steam games and the SteamGridDB ID](#non-steam-games-and-the-steamgriddb-id).
 
 </details>
 
@@ -412,7 +442,7 @@ repage-steamgrid/
 - **ShuriZma**: special thanks, as credited in the original project.
 - **[SteamGridDB](https://www.steamgriddb.com)**: community artwork database and API. Please respect and credit the artists.
 - **[Millennium](https://github.com/SteamClientHomebrew/Millennium)**: Steam client plugin framework.
-- **hatewxb (Aika theme)**: visual inspiration for the ambient light and color-token concepts.
+- **hatewxb ([Aika theme](https://github.com/hatewxb/Aika/))**: visual inspiration for the ambient light and color-token concepts.
 
 ## License
 
