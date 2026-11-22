@@ -478,6 +478,7 @@ repage-steamgrid/
 ├── metadata.json               # Plugin version metadata
 ├── linux-fix.sh                # Linux / Steam Deck first-install helper
 ├── docs/                       # Screenshots used by this README (repository only)
+├── installer/                  # Source code of Repage_SteamGrid_Setup.exe (Program.cs & ui.html, repository only)
 ├── README.md                   # Overview and documentation
 ├── INSTALLATION.txt            # Quick installation and controls guide
 ├── PATCH_NOTES.txt             # Version history
