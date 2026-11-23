@@ -40,7 +40,7 @@ Folder Structure:
     linux-fix.sh
     plugin.json
     metadata.json
-    README.md, INSTALLATION.txt, PATCH_NOTES.txt, CREDITS.md, LICENSE
+    README.md, INSTALLATION.txt, CREDITS.md, LICENSE
 
 Quick Controls & Shortcuts:
 - Open / Close Panel: Ctrl + Shift + R (Keyboard, customizable in Settings) | R2/RT + L3 + R3 (Controller) | Double-click game banner

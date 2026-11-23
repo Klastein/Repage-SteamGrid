@@ -1,3 +1,25 @@
+REPAGE STEAMGRID — PATCH NOTES (ARCHIVE)
+========================================
+NOTE: Starting with v6.2.2, PATCH_NOTES.txt is maintained only in the GitHub
+repository (no longer bundled in release ZIPs). For the primary, always
+up-to-date changelog directly inside Steam, open:
+
+  Repage SteamGrid -> About & Help -> What's new
+
+Available in all 7 supported languages: English, Português (Brasil), Español,
+日本語, 한국어, Русский, and Français.
+================================================================================
+
+Repage SteamGrid 6.2.2 - Streamlined Release ZIP, Updated About & Help & Clean Patch Notes
+------------------------------------------------------------------------------------------
+* Excluded PATCH_NOTES.txt from release ZIP archives (kept only in the GitHub repository) and updated INSTALLATION.txt accordingly.
+* Updated all 4 What's new categories in About & Help across all 7 languages through v6.2.2.
+* Cleaned and chronologically sorted PATCH_NOTES.txt in English with no duplicate blocks or internal notes.
+
+Repage SteamGrid 6.2.1 - Metacritic Score & Release Date Library Sorting
+------------------------------------------------------------------------
+* Added 'Metacritic score' and 'Release date' (alongside 'Acquisition date') to the library Sort by menu across all 7 languages, reading directly from Steam's in-memory app overview data in 0ms.
+
 Repage SteamGrid 6.2.0 - Distinct Stat Pill Palette & Temporary Excluded Authors Peek Section
 ---------------------------------------------------------------------------------------------
 * Redesigned all 7 summary stat pills (NSFW, Humor, Epilepsy, Static, Animated, Filtered, Excluded) with unique non-repeating semantic colors, detaching Static from the theme accent.
@@ -24,7 +46,7 @@ Repage SteamGrid 6.1.1 - Sculpted 3D Theme Card Bezels, Realistic Moss & Anti-Ov
 Repage SteamGrid 6.1.0 - Bespoke Artistic Cards & Borders for All 12 Theme Presets
 ----------------------------------------------------------------------------------
 * Crafted unique themed borders, corner details, and lightweight inline SVG background motifs for all 12 Personalization preset cards across Desktop and Big Picture (while keeping the full-panel café texture and cozy audio exclusive to Fluxuos Core).
-* Featured custom visual storytelling per theme: official Steam Blue mechanical motif, Midnight 8 PM moonlight vs deep 3 AM Midnight OLED eclipse, Nordic Frost ice runes, Crimson Velvet damask, Night City Neon cyber-HUD, Umbrella Kiss peeling lab sticker revealing biohazard contamination behind the facade, Bonnie & Clyde Vice sunset, The Green Hero golden triangles & rupees, Firefly Glow overgrown moss border with fireflies/guitar/mushrooms, and Cassino Inkwell 1930s rubber-hose parlor.
+* Featured custom visual storytelling per theme: Steam Blue mechanical motif, Midnight 8 PM moonlight vs deep 3 AM Midnight OLED eclipse, Nordic Frost ice runes, Crimson Velvet damask, Night City Neon cyber-HUD, Umbrella Kiss peeling lab sticker revealing biohazard contamination behind the facade, Bonnie & Clyde Vice sunset, The Green Hero golden triangles & rupees, Firefly Glow overgrown moss border with fireflies/guitar/mushrooms, and Cassino Inkwell 1930s rubber-hose parlor.
 * Increased safe preset grid spacing, responsive breakpoints, and multi-layer text contrast protection to guarantee crisp readability and full high-contrast controller focus support.
 
 Repage SteamGrid 6.0.1 - Fail-Closed SHA-256 Updater, Backup URL Allowlist & Bundle Asset Optimization
@@ -40,2305 +62,573 @@ Repage SteamGrid 6.0.0 - Surgical 1-by-1 Filter Unblocking (Preserving Custom Di
 * Surfaced 'Reset blocking filters' whenever any multi-option filter has 0 options selected, even on empty catalogs.
 * Automatically cancelled keyboard shortcut recording in Settings when clicking outside the recorder control with the mouse.
 
-Repage SteamGrid 5.9.9 - 4-Stage Filter Unblocking (Preserving NSFW/Author Preferences), Accurate bgLoading & Instant Filter Reset
------------------------------------------------------------------------------------------------------------------------------------
-* Upgraded 'Reset blocking filters' to a 4-stage priority unblocker: technical filters (Types, Formats, Styles, Dimensions) are restored first while preserving NSFW/Humor Exclude and Excluded Authors unless 100% of the game's catalog requires unlocking them.
-* Fixed onFirstBatch bgLoading check to compare info.total against downloaded raw items (info.loaded) rather than filtered items, preventing false bgLoading states on 1-page games.
-* Prevented the Confused Fluxuos empty-state card from flashing while background pages are still downloading, and updated the filter panel's Reset Filters button to preserve Width Scale in 0ms.
+Repage SteamGrid 5.9.9 - 4-Stage Filter Unblocking, Accurate bgLoading & Instant Filter Reset
+-----------------------------------------------------------------------------------------------
+* Upgraded 'Reset blocking filters' to a 4-stage priority unblocker preserving NSFW/Humor Exclude and Excluded Authors whenever possible.
+* Fixed onFirstBatch bgLoading check to compare info.total against downloaded raw items (info.loaded) and prevented premature Confused Fluxuos flashes during background pagination.
+* Updated the filter panel's Reset Filters button to preserve Width Scale in 0ms.
 
 Repage SteamGrid 5.9.8 - Pure Post-Scan Local Filtering for All Artwork Types
 -----------------------------------------------------------------------------
-* Unified Static and Animated artwork scanning so N() always fetches the full unfiltered catalog into memory and applies Types strictly as an instant post-scan local filter alongside NSFW, Humor, Epilepsy, Formats, Styles, and Dimensions.
+* Unified Static and Animated artwork scanning so N() always fetches the full unfiltered catalog into memory and applies Types strictly as an instant post-scan local filter.
 * Fixed Filtered counts, total results, and the Confused Fluxuos 'Reset blocking filters' button when Static or Animated types are deselected.
 
 Repage SteamGrid 5.9.7 - Direct Big Picture B/Circle Context Menu Dismissal
 ---------------------------------------------------------------------------
-* Fixed B/Circle in Big Picture mode so it immediately closes the X/Square artwork context menu and restores controller focus to the origin artwork card without relying on synthetic Escape events.
+* Fixed B/Circle in Big Picture mode so it immediately closes the X/Square artwork context menu and restores controller focus to the origin artwork card.
 
-Repage SteamGrid 5.9.6 - Big Picture Context Menu D-Pad Lock & Fixed Shortcut Recorder with No-Modifier Warning
------------------------------------------------------------------------------------------------------------------
-* Fixed Big Picture D-pad navigation inside the X/Square artwork context menu by rendering menu items as Focusable elements inline within the Big Picture workspace tree and locking directional focus inside the menu.
-* Fixed the Settings keyboard shortcut recorder so key presses are captured directly inside the active Repage popup window before global navigation listeners.
-* Allowed recording single-key or right-shift shortcuts and added an amber warning notice whenever a shortcut is set without a modifier key (Ctrl, Shift, Alt).
+Repage SteamGrid 5.9.6 - Big Picture Context Menu D-Pad Lock & Fixed Shortcut Recorder
+--------------------------------------------------------------------------------------
+* Fixed Big Picture D-pad navigation inside the X/Square artwork context menu by rendering menu items inline as Focusable elements and locking directional focus inside the menu.
+* Fixed the Settings keyboard shortcut recorder, enabled single-key / right-shift shortcuts, and added an amber warning notice when a shortcut has no modifier key.
 
-Repage SteamGrid 5.9.5 - Controller-Only Focus Ring, Big Picture Scroll Focus Fix, Customizable Ctrl+Shift+R & B Shortcuts, and Clean Official Steam Assets Reset
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-* Scoped the high-contrast white double-ring focus indicator strictly to active controller input (pad modality), hiding it on mouse/keyboard and clearing stale Big Picture FocusRing overlays on mouse wheel scroll.
-* Changed the default panel shortcut from Ctrl+Shift+P to Ctrl+Shift+R and added a customizable shortcut recorder in Settings, with dynamic keycap badges in About & Help.
-* Changed the keyboard library toggle shortcut from P to B.
-* Updated 'Set to Steam Assets' in the game right-click menu to safely delete custom artwork files from userdata/config/grid and clear custom artwork pointers instead of downloading and freezing CDN images as custom files.
-* Removed Apple mentions from the About & Help What's new section across all 7 languages.
+Repage SteamGrid 5.9.5 - Controller-Only Focus Ring, Big Picture Scroll Fix, Customizable Shortcuts & Clean Official Reset
+--------------------------------------------------------------------------------------------------------------------------
+* Scoped the high-contrast white double-ring focus indicator strictly to active controller input (pad modality) and cleared stale Big Picture FocusRing overlays on mouse wheel scroll.
+* Changed the default panel shortcut from Ctrl+Shift+P to Ctrl+Shift+R with a customizable recorder in Settings and changed the library toggle shortcut from P to B.
+* Updated 'Set to Steam Assets' to safely delete custom artwork files from userdata/config/grid and clear pointers so Steam loads live official assets natively.
 
-Repage SteamGrid 5.9.0 - High-Contrast Controller Focus, Trigger Shortcuts (LT/RT), Full X Context Menu & Updated What's New
-----------------------------------------------------------------------------------------------------------------------------
-* Added a universal high-contrast double-ring controller focus indicator (crisp inner white rim + outer theme glow) so focus never blends into theme borders.
-* Remapped LT/L2 to cycle NSFW mode (Include -> Only -> Exclude) and RT/R2 to cycle Sort order (Score -> Newest -> Author -> Resolution) in a loop across both Desktop and Big Picture with live toast feedback.
-* Unlocked X/Square in Big Picture and added full D-pad navigation, immediate focus highlighting, background scroll-locking, and B/X card-focus restoration for the artwork context menu.
-* Updated EgPadHints, Quick start, Tips, and all 4 What's new categories in About & Help through version 5.9.0 across all 7 languages.
+Repage SteamGrid 5.9.0 - High-Contrast Controller Focus, Trigger Shortcuts (LT/RT) & Full X Context Menu
+--------------------------------------------------------------------------------------------------------
+* Added a universal high-contrast double-ring controller focus indicator.
+* Remapped LT/L2 to cycle NSFW mode and RT/R2 to cycle Sort order in a loop across Desktop and Big Picture with live toast feedback.
+* Unlocked X/Square in Big Picture with full D-pad navigation and updated About & Help across all 7 languages.
 
 Repage SteamGrid 5.8.4 - Clean Clear ID Flow, Redetect Game Button & HTTP 404 Confused Card
 -----------------------------------------------------------------------------------------------
-* Separated Clear ID (clears cached artwork/ID and shows the clean Confused Fluxuos empty card without re-detecting) from a new standalone Redetect game action in the SGDB popover.
-* Routed HTTP 404 (invalid/nonexistent SGDB ID) cleanly to the Confused Fluxuos card instead of the connection error screen, and cleared stale grid images immediately on load start and load errors so loaders and cards never overlap old artwork.
+* Separated Clear ID (clears cached artwork/ID and shows the Confused Fluxuos empty card without re-detecting) from a new standalone Redetect game action in the SGDB popover.
+* Routed HTTP 404 (invalid/nonexistent SGDB ID) cleanly to the Confused Fluxuos card and cleared stale grid images immediately on load start and load errors.
 * Pointed Open in browser directly to steamgriddb.com when no valid SGDB ID is linked.
 
 Repage SteamGrid 5.8.3 - Error/Empty Card Typography & Mascot Sizing Polish
 -----------------------------------------------------------------------------
-* Switched primary action button labels on the error, empty-state, and SGDB ID cards to crisp white with subtle drop-shadow for high contrast across all themes.
-* Enlarged the Sad and Confused Fluxuos artwork inside error/empty cards to 268px (224px in Big Picture) with balanced card padding.
+* Switched primary action button labels on the error, empty-state, and SGDB ID cards to crisp white and enlarged Sad/Confused Fluxuos artwork inside error/empty cards.
 
-Repage SteamGrid 5.8.2 - Eye-Level Enlarged Error/Empty Cards & Auto-Discovery for Confused Fluxuos Asset
-------------------------------------------------------------------------------------------------------------
-* Enlarged the error and empty-artwork cards to 880px width with 224px Fluxuos artwork and lifted vertical centering slightly to sit comfortably at eye level below the header/filter bar.
-* Expanded scripts/build.mjs asset lookup so fluxuos_confused.png/.webp/.txt is automatically discovered in src/assets/, src/assets/fluxuos/, or adjacent version folders and cached to src/assets/fluxuos_confused.txt.
+Repage SteamGrid 5.8.2 - Eye-Level Enlarged Error/Empty Cards & Confused Fluxuos Discovery
+------------------------------------------------------------------------------------------
+* Enlarged error and empty-artwork cards to 880px width at eye level and expanded scripts/build.mjs asset discovery for fluxuos_confused.
 
 Repage SteamGrid 5.8.1 - Enlarged Error & Empty-State Cards with Sad/Confused Fluxuos
 --------------------------------------------------------------------------------------
-* Enlarged both the connection/API error card (Sad Fluxuos) and the redesigned empty-artwork card (Confused Fluxuos) to 780px centered panels with 184px mascot art.
-* Added Open in browser and Copy error log (capturing full runtime + recent [api-error]/[load-error] history) directly on the error card.
-* Added Set ID, Open in browser, hidden-count pills, and smart Reset blocking filters (resetting only the filters actually hiding results) to the empty-artwork card across all 7 languages.
+* Enlarged connection/API error (Sad Fluxuos) and empty-artwork (Confused Fluxuos) cards with Open in browser, Copy error log, Set ID, hidden-count pills, and smart Reset blocking filters.
 
 Repage SteamGrid 5.8.0 - Sad Fluxuos Error Screen, Fixed SGDB ID Flow & About & Help Overhaul
 ----------------------------------------------------------------------------------------------
-* Fixed Set ID and Clear ID across Desktop and Big Picture (safe TextField onChange extraction, full URL/numeric ID parsing, complete catalog/logo cache reset, and instant feedback toasts).
-* Redesigned the error view into a centered Apple-style card featuring Sad Fluxuos artwork, clear error guidance, and direct Retry / Change SGDB ID actions.
-* Highlighted the SGDB ID pill in the top bar for easy discovery and added a quick inline URL hint inside the SGDB popover.
-* Renamed the About tab to About & Help, added a dedicated SteamGridDB Game IDs guide, switched Performance & Loading to a distinct speedometer icon, and locked all About headings to crisp pure white across all themes and all 7 languages.
+* Fixed Set ID and Clear ID across Desktop and Big Picture (safe TextField onChange, URL/numeric parsing, cache reset, and feedback toasts).
+* Redesigned the error view around Sad Fluxuos, highlighted the SGDB ID toolbar chip, renamed About to About & Help with a SteamGridDB Game IDs guide, added a dedicated Performance icon, and locked About headings to white.
 
 Repage SteamGrid 5.7.2 - Millennium API Error Logging, Retry-Storm Guard & Clearer API Key Guidance
 ---------------------------------------------------------------------------------------------------
-* Logged all HTTP status errors, network/timeout failures, and load exceptions directly to the Millennium console output ([api-error], [load-error], [load-warn]).
-* Eliminated duplicate retry loops on HTTP 401/403/404/429 responses to prevent request storms against SteamGridDB.
-* Surfaced clear error banners guiding users to verify their API key in Settings or check steamgriddb.com in their browser (even when the game's SGDB ID was already cached locally).
+* Logged all HTTP status errors, network/timeout failures, and load exceptions to Millennium logs ([api-error], [load-error], [load-warn]) and eliminated duplicate retry loops on HTTP 401/403/404/429.
 
 Repage SteamGrid 5.7.1 - Grouped Desktop Filter Tiles & Dedicated Big Picture Filter Sheet
 ------------------------------------------------------------------------------------------
-* Added clean Apple-style grouped tiles around each filter section on Desktop, switched 4+ option filters (such as Grid Styles) to sleek uniform-height multiselect pills, and fixed the horizontal left/right alignment of the priority switches and Reset Filters footer.
-* Built a dedicated centered Apple Filter Sheet for Big Picture / Steam Deck (toggled with Y/Triangle or Filters, closing on B/Y and restoring focus to the exact artwork card) using clean horizontal console rows with zero pill piling.
-* Fixed vertical and horizontal text centering across all Big Picture Focusable buttons (Set ID, Clear ID, Segmented Controls, and Chips) plus safe top-right padding for the Big Picture close button.
+* Added grouped tiles around Desktop filters, converted 4+ option filters to sleek multiselect pills, and built a dedicated centered Filter Sheet for Big Picture / Steam Deck.
 
-Repage SteamGrid 5.7.0 - Apple-Inspired Header & Tactile Filter Redesign
-------------------------------------------------------------------------
-* Rebuilt the editor header into a clean single-row Apple-style command bar eliminating the overflow 'More' menu and duplicate language/version controls, with smooth icon-capsule compaction on narrow windows.
-* Introduced elevated SGDB and Display popovers (centered scroll-locked sheets in Big Picture / Steam Deck) featuring Apple Segmented Controls for Width Scale and Card Tags.
-* Replaced bulky filter dropdown boxes with tactile Segmented Controls (NSFW, Humor, Epilepsy), toggle capsules (Types, Mimes, Styles, compact Dimensions), inline priority switches, and a Reset Filters action.
-* Added smart responsive filter visibility: expanded on wide/maximized desktop windows, auto-folded to the Filters pill with an active-filter badge on smaller windows, and closed by default in Big Picture (Y/Triangle to toggle).
-* Enhanced intra-cell D-pad navigation inside segmented controls and filter chips plus full overlay focus management across all 7 languages.
+Repage SteamGrid 5.7.0 - Streamlined Single-Row Header & Tactile Filter Redesign
+--------------------------------------------------------------------------------
+* Rebuilt the editor header into a clean single-row command bar with SGDB ID & Display popovers, segmented filter controls, inline priority switches, and responsive filter folding.
 
 Repage SteamGrid 5.6.3 - Filtered & Excluded Counter Pills + Clean Diagnostics
 ------------------------------------------------------------------------------
-* Added discrete 'Filtered' and 'Excluded' counter pills (localized in all 7 languages) to the summary bar whenever active filters or the Excluded Authors list hide items from the loaded catalog.
-* Removed verbose per-batch console diagnostic logs from the Millennium backend output while preserving concise ApiPages and FilterAudit summaries inside About -> Copy diagnostics.
+* Added discrete Filtered and Excluded counter pills to the summary bar and cleaned up per-batch console logs while keeping ApiPages and FilterAudit in Copy diagnostics.
 
 Repage SteamGrid 5.6.2 - Detailed API Page & Filter Drop Telemetry
 --------------------------------------------------------------------
-* Added per-page API fetch counts (api-diag), per-filter drop breakdown with rejected samples (filter-diag), and final load reconciliation telemetry (load-diag) to both About -> Copy diagnostics and Millennium logs.
+* Added per-page API fetch counts and per-filter drop breakdown telemetry to About -> Copy diagnostics and Millennium logs.
 
-Repage SteamGrid 5.6.1 - Accurate Catalog Totals, Deleted Icon Respect, Language Width-Scale Lock & Hidden Game Opening
---------------------------------------------------------------------------------------------------------------------------
-* Fixed premature page-0 stop in k() when SteamGridDB returns fewer than 'limit' items despite a higher total, updated frozen totalCount after background completion when raw length matches initial batch, and eliminated the lockedHead/batchViewVer race on sort/filter changes.
-* Added missing static/animated type filtering in egFilterAndSortRaw() during partial/cached updates.
-* Stopped egReapplyIcons() from re-downloading icons manually deleted from userdata/config/grid, cleanly forgetting them instead.
-* Cached EasyGridEditor per window in q() with appid-scoped tab keys so switching languages preserves Width Scale and loaded state without breaking game switching.
-* Preserved direct selection of Repage-hidden games when opening the panel via game context menu or banner double-click.
+Repage SteamGrid 5.6.1 - Accurate Catalog Totals, Deleted Icon Respect & Language Width-Scale Lock
+----------------------------------------------------------------------------------------------------
+* Fixed premature page-0 pagination stops, added missing type filtering during cached updates, stopped egReapplyIcons() from re-downloading manually deleted grid icons, cached EasyGridEditor per window across language switches, and preserved direct selection of hidden games.
 
 Repage SteamGrid 5.6.0 - Millennium v3 Path Support & SHA-256 Self-Update Verification
 --------------------------------------------------------------------------------------
-* Added steam_path/millennium/plugins/repage-steamgrid to resolve_plugin_dir() in backend/main.lua so in-Steam self-updates work cleanly on Millennium v3 layouts.
-* Verified GitHub Release ZIP SHA-256 digests via WebCrypto in egInstallLatestUpdate() before unpacking or staging update files.
+* Added steam_path/millennium/plugins/repage-steamgrid support and verified GitHub Release ZIP SHA-256 digests via WebCrypto before unpacking updates.
 
 Repage SteamGrid 5.5.9 - L3/R3 Filter Hint Bar Glyphs & 144px About Fluxuos Emblem
 ----------------------------------------------------------------------------------
-* Added L3/LS (Library top) and R3/RS (Library) controller glyphs to the editor hint bar below the filters across all artwork tabs.
-* Enlarged the About tab Fluxuos emblem to 144x144px and shifted it slightly left for a tighter, more balanced hero card layout.
+* Added L3/LS and R3/RS glyphs to the editor hint bar and enlarged the About tab Fluxuos emblem to 144px.
 
-Repage SteamGrid 5.5.8 - Root-Folder Release ZIP Fix, 124px Fluxuos Hero & Controller/Keyboard Glyphs
------------------------------------------------------------------------------------------------------
-* Fixed release ZIP archive packaging in scripts/build.mjs so all runtime files are nested inside the top-level 'repage-steamgrid/' directory as documented in INSTALLATION.txt and README.md.
-* Refined the About tab hero card into a fixed 2-column CSS Grid (max-width 920px) with a larger, clearer 124x124px Fluxuos emblem, softer glow, anti-overlap layout across all window sizes and languages, and an updated studio description in all 7 languages.
-* Added platform-reactive L3/LS, R3/RS, and R2/RT controller SVG glyphs plus a dedicated keyboard shortcut row with a keyboard icon and hardware keycap badges (Ctrl, Shift, P, Home, Esc) in the About tab.
+Repage SteamGrid 5.5.8 - Root-Folder Release ZIP Fix & Controller/Keyboard Glyphs
+---------------------------------------------------------------------------------
+* Packaged release ZIPs inside a top-level 'repage-steamgrid/' directory, refined the About hero layout, and added platform-reactive controller SVGs plus keyboard keycap badges.
 
 Repage SteamGrid 5.5.7 - Tapered Comet Loader & Redesigned About Hero Header
 -----------------------------------------------------------------------------
-* Tapered the Fluxuos loader comet arc into a 3-layer soft fade-in ribbon with sharp pointed tips instead of solid round caps.
-* Redesigned the About tab hero header with the matching stacked REPAGE / STEAMGRID brand wordmark, action buttons always aligned cleanly below the description, and a large featured Fluxuos emblem on the right.
+* Tapered the Fluxuos loader comet arc into a 3-layer fade-in ribbon and redesigned the About hero header.
 
 Repage SteamGrid 5.5.6 - Elastic Comet-Chase Fluxuos Loader Animation
 --------------------------------------------------------------------
-* Split the Fluxuos loader comet arc and leading star into paired same-period orbits (1.95s) with distinct ease curves plus a gentle star bloom pulse, so the comet bar smoothly accelerates in pursuit of the star without ever overtaking or crossing it.
+* Split the Fluxuos loader comet arc and star into paired same-period orbits (1.95s) with distinct ease curves.
 
 Repage SteamGrid 5.5.5 - Smooth Fluxuos Orbit Fix & Zero-Lag Circular Apply Medallion
 --------------------------------------------------------------------------------------
-* Fixed the frozen Fluxuos comet-star loader animation by removing the !important transform override that blocked @keyframes rclOrbit.
-* Streamlined the circular apply medallion by removing per-chunk percentage ticks and re-render overhead, using pure GPU-composited ring rotation across Downloading, Applying, Applied, and Failed states (Normal and Compact modes).
+* Fixed the Fluxuos loader orbit animation and streamlined the circular apply medallion with GPU-composited ring rotation.
 
 Repage SteamGrid 5.5.4 - Synchronized Fluxuos Comet Loader & Circular Progress Medallion
 ----------------------------------------------------------------------------------------
-* Synchronized the Fluxuos loading comet arc and leading star inside a single unified orbit so the arc smoothly trails behind the star and can never overtake or cross it.
-* Rebuilt the artwork card apply status into a high-contrast circular progress medallion displaying live Downloading (%), Applying (%), Applied (green checkmark), and Failed (red cross) states legible over any artwork background.
-* Added an automatic compact circular medallion mode for small cards and Big Picture icon tiles so the indicator never clips or overflows, plus tighter resolution typography on compact cards.
+* Built a high-contrast circular progress medallion on artwork cards (Downloading, Applying, Applied, Failed) with compact icon mode.
 
 Repage SteamGrid 5.5.3 - Lock-Serialized Deferred Cleanup & Backend Duplicate Guard
 -----------------------------------------------------------------------------------
-* Serialized deferred artwork cleanup (egFlushPendingArtCleanups) through egWithApplyLock() with per-slot monotonic generation tracking (egSlotGen) so a stale cleanup can never run concurrently with or overwrite a newer apply or reset.
-* Added exponential backoff (8s -> 16s -> 32s -> 64s -> 120s, max 5 attempts) and re-entrancy protection to deferred artwork cleanup retries, and cleared pending cleanup timers on egRestartPlugin().
-* Rejected duplicate staged file paths inside backend/main.lua stage_update_file() ('duplicate_path') for full dual-layer defense in depth.
+* Serialized deferred artwork cleanup with exponential backoff and rejected duplicate staged file paths in backend/main.lua.
 
 Repage SteamGrid 5.5.2 - Strict Integrity, Updater Allowlist & Symlink-Safe Staging
 -----------------------------------------------------------------------------------
-* Removed the mismatched-size stability fallback in egWaitForArtwork() and added 12-byte media magic-header verification in backend artwork_file_size() so incomplete/stale artwork writes are never accepted as applied.
-* Enforced a strict 12-file allowlist (plus duplicate-path rejection) in both frontend egParseZipArchive() and backend stage_update_file() / commit_staged_update().
-* Added symlink detection and path-component verification for .repage_update_stage (never recursing into symlinks during cleanup), confirmed stage directory removal post-commit (reporting ok_cleanup_pending on failure), and added startup stale-stage cleanup in on_load().
-* Added tx.onabort, tx.onerror, and db.onclose/onversionchange pending-waiter settlement across all IndexedDB local artwork helpers.
-* Tracked clear_artwork_files() outcomes in egFinishApply() with explicit logging, deferred automatic retry, and user-facing notice when cleanup is pending.
+* Added 12-byte media magic-header verification, dual-layer updater allowlist, symlink-hardened staging cleanup, and IndexedDB abort resilience.
 
 Repage SteamGrid 5.5.1 - Big Picture Overlay Scroll Lock & Compact Header Brand Fix
 -----------------------------------------------------------------------------------
-* Locked background scrolling and analog stick input (Big Picture and Desktop) while any dropdown menu, multiselect filter, context menu, virtual keyboard, or update modal is open, and replaced ancestor-bubbling scrollIntoView() inside menus with contained menu scrolling.
-* Removed the lingering 3D transform on .repage-main after entrance animation so fixed Big Picture dropdown modals always stay centered inside the viewport.
-* Stacked the REPAGE / STEAMGRID brand wordmark cleanly beside the Fluxuos emblem with overflow guards so the version chip never overlaps the logo on narrow windows.
+* Locked background scrolling and analog stick input while overlays are open and stacked the REPAGE / STEAMGRID brand wordmark cleanly.
 
 Repage SteamGrid 5.5.0 - Deep Audit, Reliability, Controller, Linux & Performance Overhaul
 ------------------------------------------------------------------------------------------
-* Fixed strict-mode ReferenceError ('failReason') during artwork apply retry.
-* Fixed WebM video viewport prioritization (added missing 'index' field in egPosterAcquire and raised video pool to 3).
-* Awaited clear_artwork_files() inside egFinishApply() to prevent fast consecutive applies from deleting newly written artwork.
-* Fixed mid-load sort/filter switching concatenating stale lockedHead results on top of freshly sorted artwork.
-* Hardened local file apply: added 1.8s metadata timeouts for local images/WebM, proper GIF/WebP/ICO handling on non-icon slots, and signed shortcut ID + RequestIconDataForApp refresh for local icons.
-* Replaced Lua %b{} matching in backend/icons.lua active_account_id() with a string-aware VDF brace parser so Steam nicknames containing '{' or '}' never break multi-account detection.
-* Hardened Linux / Steam Deck shell commands in backend/main.lua with single-quote shell escaping, recursive .repage_update_stage cleanup, explicit +x permission on linux-fix.sh, and lowercase .millennium/dist/.check_tmp.js in scripts/build.mjs.
-* Fixed Big Picture Personalization D-pad navigation (up from My Presets now lands on row 4 instead of jumping to row 2, and Performance Mode disabled controls are properly skipped).
-* Fixed Escape key closing the desktop update modal, deferred auto-update session flag until the check actually runs, fixed popup AudioContext routing (including Fluxuos Core sounds), and muted clicks on disabled buttons.
-* Eliminated 60 Hz forced layout reflows in desktop gamepad polling, cached egAppKind() via WeakMap, cached IndexedDB connections, cleaned detached popup/focus references on unmount, and completed onDismount() cleanup.
-* Fixed untranslated filter labels (Types/Mimes/Styles/Dimensions) in Millennium Settings, removed dead code & duplicated Fluxuos CSS layers, added -webkit-mask-source-type luminance fallback, updated About/README, and finalized MIT LICENSE.
+* Fixed apply retry failReason, WebM viewport queue priority, local file metadata timeouts, VDF brace-safe account parsing, Linux shell quoting, Big Picture Personalization D-pad navigation, 60 Hz gamepad reflows, and MIT LICENSE.
 
 Repage SteamGrid 5.4.5 - Paw & Coffee Café Pattern + Theme-Colored Fluxuos Loader
 -----------------------------------------------------------------------------------
-* Replaced the bow motif in the Fluxuos Core background and preset card
-  pattern with cute raccoon paw prints, steaming coffee cups, and stars.
-* Updated the Fluxuos loading emblem to dynamically adopt each theme's accent
-  color via luminance masking with a soft matching glow.
+* Added raccoon paw prints, steaming coffee cups, and stars to Fluxuos Core and dynamically matched the loader emblem to each theme's accent color.
 
 Repage SteamGrid 5.4.4 - Custom Fluxuos Line-Art Emblem & Fluxuos Core Card Polish
 ----------------------------------------------------------------------------------
-* Replaced the geometric logo and loader head with Klastein's custom Fluxuos
-  line-art artwork (transparent anti-aliased asset bundled at build time).
-* Updated the Fluxuos Core accent color to #5E4B86 (with #8B74B8 hover).
-* Refined the Fluxuos Core preset card with a thicker glowing café-lace border,
-  more visible exclusive card texture, and a clean star emblem (removing the
-  'Special' text pill and background watermark behind the text).
+* Embedded custom transparent Fluxuos line-art, tuned Fluxuos Core accent to #5E4B86, and polished the café-lace border.
 
 Repage SteamGrid 5.4.3 - Fluxuos Logo, Signature Loader & Special Fluxuos Core Theme
 -------------------------------------------------------------------------------------
-* Redesigned the Repage logo mark (EgRepageMark) and center/boot loading
-  animation (EgFluxuosLoader) inspired by Fluxuos.
-* Replaced Emerald Pine with the special 'Fluxuos Core' Dark OLED theme as the
-  1st preset in Personalization, featuring a subtle exclusive café-lace/star
-  background pattern, signature card badge & watermark, and an exclusive cozy
-  Web Audio soundscape active only while Fluxuos Core is selected.
+* Redesigned Repage logo and center loader around Fluxuos and added the Fluxuos Core preset with exclusive café pattern and cozy Web Audio soundscape.
 
 Repage SteamGrid 5.4.2 - Round-Trip List Probe, Unique Write Probe & Strict Retry
 -----------------------------------------------------------------------------------
-* Added a round-trip directory enumeration probe in inspect_backup_dir(): when
-  fs.list(bdir) returns empty, a unique probe file is written, enumerated via
-  fs.list(bdir) to prove actual directory read/list permission (+r), and removed.
-* Replaced the fixed '.sgdb_write_test' filename in can_write_in() with a
-  collision-checked unique temporary probe name.
-* Updated the second SetCustomArtworkForApp attempt to abort immediately with
-  'retry_fresh_read_failed' if fresh image bytes cannot be obtained.
+* Added round-trip directory enumeration probes in inspect_backup_dir() and strict retry_fresh_read_failed handling.
 
 Repage SteamGrid 5.4.1 - Witness-Verified Directory Listing & Fresh-Data Apply Retry
 -------------------------------------------------------------------------------------
-* Hardened inspect_backup_dir() against silent fs.list() permission failures by
-  requiring a known plugin sibling witness (plugin.json / backend) when listing
-  the parent directory and probing write/journal access whenever bdir lists as
-  empty.
-* Updated the second SetCustomArtworkForApp attempt to clear cached download
-  promises and re-read fresh image bytes via R() before re-applying.
-* Verified cached download byte length and magic header in download_image()
-  and cleared stale img_cleanup_pending flags on cache reuse.
+* Hardened inspect_backup_dir() with parent witness verification and fresh-bytes retry on SetCustomArtworkForApp.
 
-Repage SteamGrid 5.4.0 - Fail-Closed Parent/Entry Backup Verification & First-Click Apply Fix
----------------------------------------------------------------------------------------------
-* Hardened inspect_backup_dir() in backend/main.lua to reject unclassifiable
-  fs.list() entries as errors and cross-check fs.exists(bdir)==false against a
-  verified parent directory listing so permission failures are never mistaken
-  for a missing folder.
-* Fixed first-click artwork apply failures after hover prefetch by unwrapping
-  quoted Lua boolean/empty-string returns in R() (egLuaBool + pre-sanitized
-  base64 chunks) and forcing a fresh download retry if a cached temp file was
-  evicted.
-* Added an automatic retry on SetCustomArtworkForApp verification.
+Repage SteamGrid 5.4.0 - Fail-Closed Backup Verification & First-Click Apply Fix
+--------------------------------------------------------------------------------
+* Hardened inspect_backup_dir() against unclassifiable entries and fixed first-click artwork apply after hover prefetch.
 
 Repage SteamGrid 5.3.9 - Fail-Closed Backup Directory Inspection & Categorized What's New
 ------------------------------------------------------------------------------------------
-* Replaced safe_list-based backup directory checks with fail-closed
-  inspect_backup_dir() that explicitly distinguishes missing, empty, has_files,
-  and filesystem read error states, blocking transactions and preserving backups
-  whenever directory listing fails.
-* Added explicit user-facing messages in the frontend for
-  commit_journal_finalize_failed and locked/unreadable backup directories.
-* Reorganized the 'What's new' section in the About tab into 4 categorized
-  panels (Performance & Loading, Security/Updater & Backend, Interface/Themes &
-  QoL, and Controller/Big Picture & Steam Deck) ordered newest-first.
+* Added fail-closed backup directory states and reorganized About -> What's new into 4 categorized panels.
 
 Repage SteamGrid 5.3.8 - Pre-Transaction Backup Guard & Explicit Finalization Status
 --------------------------------------------------------------------------------------
-* Added ensure_clean_backup_dir_before_transaction() so commit_staged_update()
-  aborts immediately with pending_recovery_locked or pre_cleanup_failed if a
-  previous backup directory cannot be recovered and verified clean.
-* Separated unpromoted backup cleanup (purge_unpromoted_backup_dir) from active
-  journal cleanup.
-* Returned explicit post-commit states (ok, ok_cleanup_pending, or
-  commit_journal_finalize_failed) from commit_staged_update() to the frontend.
+* Added pre-transaction backup cleanliness checks and explicit journal finalization status reporting.
 
 Repage SteamGrid 5.3.7 - Verified Journal Finalization & Fail-Safe Backup Cleanup
 ----------------------------------------------------------------------------------
-* Reworked mark_journal_committed_and_remove() to write and byte-verify a
-  temporary commit marker (journal.committed) and replace journal.txt via a
-  verified temporary file if direct removal is blocked.
-* Updated cleanup_backup_dir() to check mark_journal_committed_and_remove() and
-  abort .bak deletion immediately with a specific error log if journal
-  neutralization cannot be confirmed on disk.
+* Verified temporary commit markers (journal.committed) before clearing backup files.
 
 Repage SteamGrid 5.3.6 - Fail-Safe Journal Lifecycle & Continuous Session Heartbeat
 ------------------------------------------------------------------------------------
-* Verified update journal persistence by writing to journal.txt.tmp with
-  ACTIVE/END_JOURNAL sentinels, flushing, reading back byte-for-byte from disk,
-  and promoting to journal.txt before modifying any plugin file.
-* Reordered post-commit cleanup so journal.txt is marked COMMITTED and removed
-  before any .bak files are deleted, preventing interrupted cleanup from
-  triggering a false rollback on next startup.
-* Made recover_interrupted_update() and rollback_all() fail-safe: every restored
-  file is verified on disk, and .repage_update_backup is preserved if any file
-  cannot be restored.
-* Added a periodic 10-minute frontend->backend session heartbeat timer so
-  long-running idle sessions keep their temp cache locks active.
+* Verified byte-for-byte update journal persistence, ordered commit cleanup, fail-safe recovery, and 10-minute session heartbeats.
 
 Repage SteamGrid 5.3.5 - Persistent Update Journal, Crash Recovery & Account/ZIP Hardening
 ------------------------------------------------------------------------------------------
-* Added persistent on-disk update backups (.repage_update_backup/ + journal.txt)
-  with swap-based file replacement and automatic startup rollback in on_load() if
-  Steam or the OS crashes mid-update.
-* Closed the single-account fallback in backend/icons.lua when active_account_id()
-  identifies an account whose userdata folder does not yet exist.
-* Added per-file creation timestamps and active session heartbeat locks
-  (repage_hb_<session>.lock) so long-running sessions never lose temp files.
-* Verified Local File Header filenames against Central Directory filenames in
-  egParseZipArchive().
+* Added persistent on-disk update backups with swap replacement and startup crash rollback.
 
 Repage SteamGrid 5.3.4 - Transactional Rollback, CRC32 ZIP Guard & Multi-Account Isolation
 --------------------------------------------------------------------------------------------
-* Added full transactional backup and automatic rollback to commit_staged_update
-  in backend/main.lua so interrupted updates never leave mixed-version files.
-* Hardened egParseZipArchive with streaming chunk limits, a 32 MB global
-  uncompressed ceiling, 64-entry cap, header consistency checks, and CRC32
-  verification for every extracted file.
-* Isolated write/delete operations in backend/icons.lua so ambiguous
-  multi-account setups never modify other Steam accounts' grid folders.
-* Added a 1-hour minimum age check to cleanup_stale_temp_files() before
-  removing temp files from other sessions.
+* Added transactional rollback on updates, streaming anti-ZipBomb CRC32 validation, and strict multi-account isolation.
 
 Repage SteamGrid 5.3.1 - Clean Multi-res / Original Badge
 ------------------------------------------------------------
-* Replaced '? × ?' on cards missing fixed resolution metadata (such as .ico
-  icons) with a clean, themed 'Multi-res' / 'Original' pill badge.
+* Replaced '? × ?' on variable-resolution cards with a clean Multi-res / Original pill badge.
 
 Repage SteamGrid 5.3.0 - Clean Steam Restart Fix
 -------------------------------------------------
-* Fixed Steam hanging / 'Steam stopped responding' on Restart Steam by
-  closing the Repage modal and popup window cleanly 320ms before calling
-  SteamClient.User.StartRestart.
+* Closed the Repage modal and popup cleanly before invoking SteamClient.User.StartRestart.
 
 Repage SteamGrid 5.2.8 - Self-Updater Quote Unwrap Fix & Detailed Step Logs
 -----------------------------------------------------------------------------
-* Fixed Millennium Lua->JS quoted string return handling (e.g. '"ok"' / '"windows"')
-  in egInstallLatestUpdate and egRefreshPlatform via egUnwrapLuaStr().
-* Added detailed [self-update] step logs in Millennium Logs (download size,
-  ZIP entry validation, staging, and commit results).
+* Fixed Lua->JS quoted string unwrapping in self-update and platform detection plus detailed step logs.
 
 Repage SteamGrid 5.2.7 - Instant Big Picture Library D-Pad Navigation
 ------------------------------------------------------------------------
-* Eliminated ~574ms-626ms per-press D-pad lag in Big Picture library
-  navigation (found via 5.2.6 telemetry):
-  - Replaced per-row getComputedStyle/getBoundingClientRect visibility scans
-    across 280-430 library items with O(1) visibility check on the library
-    container plus single-target verification in egLibraryNavTarget.
+* Eliminated Big Picture library D-pad lag via O(1) container visibility checks.
 
 Repage SteamGrid 5.2.6 - Big Picture & Library D-Pad Performance Telemetry
 -----------------------------------------------------------------------------
-* Added detailed PadNav, PadLibScan, PadFocus, PadAutoSelect, and PadFrameRAF
-  timings to Copy diagnostics and Millennium backend logs to pinpoint Big
-  Picture D-pad latency.
+* Added detailed D-pad navigation timings to Copy diagnostics and Millennium logs.
 
 Repage SteamGrid 5.2.5 - Auto-Updater 32-Bit ZIP Offset Fix
 -------------------------------------------------------------
-* Fixed ZIP Central Directory parsing (getUint32 instead of getUint16 for
-  local header offset) so release archives over 64 KB extract and install
-  properly on Windows, Linux, and Steam Deck.
-* Added technical error detail logging and cleaned up .repage_update_stage.
+* Fixed 32-bit local header offset parsing for release ZIP archives over 64 KB.
 
 Repage SteamGrid 5.2.4 - Animated Current-Art Preview & Linux Auto-Repair
 ---------------------------------------------------------------------------
-* Animated Current-Artwork Fix:
-  - Updated apply() and verifyAndSetCurrentArt() to save and render animated
-    WebM/WebP/GIF previews immediately in the Current chip/popover even when
-    files exceed the backend IPC size limit (also raised preview read cap to
-    8 MB).
-* Linux / Steam Deck Diagnostics & Auto-Repair:
-  - Added check_and_repair_linux_frontend() in backend/main.lua on_load() and
-    commit_staged_update() to log missing/unreadable frontend index.js files
-    and automatically repair dist/Dist symlinks and read permissions.
-  - Included linux-fix.sh in the release archive for first-time Linux setup.
+* Added animated Current-art previews, Linux dist/Dist symlink auto-repair, and linux-fix.sh.
 
 Repage SteamGrid 5.2.3 - In-Plugin GitHub Release Auto-Updater
 -----------------------------------------------------------------
-* Added automatic & manual GitHub Releases update checking (Settings -> Account
-  & Backup and About header), paired with a theme-aware acrylic modal.
-* Built-in pure-Chromium ZIP extraction (DecompressionStream) + staged atomic
-  file verification in Lua, automatically resolving custom Windows/Linux/Steam
-  Deck plugin paths with clean permission/network fallback.
+* Added automatic and manual GitHub Releases update checking and staged in-plugin ZIP installation.
 
 Repage SteamGrid 5.2.2 - Instant Filter Switching, Linux dist Standard & Updated README
 --------------------------------------------------------------------------------------
-* Filter Reactivity Fix:
-  - Cleared the visible grid and lowered the reveal gate immediately inside
-    recomputeFromRaw() when switching filters (e.g. NSFW -> Only), preventing
-    stale unfiltered artwork from lingering during preview prep.
-  - Added state sync effect on the NSFW / Humor / Epilepsy dropdown (z).
-* Linux Compatibility & GitHub Polish:
-  - Standardized frontend build path to lowercase .millennium/dist/index.js
-    for native Linux case-sensitivity compatibility (with Windows NTFS case
-    normalization during build).
-  - Added Linux / Steam Deck permission & symlink fallback note to README.md
-    and INSTALLATION.txt, and completely refined README.md.
+* Standardized lowercase .millennium/dist/index.js and instant recomputeFromRaw() filter updates.
 
 Repage SteamGrid 5.2.1 - API Key Privacy Blur & Settings-Only Restart Button
 -----------------------------------------------------------------------------
-* API Key Privacy Toggle:
-  - Added an eye button next to the API key field that blurs the key on
-    screen (persisted across sessions).
-* Restart Steam Placement:
-  - Moved the Restart Steam button exclusively to the Settings tab header.
+* Added API key blur toggle and moved Restart Steam exclusively to Settings.
 
 Repage SteamGrid 5.2.0 - Streamlined Installation Guide & Public Release
 ------------------------------------------------------------------------
-* Rewrote INSTALLATION.txt into a clean, concise English guide focused on
-  supported platforms (Windows and Linux / Steam Deck) and current controls.
-* Updated README.md and .gitignore for the public GitHub repository.
+* Streamlined INSTALLATION.txt and updated README.md / .gitignore for public releases.
 
 Repage SteamGrid 5.1.9 - GitHub Release Ready (README & .gitignore)
 --------------------------------------------------------------------
-* Added complete English README.md with feature overview, installation
-  instructions, control table, build commands, credits, and MIT license badge.
-* Added standard .gitignore for repository source control.
+* Added complete README.md and repository .gitignore.
 
 Repage SteamGrid 5.1.7 - D-Pad Auto-Select, Filter Focus Ring & Smooth Title Logo
 ----------------------------------------------------------------------------------
-* Library Controller Navigation:
-  - Moving through library games with the D-pad now automatically selects the
-    focused game (130ms debounce; mouse hover remains preview-only).
-  - Pressing B / Left to return to the library now always focuses the
-    currently active game row instead of jumping to the first item.
-* Multi-Select Filter Focus Ring Fix:
-  - Ignored synthetic mousedown events from egCloseLayer so controller input
-    modality and the visible [data-eg-focus] ring are preserved on B.
-* Smooth Game Title Logo:
-  - Hid the fallback text title until SteamGridDB confirms no logo is
-    available, and added a smooth GPU fade/scale transition on logo load.
+* Enabled D-pad game auto-selection in library, preserved filter focus rings on B, and smoothed title-logo fade-in.
 
 Repage SteamGrid 5.1.6 - Smart Context Tab, Controller Anim Fix & QoL Polish
 -----------------------------------------------------------------------------
-* Controller & Click Animated Preview Fix:
-  - Fixed EgMediaCard losing its is-revealed class when controller focus or
-    mouse click updated isSelected/isFocused/cardState (which turned cards
-    black), added is-ready to EGA's animated WebP/GIF <img>, and enabled
-    autoplay whenever isFocused is true.
-* Multi-Select Filter Focus Restoration:
-  - Closing Formats, Styles, Dimensions, or Types with B / Escape now returns
-    focus directly to that filter's trigger button.
-* Keep Plugin Window on Top on 'Library page':
-  - Navigating Steam's background main window to the game's library page now
-    calls ShowWindow + BringToFront + SetKeyFocus on the Repage popup.
-* Smart Tab Selection on Open (Desktop & Big Picture):
-  - Banner double-click opens Hero; sidebar game-list context menu opens
-    Icon; wide/landscape cover context menu opens Wide Grid; vertical cover
-    context menu opens Grid.
-* Centered Grid Loader:
-  - Wrapped the image grid area in .repage-grid-stage below filters and
-    controller hints so the loading ring never overlaps top controls.
+* Added context-aware smart tab selection, non-minimizing Library page jump, and centered grid loader.
 
 Repage SteamGrid 5.1.5 - Dynamic First-Screen Prep & Gapless Card+Preview Reveal
 ----------------------------------------------------------------------------------
-* Gapless Card + Preview Synchronization:
-  - Computed firstScreenNeed dynamically from active columns and viewport
-    height (12 to 30 items, 3.2s cap) so the entire visible first screen has
-    both frame and preview ready before the loader lifts.
-  - Restored lightweight DOM-only A->B->C ordered reveal in EGGrid (950ms
-    per-item anti-stall guard, bidirectional jump handling) so cards and
-    their previews fade in together cleanly without blank holes or layout shifts.
+* Synchronized first-screen preview loading and ordered left-to-right card reveal.
 
 Repage SteamGrid 5.1.4 - Non-Shifting Catalog Append & Viewport-First Video Queue
 ----------------------------------------------------------------------------------
-* Stable Catalog Order During Background Load:
-  - Locked the initial visible pool (lockedHead) at the top while remaining
-    API pages load, appending newly fetched items below instead of shuffling
-    unloaded cards between images the user is already viewing.
-* Faster Visible Animated Previews:
-  - Added dynamic viewport prioritization (egVisRange) so animated cards
-    currently on screen jump ahead of off-screen queued items.
-  - Tuned video extractor pool to 3 slots (1 in Performance mode) with 150ms
-    post-scroll resume, 16-item initial batch (1.35s cap), and smooth poster
-    fade-in.
+* Locked initial visible pool during background load and prioritized visible viewport video extractions.
 
 Repage SteamGrid 5.1.3 - Animated Hover Canvas Fix & Curated Changelog
 -------------------------------------------------------------------------
-* Fixed Animated Card Canvas Disappearing After Hover Leave:
-  - Replaced raw DOM style.opacity mutation on EGA's <canvas> with React
-    state (posterReady) so hover/focus re-renders never reset opacity to 0.
-* Compatibility & Cache Audit Passed:
-  - Verified disk temp cache stays bounded (< 12 files / <= 128 MB) and
-    checked Big Picture / controller focus and Linux / Steam Deck paths.
-* Tidied About -> What's new to highlight the major milestones cleanly.
+* Preserved animated canvas frames across React state updates after hover leave.
 
 Repage SteamGrid 5.1.2 - Off-Screen Video Abort & Frame-Paced Video Pool
 --------------------------------------------------------------------------
-* Video Preview Optimization:
-  - Added a 250ms cancellation check inside active video frame extractions
-    so off-screen videos scrolled past quickly abort immediately and hand
-    their slot to visible cards.
-  - Tuned video extraction to 2 slots (1 in Performance mode) with a 16ms
-    frame yield between jobs and 240ms post-scroll cool-down, keeping main-
-    thread Long Tasks from stacking up.
-  - Measured pure decode time (excluding queue wait) and updated first-batch
-    telemetry counters immediately when the first screen paints.
+* Aborted off-screen video extractions immediately and tuned frame pacing.
 
 Repage SteamGrid 5.1.1 - Instant Card Frames, 4-Slot Video Pool & Preview Telemetry
 ----------------------------------------------------------------------------------------
-* Preview Appearance & Zero Black Voids:
-  - Removed opacity: 0 hiding on .repage-image-card during scroll so no
-    missing black square voids appear in the grid; media (<img> and <canvas>)
-    fades in smoothly inside its card frame.
-  - Raised pooled video frame extractors from 2 to 4 (2 in Performance mode),
-    cancelled off-screen queued entries in 0ms before acquiring a slot, and
-    added a gentle 1-row post-scroll lookahead (200ms idle) + 3-slot API
-    catalog concurrency.
-* Isolated Preview & Filter Telemetry:
-  - Emits a cleanly delimited ----- PREVIEW & ORDER TELEMETRY ----- block in
-    the Millennium debug log (and in Copy diagnostics) covering active sort/
-    filter flags, first-12 prep timing, queue skips/timeouts, and completion
-    order.
+* Tuned pooled video extractors and added preview order telemetry.
 
 Repage SteamGrid 5.1.0 - True React.memo, Video Extractor Pool & Prefetch Fix
 ----------------------------------------------------------------------------------
-* Eliminated 2,165 Redundant Card Re-Renders:
-  - Wrapped markThumbLoaded in React.useCallback so React.memo(EgMediaCard)
-    actually skips unchanged cards, and throttled background page progress
-    updates to 450ms.
-* Eliminated Video Teardown Long Tasks & Scroll Stutter:
-  - Replaced per-card createElement('video') + v.load() teardowns with a
-    reusable 2-element video pool (egVideoPool) and deferred video poster
-    extraction until 260ms after scrolling settles.
-* Prevented 50 MB Animated Hover Prefetches from Stalling API Requests:
-  - Restricted hover prefetch to lightweight static PNG/JPGs after 550ms and
-    only when the API/download queue is idle (dropping large-catalog load
-    times from ~19s down to normal API speed).
+* Eliminated redundant card re-renders, added reusable video pool, and restricted hover prefetch to idle static images.
 
 Repage SteamGrid 5.0.9 - Telemetry-Driven Performance Overhaul & Millennium Perf Logs
 ------------------------------------------------------------------------------------------
-* Scroll & Main-Thread Optimization (from 5.0.8 telemetry):
-  - Removed .is-scrolling class mutations on .repage-workspace and the
-    wildcard .repage-workspace * selector, eliminating 56ms synchronous style
-    recalculations over 4,267 DOM nodes during wheel scrolling.
-  - Applied pointer-events: none directly onto .repage-grid-space while
-    scrolling, and removed heavy will-change: transform on the full grid.
-  - Added content-visibility: auto + React.memo (EgAppRow) on the library
-    list so ~400 off-screen game rows skip layout/paint work.
-  - Halved grid overscan from 5 rows to 2 rows and simplified 2560x1392
-    ambient gradient layers.
-* Millennium Debug Telemetry:
-  - Automatically emits [perf-load] and [perf-scroll] summaries (CPU vs
-    GPU/Compositor, JS Heap RAM, cache counts) to Millennium's debug log,
-    enriched by backend/main.lua with Lua VM RAM and temp disk cache size.
+* Eliminated full-tree scroll style recalculations and added content-visibility: auto to library rows.
 
 Repage SteamGrid 5.0.8 - Detailed Performance Telemetry in Copy Diagnostics
 -----------------------------------------------------------------------------
-* Added lightweight performance instrumentation (zero background idle loop):
-  - Tracks JS heap RAM, DOM node count, all internal cache sizes, boot &
-    maximize timeline, catalog load/filter/sort times, static <img> & animated
-    WebP/WebM decode latencies, scroll frame drops (>33/50/100ms), React card
-    mounts/renders, and Chromium Long Tasks (>50ms).
-  - Everything is included automatically in About -> Copy diagnostics.
+* Added RAM, DOM, frame, and Long Task telemetry to Copy diagnostics.
 
 Repage SteamGrid 5.0.7 - Hotfix for Memoized Card Render
 ---------------------------------------------------------
-* Fixed ReferenceError: hideTags is not defined inside EgMediaCard.
+* Fixed hideTags reference inside memoized EgMediaCard.
 
 Repage SteamGrid 5.0.6 - Smooth Compositor Scrolling & Memoized Cards
 ------------------------------------------------------------------------
-* Scroll Smoothness:
-  - Extracted EgMediaCard with React.memo and stable useCallback handlers so
-    visible cards no longer re-render while scrolling.
-  - Added 5-row window hysteresis in EGGrid (only re-slices when approaching
-    buffer edges) and removed visFirst/visLast React state churn on scroll.
-  - Added GPU layer promotion on .repage-grid-space, overflow-anchor: none,
-    and pointer-events: none on cards while .is-scrolling is active.
+* Extracted EgMediaCard with React.memo and added 5-row hysteresis in EGGrid.
 
 Repage SteamGrid 5.0.5 - Unobstructed Titlebar Drag Strip & Popup Diagnostics
 -------------------------------------------------------------------------------
-* Titlebar Dragging:
-  - Moved .repage-titlebar outside .repage-workspace and shifted desktop
-    .repage-workspace to top: 28px (calc(100vh - 28px)), eliminating the
-    full-screen no-drag overlay over the top 28px strip and lifting
-    .titleBarContainer / .title-area cleanly.
-* Diagnostics:
-  - Updated About -> Copy diagnostics to inspect the actual popup document
-    (aboutRef.current.ownerDocument) and report elementFromPoint(120, 14)
-    and its computed -webkit-app-region.
+* Restored unobstructed desktop titlebar dragging.
 
 Repage SteamGrid 5.0.4 - Synchronized Reveal, Split WebP/WebM Queues & Window Diagnostics
 ----------------------------------------------------------------------------------------
-* Animated Previews & Synchronized Card+Image Reveal:
-  - Split animated extraction into a 6-slot image queue (WebP/GIF) and a
-    lightweight 2-slot video queue (WebM with preload="auto"), so slow videos
-    no longer leave animated WebPs blank.
-  - Restored fast 1-screen (12-item, 2.2s cap) initial pre-warming and
-    synchronized card opacity with media readiness + OVER=3 overscan so
-    cards and their previews appear together smoothly.
-  - Flattened idle grid card backgrounds/shadows to reduce scroll repaint cost.
-* Diagnostics:
-  - Added live SteamClient.Window method keys and .title-area detection to
-    About -> Copy diagnostics.
+* Split animated WebP/GIF and WebM extraction queues.
 
 Repage SteamGrid 5.0.3 - True Low-CPU Pipeline, Instant Grid & Titlebar Fix
 ---------------------------------------------------------------------------
-* Eliminated First-Launch Freeze:
-  - Removed the 90ms fillScreen() resizeTo/moveTo fallback that collided with
-    SteamClient.Window.Maximize() right as the grid mounted.
-* Titlebar Double-Click & Drag:
-  - Hid .title-area again so .repage-titlebar-drag receives double-click and
-    mouse events, and wired SteamClient.Window.MoveTo(x, y) using clientX/
-    clientY offsets.
-* Genuine CPU/GPU/Fan Relief:
-  - Removed duplicate 40-image JS pre-decoding (egPrepareBatch) and background
-    lookahead decoding; cards now mount and reveal in 0ms with native browser
-    lazy/eager loading.
-  - Lowered simultaneous video frame extractors from 8 to 2 (1 in Performance
-    mode) and captured keyframe 0 at onloadeddata without a heavy second seek.
-  - Disabled redundant Lua download + 400k-pixel CPU scan on sidebar logos.
+* Fixed startup window maximization collision and reduced idle video decoder usage.
 
 Repage SteamGrid 5.0.2 - Native Window Drag, Lookahead Scroll & Reliable Animated Frames
 -----------------------------------------------------------------------------------------
-* Window Dragging:
-  - Kept Steam's native .title-area active as a transparent 28px drag strip
-    (stopping at right: 128px before Repage's Minimize/Maximize/Close buttons)
-    with its internal Steam children hidden, fixing popup dragging alongside
-    double-click maximize.
-* Scroll Previews & Animated WebP/WebM Reliability:
-  - Video frame extraction now snapshots frame 0 immediately inside onloadeddata
-    before attempting the 0.1s seek, falling back to frame 0 instead of failing
-    to blank when seeks are slow.
-  - Routed animated WebP/GIF extraction through the 8-slot priority queue
-    (12s timeout) so large Hero animations do not saturate connections and time
-    out, and added a graceful <img> fallback in EGA if extraction ever fails.
-  - Added a rolling 24-card lookahead pre-warmer in EGGrid (10 in Performance
-    mode), raised canvas cache to 200 (80 in Performance mode), and stopped
-    scrolled cards (>= 40) from waiting sequentially behind slow neighbors.
+* Added keyframe-0 video capture fallback and rolling lookahead pre-warming.
 
 Repage SteamGrid 5.0.1 - Window Drag/Centering, NSFW Favorites & Lighter Footprint
 ---------------------------------------------------------------------------------
-* Titlebar & Boot Polish:
-  - Fixed custom titlebar dragging (using screen-coordinate window moveTo) and
-    double-click Maximize/Restore (removed -webkit-app-region: drag interception
-    and added multi-monitor availLeft/availTop + resize fallback).
-  - Deferred initial window maximization until boot finishes and removed
-    transform/filter from the workspace entrance animation so the "Starting
-    plugin..." splash always stays dead-center.
-* Artwork Cards & Favorites:
-  - Fixed the "APPLYING / APPLIED / FAILED" status pill drifting off-center by
-    making .repage-image-focus position:relative and centering at 50%/50%.
-  - Favorited NSFW artwork is now hidden while the tab's NSFW filter is set to
-    Exclude ("false"), and returns to the top when NSFW is Include or Only.
-* Lighter CPU/GPU/RAM & Consistency:
-  - Switched egThumbMem from a 200-element Image Map to a URL Set so Chromium
-    can release off-screen decoded bitmaps; reduced canvas poster snapshots to
-    260px (cap 90 / 45 in Perf mode) and normalized logos to 360px (cap 50).
-  - Changed ambient glow keyframes to opacity-only and wired .is-scrolling so
-    the glow pauses automatically while scrolling.
-  - Staggered egPrepareBatch (12 top items first), debounced disk current-art
-    reads on rapid tab switching, respected disable_webp in title-logo previews,
-    synced EgTagInput on context-menu author changes, added Enter support on
-    SGDB ID, guarded Steam library MutationObservers, and removed dead 3.3.0
-    expand_headers code.
+* Filtered NSFW favorites when NSFW is set to Exclude and reduced cached bitmap memory.
 
 Repage SteamGrid 5.0.0 - Precision, Controller & Millennium Settings Polish
 --------------------------------------------------------------------------
-* Backend (icons.lua): Fixed SteamID64 -> account ID calculation using exact
-  decimal string subtraction so LuaJIT (53-bit float) never rounds account
-  folder IDs or breaks artwork confirmation.
-* Controller / Big Picture:
-  - D-pad Left now returns cleanly to the tabs column from Settings,
-    Personalization, About, Filters, and Toolbar boundaries.
-  - EgBpSidebar now opens directly on the last remembered tab without starting
-    an extra Hero API fetch first.
-  - Fixed duplicate focus/nav sound on Big Picture dropdowns and added a clear
-    Desktop-only notice in Backup & Restore when running in Gamepad UI.
-* Millennium Settings UI: Added standalone base styles in shared.css so toggle
-  switches, fields, and inputs inside Millennium's plugin settings panel render
-  properly outside .repage-workspace.
-* Editor & Stability:
-  - Fixed .ico legacy fallback re-downloading the file before set_icon_from_url.
-  - Preserved Steam popup core layout CSS in Performance mode; fixed
-    Ctrl+Shift+P closing the showModal fallback; sanitized semicolons in
-    excluded game names; eliminated duplicate applyViewOrder and off-screen
-    grid reveal stalls; added EGA animated fallback & instant boot finish on
-    Settings/Personalization/About.
-* Build & Localization: Cleaned up pt-BR typos, aligned Hero tab names across
-  all 7 languages, and made build.mjs --zip fail fast on missing runtime files.
+* Fixed 53-bit SteamID64 string math in LuaJIT, standalone Millennium Settings styling, and controller sidebar navigation.
 
 Repage SteamGrid 4.9.9 - Stable Previews, Honest Loading & Hardened Backend
 --------------------------------------------------------------------------
-* Fixed animated previews starting empty: a video-extraction slot could leak
-  when a card was cancelled, deadlocking the queue; shared extraction tasks no
-  longer inherit the first caller's cancellation, and failed frames retry with
-  back-off. The first batch no longer waits for more items than there are slots.
-* Fixed the loading screen ending early and "No matching artwork" flashing for
-  1-2 s: the loader now stays up until the first batch is ready, and the empty
-  state only shows when loading is really finished (12 s watchdog as safety).
-* Backend: strict HTTPS host allowlist for downloads, size limits (64 MB) with
-  magic-byte checks, random per-session temp prefix, validated chunk indexes.
-* Artwork removal now only touches the active Steam account (no more deleting
-  grid files of other accounts) and removes every extension variant.
-* Icons are written sequentially to avoid races; local files keep the correct
-  extension; backup import is validated; localStorage failures no longer throw.
-* Current-art preview uses its own queue and no longer blocks API requests.
-* Warns when some catalog pages could not be loaded instead of truncating
-  silently.
-* Lifecycle: per-load hotkey token, pending timers cleared and
-  BroadcastChannel closed on unload; right-stick deadzone unified at 0.3.
-* New UI strings translated in all 7 languages (changelog texts stay in English
-  outside pt-BR, as in previous versions).
+* Fixed video-slot leaks, hardened download allowlists, and ensured per-account grid isolation.
 
 Repage SteamGrid 4.9.8 - GPU Canvas Freeze-Frames (WebM + WebP) & Zero Lua Flooding
 --------------------------------------------------------------------------------------
-* Replaced CORS-sensitive canvas.toDataURL() + Lua read_preview_image fallback
-  with direct <canvas> drawImage() frame rendering for animated cards:
-  - Both .webm videos and animated .webp/.gif images extract and display a
-    static first frame cleanly on <canvas> while idle (zero Lua traffic, zero
-    CORS failures, zero empty previews, and zero idle playback).
-  - Hovering/focusing plays only that card; leaving snapshots the exact last
-    frame back onto the card's <canvas> and unmounts the media player.
-* Fixed EGGrid stall where slow animated items past index 4 could pause reveal.
-* Reset egLastApiStatus on request timeout so stale HTTP 200 is never shown on
-  timeout errors.
+* Switched animated cards to direct GPU <canvas> drawImage() freeze-frames.
 
-Repage SteamGrid 4.9.7 - Clean Animated WebP/WebM Freeze, 40-Preview Cap & No Auto-Repair Loop
---------------------------------------------------------------------------------------------------
-* Removed the auto-repair search timer loop that could restart loads mid-prep.
-* Fixed animated WebP/GIF artwork playing while idle: non-video animated
-  artwork now extracts a static first frame (with CORS-safe backend fallback)
-  and animates strictly on hover/controller focus, just like WebM videos.
-* Capped initial 40-preview extraction (6 concurrent extractors, 2.4 s per
-  video, 4.2 s batch cap) and switched status to "Preparing previews - X / 40"
-  so loading never gets stuck behind slow CDN videos.
-* Fixed grid reveal gate so every card in the slot renders cleanly.
+Repage SteamGrid 4.9.7 - Clean Animated WebP/WebM Freeze & 40-Preview Cap
+--------------------------------------------------------------------------
+* Capped initial animated preview batch and paused non-hovered animated WebP/GIF playback.
 
 Repage SteamGrid 4.9.6 - Rebuilt Image Loader, Freeze-Frame Animated Cards & Audit
 ----------------------------------------------------------------------------------
-* Rebuilt image loading & reveal pipeline from scratch:
-  - Prepares and pre-decodes the first 40 matching previews (static decode +
-    first-frame extraction for animated items) in exact active Sort/Priority
-    order before revealing left-to-right with a lightweight opacity fade-in.
-  - Remaining pages stream smoothly in the background; switching Sort by or
-    filters mid-load updates viewVersion immediately without restarting or
-    clogging the API queue.
-* Animated cards behavior:
-  - Idle animated cards display a cached first-frame <img> with zero mounted
-    <video> decoders.
-  - Hovering or controller-focusing plays only that card; leaving captures the
-    exact last frame on screen and immediately unmounts the <video> player.
-* Hysteresis virtual grid + dual LRU caches (180 decoded static thumbs, 240
-  animated frames) + fast-scroll velocity guard prevent unload/reload stutter.
-* Ground-up audit fixes: fixed egStatusListeners.add(l) status badges, unified
-  egAllApps() everywhere, null-safe Steam module hooks in Ee, low-priority Lua
-  queueing for title-logo remote reads, multi-account-safe artwork_file_size
-  check, faster hover prefetch (240 ms), and removal of expensive CSS filters.
+* Rebuilt progressive loading pipeline with dual LRU caches and fast-scroll guards.
 
 Repage SteamGrid 4.9.5 - Source-Code Audit, GPU Polish & Update Resilience
 --------------------------------------------------------------------------
-* Converted project to a structured source-code repository (src/app.js,
-  src/i18n/translations.js, src/styles/*.css, scripts/build.mjs).
-* Removed hidden full-window background-attachment:fixed repaints on <html>,
-  removed per-badge backdrop-filter blurs on animated cards, and replaced
-  remaining universal :has() selectors in gallery cards and panels.
-* Hardened Steam client hooks with safe egAllApps() accessor so future Steam UI
-  updates cannot trigger uncaught exceptions.
-* Added a 1.5 s safety timeout when reading local WebM metadata and bounded
-  egIconReadyCache to 600 entries.
+* Modularized repository source structure and removed expensive full-window CSS repaints.
 
 Repage SteamGrid 4.9.1 - Activity-Based Watchdog, Animated Hover Fix & Categorized Settings
 -------------------------------------------------------------------------------------------
-* Refined API queue & watchdog:
-  - Tuned Lua API concurrency to 2 slots (matching Millennium's serialized Lua
-    HTTP runner) with priority -1 for active ID lookup & page 0 so tab switching
-    cannot cause backend queue pileups.
-  - Replaced the aggressive 6.5 s wall-clock timer with an activity-based
-    watchdog: slow connections that are making progress are never interrupted,
-    while true prolonged inactivity (15 s with zero Lua completions/progress)
-    checks navigator.onLine first or performs one clean recovery.
-* Fixed animated previews not playing on hover/controller focus: added explicit
-  muted + play() handling in useEffect and onCanPlay, placed active <video>
-  above the poster layer, and stopped onSeeked from re-running poster capture
-  once cached.
-* Organized the Settings page into 4 clean categories: Account & Backup,
-  Catalog & Authors, Controller & Input, and Interface & Performance.
+* Added activity-based API watchdog and organized Settings into 4 categories.
+
 Repage SteamGrid 4.9.0 - Automated Search Watchdog, Self-Healing Queue & Zero-Hook Scroll
 -----------------------------------------------------------------------------------------
-* Fixed infinite "Fetching images - page 1" hang when switching tabs:
-  - Added per-request 9 s timeout and instant cancellation pruning in egApiRun
-    so cancelled tab requests are dropped before reaching Lua and hung calls
-    can never permanently block the 4-slot queue.
-  - Added an automated two-stage search watchdog: if a search stalls for >6.5 s,
-    Repage automatically flushes/heals the internal queue and retries; if no
-    response arrives after 14.5 s, it displays a connection/rate-limit diagnostic
-    with a one-click "Retry now" button.
-  - "Restart plugin" and "Search again" now also reset all active API and poster
-    queues.
-* Eliminated the remaining row-mount scroll hitch on Desktop by replacing
-  per-card Steam Focusable wrappers with lightweight native divs on Desktop,
-  replacing per-card EgCardStatus useEffect hooks with a single editor-level
-  listener, and memoizing computed tag lists per image.
+* Added automatic search stall recovery and reduced per-card scroll hook overhead.
+
 Repage SteamGrid 4.8.3 - Verified Video Poster Frames, Spinner Fix & Scroll Pacing
 ----------------------------------------------------------------------------------
-* Fixed animated cards showing black rectangles: poster capture now waits for
-  onLoadedData (readyState >= 2) and inspects pixel alpha/luminance before
-  caching JPEG posters (seeking past black fade-in frames if needed), so empty
-  video buffers are never cached as black images.
-* Restored the central loading spinner and progress bar animations when
-  Performance mode is enabled.
-* Smoothed scrolling by pacing canvas.toDataURL calls (at least 40 ms apart and
-  paused during active scroll), coalescing RevealCoordinator updates into a
-  single requestAnimationFrame, and applying CSS contain:strict to grid slots.
+* Prevented black fade-in frames from being cached as animated video posters.
+
 Repage SteamGrid 4.8.2 - Startup Screen, Pre-Warmed Ordered Reveal & Animated Frame Fix
 ---------------------------------------------------------------------------------------
-* Added a "Starting plugin..." startup screen that prepares the workspace and
-  initial catalog before revealing the UI ready for use.
-* Top-batch preview preloading: the editor now pre-decodes the initial visible
-  batch of static and animated previews before opening the reveal gate, so top
-  cards appear together in strict left-to-right order without empty gaps.
-* Fixed animated previews staying blank until hovered: restored preload="auto"
-  on active poster extractors, hooked both onLoadedMetadata and onLoadedData
-  with a 1.8 s anti-deadlock watchdog, and fixed .is-perf-mode card opacity so
-  unloaded cards never show as black rectangles.
-* Fixed stacked/overlapping boolean rows at the bottom of the Settings tab by
-  enforcing flex-shrink:0 and unified row styling.
-* Dimmed inactive Personalization options (Light intensity, Surface finish, and
-  ambient lights) with a frosted badge when Performance mode is enabled.
+* Added startup splash screen and top-batch ordered card reveal.
+
 Repage SteamGrid 4.8.1 - Performance Mode, Popup Theme Isolation & Settings Scroll Fix
 --------------------------------------------------------------------------------------
-* Added "Performance mode" in Settings: toggling it automatically restarts the
-  plugin with ambient light layers, backdrop blurs, entrance/hover animations,
-  shadows, overscan rows, and background title-logo pixel scanning disabled,
-  while keeping clean matte surfaces and preset accent colors.
-* Isolated the Desktop Repage popup window from third-party Steam theme
-  stylesheets (e.g. Adwaita custom.css) so theme selectors no longer slow down
-  scrolling inside the Repage window.
-* Fixed the Settings tab scrollbar and mouse/controller scrolling outside Big
-  Picture by removing the extra unstyled wrapper div around the Settings page.
+* Added Performance Mode and isolated desktop popup stylesheets from third-party Steam themes.
+
 Repage SteamGrid 4.8.0 - Deep GPU/CPU Performance & Scroll Fluidity Overhaul
 ----------------------------------------------------------------------------
-* Eliminated redundant full-screen backdrop-filter blur passes over the
-  animated ambient-light layer, cutting idle GPU compositing load by >90% and
-  preventing fan spin-up or system-wide frame drops.
-* Unmounted <video> elements from animated cards immediately after poster
-  capture so Chromium frees WebMediaPlayer threads and GPU video memory; video
-  decoders now mount only while a card is hovered or controller-focused.
-* Paused background video poster extraction during active scrolling (2-slot
-  idle queue, 360 px JPEG posters) so scrolling never competes with canvas
-  encoding.
-* Reworked EGGrid scroll virtualization to update React state only when visible
-  row indices change, cutting scroll re-renders by ~95%.
-* Switched library app icons to lazy loading (stops 250+ simultaneous decodes
-  on panel open), removed dead array scans and subtree MutationObservers,
-  compressed cached Current-art previews in memory, and capped gamepad polling
-  at 60 Hz on high-refresh-rate monitors.
+* Unmounted off-hover <video> elements and cut idle GPU compositing load by >90%.
+
 Repage SteamGrid 4.7.3 - Repage-Owned Window Titlebar & Controls (-, Square, X)
 -------------------------------------------------------------------------------
-* Added a dedicated Repage window titlebar on Desktop with Minimize (-),
-  Maximize/Restore (square), and Close (X) buttons plus double-click maximize
-  and drag region, replacing Steam's native .title-area so themes like Adwaita
-  that hide minimize/maximize buttons always retain full window controls.
-* Full 7-language localization, controller skip protection, and Linux/Steam Deck
-  compatibility.
+* Added Repage-owned Minimize, Maximize/Restore, and Close titlebar buttons.
+
 Repage SteamGrid 4.7.2 - Viewport Lock, No-Drag Hit-Testing & 100% Repage Controls
 ----------------------------------------------------------------------------------
-* Fixed unclickable/unscrollable UI when third-party Steam themes (e.g. Adwaita)
-  are active:
-  - Kept Steam's full-window .title-area overlay at pointer-events:none (only
-    .title-bar-actions window buttons and a 14 px top drag strip receive pointer
-    events) and enforced -webkit-app-region:no-drag across .repage-workspace.
-  - Locked .repage-workspace directly to the window viewport (position:fixed;
-    inset:0; 100vw x 100vh) so parent modal wrappers with height:auto cannot
-    expand the panel past the screen or disable internal scrollbars.
-  - Replaced the remaining Steam Settings components (Field, DialogButton,
-    TextField) with Repage-owned controls.
+* Locked workspace to viewport and replaced remaining native Steam settings controls.
+
 Repage SteamGrid 4.7.1 - Native Sidebar/Toggle Independence & Window Controls Fix
 ---------------------------------------------------------------------------------
-* Replaced Steam's native SidebarNavigation and Toggle inside the Repage panel
-  with Repage-owned components (EgDesktopSidebar and pure-CSS EgToggle). Third-
-  party Steam themes such as Adwaita can no longer alter the tabs column,
-  switches, or break the flex-height chain required for image grid scrolling.
-* Fixed top-right window buttons (-, square, X) on Desktop by keeping the
-  window title-area above the workspace, and unified the Big Picture X close
-  button with history/route fallback so it closes reliably in every setup.
+* Replaced native SidebarNavigation and Toggle with Repage-owned components.
+
 Repage SteamGrid 4.7.0 - Favorite Images, Big Picture Shortcuts & Theme Shield
 -----------------------------------------------------------------------------
-* Context menu additions (right-click / X):
-  - Added "Remove author priority" when the card's author is already prioritized.
-  - Added "Favorite image" / "Remove favorite image": favorited artwork stays
-    pinned at the top of the slot (most recently favorited first), regardless
-    of active filters, sort mode, or excluded authors, and is included in Backups.
-* Big Picture double-click & shortcuts:
-  - Fixed banner double-click in Big Picture so it routes cleanly into the
-    Big Picture editor for the current game.
-  - Enhanced egCurrentAppId to inspect Big Picture window/router state and
-    focused game tiles (.gpfocus / React fiber) for Ctrl+Shift+P and R2+L3+R3.
-* Steam Theme CSS Shield:
-  - Added an isolated theme-shield stylesheet kept at the bottom of <head>
-    while Repage is open, preventing third-party Steam themes from breaking
-    scrolling, pointer events, button layout, or panel visibility.
-* Full 7-language localization, controller navigation, and Linux/Steam Deck support.
+* Added Favorite image pinning, Remove author priority, and Steam Theme CSS Shield.
+
 Repage SteamGrid 4.6.1 - Reliable Per-Slot Current Artwork Preview
 ------------------------------------------------------------------
-* Fixed the Current applied artwork preview disappearing when switching tabs or
-  reopening the panel:
-  - Per-slot cache (appid:imagetype) in memory and localStorage restores the
-    slot's exact preview in 0 ms and strictly isolates Grid, Hero, Logo, Wide
-    Grid, and Icon slots so artwork from one tab never appears on another.
-  - Disk verification via read_artwork_preview now runs cleanly through the
-    shared API queue (priority 2, 25s timeout) so it never falsely times out
-    behind ongoing page fetches.
+* Added isolated per-slot Current artwork preview caching.
+
 Repage SteamGrid 4.6.0 - Persistent Local Art, Instant Sort/Filter & Library Jump
 ----------------------------------------------------------------------------------
-* Persistent Local Artworks: local files applied from your PC are stored safely
-  in IndexedDB (no 5 MB localStorage cap), stay pinned at the top of the grid
-  with a "Local" tag, and include a quick X remove button (plus context menu
-  remove for controllers).
-* Instant 0 ms Sorting & Filtering: changing Sort by or client-side filters
-  (NSFW, Humor, Epilepsy, Mimes, Styles, Dimensions, Prioritize animated/
-  resolution, Author priority/exclusion) now re-sorts/filters in memory without
-  re-fetching from the SteamGridDB API. Added a dedicated "Search again" button.
-* Library Page Shortcut: new "Library page" button jumps directly to the game's
-  Steam Library details page (banner/logo) on Desktop, Big Picture & Steam Deck.
-* Hidden Games Section & Backup Fix: hidden games appear in their own top
-  section when "Show hidden" is enabled; importing a backup now immediately
-  refreshes favorites, hidden games, and library preferences in the UI.
-* Current Applied Artwork Fixes: Lua preview now supports librarycache fallback
-  for icons and animated .webm previews, and Reset clears immediately.
-* API Priority Queue & CDN Preconnect: prioritized ID lookup & page 0 requests
-  ahead of background pages and logo previews.
+* Added IndexedDB local artwork persistence, 0ms in-memory sorting/filtering, and Library page jump.
+
 Repage SteamGrid 4.5.1 - Safe Current-Artwork Preview & Reorganized UI
 ----------------------------------------------------------------------
-* Fixed the Current applied artwork preview: now reads and validates slot
-  files via Lua backend (data URI) instead of blocked file:// URLs, pre-decodes
-  images before rendering so broken glyphs never appear, hides cleanly when no
-  previewable artwork exists, and updates immediately on Apply, Local file,
-  and Reset.
-* Reorganized the top toolbar into logical groups with subtle dividers and
-  grouped Settings sections cleanly by topic.
-* Localized 4.5.1 About changelog across all 7 languages.
+* Switched Current artwork preview to safe backend data URIs and reorganized Settings.
+
 Repage SteamGrid 4.5.0 - Quick Author Actions, Local Files, Backups & Slot Preview
 ----------------------------------------------------------------------------------
-* Rich card context menu (right-click / X / long-press): added Prioritize
-  author, Exclude author, and Open on SGDB alongside Save to disk, with full
-  D-pad/keyboard up/down navigation.
-* Local file apply: apply custom PNG/JPG/WebP/GIF/ICO/WebM files from your PC
-  (up to 32 MB) using the safe Steam artwork/icon pipeline.
-* Profile Backup & Restore: export/import settings, presets, favorites, hidden
-  games, and overrides as JSON (API key is never exported and existing keys
-  are preserved on import).
-* Current applied artwork preview chip in the editor summary + Copy diagnostics
-  button in About (sanitized, never exposes API key).
-* Full 7-language localization, controller navigation, and Linux/Steam Deck support.
+* Added author quick-actions, local file apply, JSON Backup & Restore, and Copy diagnostics.
+
 Repage SteamGrid 4.4.2 - Thematic Presets Expansion (12 Complete Grid)
 ----------------------------------------------------------------------
-* Renamed the 4 new presets with creative non-explicit references:
-  Night City Neon, Umbrella Kiss, Bonnie & Clyde, and The Green Hero.
-* Added 2 additional presets to complete a balanced 12-preset (4x3) grid:
-  Firefly Glow and Cassino Inkwell, with subtle localized descriptions in
-  all 7 languages.
+* Expanded Personalization to a balanced 12-preset (4x3) theme grid.
+
 Repage SteamGrid 4.4.1 - Desktop D-Pad Polish, Panel Sounds & Game Presets
 --------------------------------------------------------------------------
-* Desktop D-pad navigation: pressing Y/Triangle to show filters now moves
-  focus to the first filter control; multi-select panels auto-focus on desktop
-  controller use; library checkboxes (Show games, Show software, Show hidden)
-  now use sleek pill toggles reachable via D-pad outside Big Picture.
-* Soft Web Audio open/close panel sounds matching the existing UI audio style.
-* Two-step inline delete confirmation ("Confirm?") on custom theme presets
-  for both Desktop and Big Picture to prevent accidental deletion.
-* Added 4 game-inspired presets (Cyberpunk 2077, Resident Evil, GTA VI,
-  The Legend of Zelda) and redesigned Nordic Frost to stand apart from Steam Blue.
-* Full 7-language localization, controller navigation, and Linux/Steam Deck support.
+* Added Desktop D-pad filter navigation, soft panel open/close sounds, and two-step preset delete confirmation.
+
 Repage SteamGrid 4.0.0 - Hidden Library Games, Restart Steam Debug Button & Smart Prefetch
 -----------------------------------------------------------------------------------------
-* Hidden Library Games: hide or unhide any game directly from the library list
-  via the eye icon button, and toggle "Show hidden" in library filters to view
-  or restore hidden games at any time.
-* Optional Restart Steam Debug Button: enable "Show Restart Steam button in
-  header" in Settings (off by default) for a one-click Steam client restart.
-* Smart Library Hover Prefetch: hovering or focusing a library entry gently
-  warms up its SteamGridDB ID and title logo when the API queue is idle.
-* Full 7-language localization, controller navigation (Desktop & Big Picture),
-  and Linux / Steam Deck compatibility.
+* Added hidden library game management, optional Restart Steam button, and smart hover prefetch.
+
 Repage SteamGrid 3.9.2 - Reveal Coordinator Fix & Faster Animated Posters
 ------------------------------------------------------------------------
-* Fixed cards staying hidden (opacity: 0) after background page updates:
-  RevealCoordinator now tracks readiness and reveal state by unique item
-  ID/URL instead of array index, and no longer resets its 400 ms anti-stall
-  timer when new streaming pages arrive.
-* Increased animated poster capture concurrency from 5 to 8 slots and reduced
-  seek timeout to 350 ms; tuned streaming UI refresh interval to 900 ms.
-* Localized 3.9.2 About changelog across all 7 languages.
+* Tracked card readiness by unique item ID/URL across streaming updates.
+
 Repage SteamGrid 3.9.1 - Catalog Load Timing Diagnostics
 --------------------------------------------------------
-* Added [perf] timing logs (browser console and Millennium backend log)
-  reporting tab, game, ID lookup latency, page 0 latency, firstPaintMs,
-  totalMs, shown/total image counts, page count, cache hit, and HTTP 429
-  retries to pinpoint remaining loading bottlenecks.
+* Added [perf] catalog load timing telemetry.
+
 Repage SteamGrid 3.9.0 - Fast Progressive Loading, Ordered Reveal & Hardening
-----------------------------------------------------------------------------
-* Progressive catalog loading: page 0 of static and animated artwork now
-  renders immediately instead of blocking behind the full-catalog spinner on
-  large games (e.g., 1,000+ artworks). Remaining pages stream via a 6-worker
-  concurrent pool driven by total/limit with automatic cancellation on tab/game
-  change, retry resilience on HTTP 429/transient errors, and controller focus
-  preservation when background results settle.
-* Deduplicated SteamGridDB game-ID lookups between title logo and editor.
-* Ordered left-to-right card + preview reveal: cards fade/slide in smoothly
-  once their preview is decoded so empty frames do not pop ahead of previews.
-  Includes a 550 ms anti-stall shimmer gate for exceptionally heavy files,
-  5-slot priority-ordered animated poster extraction, 480 px poster downscaling,
-  off-screen queue cancellation, and img fallback if video decoding fails.
-* Localized 3.9.0 About changelog and error messages across all 7 languages.
-* Security & bug fixes: masked API key in startup logs, HTTPS domain allowlist
-  in Lua download_image, strict appid/extension validation against path
-  traversal in backend Lua, Windows reserved filename protection in Downloads,
-  fixed Auto Replace fallback check, pinned Save-to-disk temp downloads, clean
-  onDismount interval/observer teardown, and idle-aware controller polling.
-Repage SteamGrid 3.5.7 — Flicker-free title-logo preview
-----------------------------------------------------------------
-* Kept the eagerly loaded remote logo as a persistent base image. The
-  normalized preview is now decoded as a separate transparent overlay and
-  fades in only after it is ready; the base image stays visible underneath,
-  so normalization no longer swaps the active image source or restarts its
-  fade-in.
-* Background candidate-cache refreshes now update only the candidate list.
-  They do not replace or re-apply the currently displayed logo when a late
-  SteamGridDB response arrives. The active URL is tracked in a ref so stale
-  React state cannot trigger a duplicate application.
-* Preserved immediate first paint, alpha-aware normalization, same-artwork
-  original fallback, score ordering, gallery image fallback, and all apply
-  URLs. No gallery, installed artwork, navigation, or Lua backend behavior
-  was changed.
-* Updated frontend version, diagnostic prefixes, plugin.json and
-  metadata.json to 3.5.7.
-* Static validation covers JavaScript syntax, JSON metadata and ZIP integrity.
-  A live Steam-client rendering test is still required.
+-----------------------------------------------------------------------------
+* Added progressive page-0 display with parallel background pagination and security hardening.
 
-Repage SteamGrid 3.5.5 — Same-artwork original fallback and adaptive preview
---------------------------------------------------------------------------------
-* Preview candidates are now stored as score-ordered thumbnail/original pairs.
-  When a thumbnail loads but has no useful alpha crop, the preview tries the
-  original URL of that same artwork before considering the next score.
-* The title-logo preview uses a stronger core-alpha bound and limits how far
-  low-opacity glow/noise may expand the crop, while retaining a proportional
-  safety margin for thin strokes.
-* If a thumbnail and original have no safely detectable transparent crop, the
-  original is shown unchanged rather than being stretched, distorted or cut.
-* Preview URL cache is versioned separately; gallery cards, ranking, selection,
-  apply URLs, installed artwork, and controller navigation remain untouched.
-* Verified JavaScript syntax, metadata version, and ZIP integrity. Live Steam
-  rendering still requires user confirmation.
+Repage SteamGrid 3.5.7 - Flicker-Free Title-Logo Preview
+--------------------------------------------------------
+* Eliminated title-logo swap flicker using a separate transparent overlay.
 
-Repage SteamGrid 3.5.4 — Gallery image fallback and tighter preview fitting
---------------------------------------------------------------------------------
-* Fixed broken static gallery thumbnails: when a SteamGridDB thumbnail fails,
-  the card now retries that same artwork's original image URL. If both fail,
-  the broken-image glyph is hidden while the card and its metadata remain usable.
-* Animated gallery cards now also retry the original artwork URL when the
-  thumbnail/video source fails. This retry is limited to rendering the card;
-  selecting/applying artwork continues to use the original catalogue entry.
-* Tightened the alpha-aware crop used only by the sidebar title-logo preview:
-  low-opacity glow/noise contributes less to the detected bounds, the mass-tail
-  trim is stronger, and a small proportional safety margin protects fine edges.
-  The crop is still generated on a temporary in-memory copy and never changes
-  the SteamGridDB source image, gallery item, or applied artwork.
-* Kept the gallery fallback and preview normalization independent: preview
-  processing cannot rewrite gallery URLs, ranking, selection, or apply payloads.
-* Preserved original proportions, natural wide-logo sizing, preview cache, fade-in,
-  96 px title region, and all controller/navigation behavior.
-* Verified JavaScript syntax, metadata version, and ZIP integrity. Live Steam
-  rendering still requires user confirmation.
+Repage SteamGrid 3.5.6 - Preview Load Performance
+-------------------------------------------------
+* Revealed title logos immediately before background alpha normalization and added stale-while-revalidate caching.
 
-Repage SteamGrid 3.5.2 — Adaptive game-logo fitting and CORS-safe normalization
-----------------------------------------------------------------------------------
-* Replaced the fixed 3:1 normalization canvas with a tight crop matching each
-  logo's actual visible aspect ratio. Compact/square logos can now use the full
-  available column height; naturally wide logos remain wide and therefore use
-  less height, without distortion or forced rectangular framing.
-* Alpha bounds now use a small opacity threshold and alpha-mass trimming to ignore
-  fully transparent padding and sparse, nearly invisible outlier pixels. A modest
-  proportional safety margin preserves fine edges and glow details.
-* Fixed the silent CORS fallback: when a remote image loads but browser canvas
-  inspection is blocked, the plugin uses its existing bounded temporary image
-  cache to read the small preview, normalizes it in memory, and cleans the
-  temporary file. The preview is never installed as Steam artwork or retained as
-  a permanent downloaded file.
-* Added an in-session cache for normalized previews to avoid reprocessing or
-  re-reading the same logo when navigating between pages. The cache is bounded
-  to 100 entries.
-* Preserved the 96 px title region, centered rendering, fallback game-name text,
-  remote thumbnail selection, fade-in, Big Picture navigation, and Steam logo
-  position/scale settings. No backend Lua changes were necessary.
-* Verified JavaScript syntax, version metadata, frontend version string, and ZIP
-  integrity. Final appearance still needs confirmation in the live Steam client.
-
-Repage SteamGrid 3.5.1 — Content-aware game logo fitting
--------------------------------------------------------
-* The game-title preview now measures the actual visible PNG artwork using its
-  alpha channel, rather than sizing the whole image canvas (which may contain
-  large transparent margins).
-* Transparent pixels and near-invisible alpha noise are excluded from the bounds.
-  A small safety margin is added around the detected artwork so strokes and glow
-  effects are not pressed against the edge.
-* Every detected logo is fitted into the same 3:1 preview canvas. The visible mark
-  may use up to 540 x 168 pixels inside a 600 x 200 canvas: compact/tall logos grow
-  until they reach the height limit; wide logos grow until they reach the width
-  limit. This maximizes their size without cropping or distorting them.
-* The visible bounds are centered both horizontally and vertically. Original
-  proportions and transparency are preserved, with high-quality smoothing and
-  the existing subtle fade-in. This uses a small in-memory canvas thumbnail only.
-* If cross-origin pixel inspection is blocked, the image cannot be read, or no
-  usable alpha bounds are found, the original remote preview falls back to the
-  existing CSS `object-fit: contain` behavior.
-* The change affects only the title-area preview. It does not download the logo
-  to disk, apply it as Steam artwork, or modify/reset installed Steam logo
-  position or scale settings.
-* Calibrated against the three supplied PNG examples, using The Last of Us Part II
-  Remastered as the visual reference. Their fitted artwork sizes are approximately
-  450 x 168 (wide), 209 x 168 (Zelda) and 226 x 168 (Lies of P) inside the same
-  600 x 200 canvas; their different widths preserve each logo's natural proportions.
-
-Version 3.4.10
---------------
-* Fixed the desktop game-logo preview placement: it now renders inside the
-  SidebarNavigation title area, fully within the pages column instead of
-  spanning the main content panel.
-* Centered the preview within that column and gave it a bounded 96 px title
-  area (80 px image area); `object-fit: contain` keeps the complete logo visible.
-* Kept the game-name text as the fallback when no safe static logo is available.
-* Big Picture navigation structure, artwork application, and logo position/reset
-  behavior were not changed.
-
-Version 3.4.9
--------------
-* Title logos now stay inside the pages column (they can no longer push past the
-  separator line), are centered and share the same box, so none looks giant or tiny.
-* Automatic fit: the logo's transparent margins are measured and cropped, so the
-  visible artwork fills the box. No AI or download involved; if the image server
-  does not allow measuring, the logo is simply shown contained.
-
-Version 3.4.8
--------------
-* The game name above the pages column now shows the highest-score static logo
-  as a small preview (thumbnail only: nothing is downloaded or applied). The logo
-  is always shown whole (contain, never cropped), fades in softly once loaded and
-  is cached (7 days; 1 day when the game has none). NSFW, epilepsy and black-style
-  logos are skipped. Without a logo, an API key or a connection, the plain text
-  title is shown exactly as before.
-* Library icons: PNG icons with transparency no longer show the initial letter
-  placeholder behind them; the letter is only shown while loading or when the
-  game has no icon.
-
-Version 3.4.7
--------------
-* Added the missing translations (7 languages) for "Current look", "No saved presets yet.", "Accent & Ambient lights" and its description.
-
-Repage SteamGrid 3.4.6 — Metadata, About copy and attribution polish
-
-- Synchronized the embedded frontend version, diagnostic log prefixes, plugin.json and metadata.json to 3.4.6.
-- Condensed About > Latest updates into six grouped highlights, removing repeated and overly detailed historical notes.
-- Reworded the SteamGridDB notice to credit community artists without sounding like a reprimand.
-- Audited logo placement handling against the 3.3.1 baseline: the artwork-application path and backend cleanup/refresh logic are unchanged. The plugin does not read, write, or reset Steam's per-app logoPosition metadata; it does not call SetCustomLogoPositionForApp. No speculative geometry rewrite was added without a reproducible Steam-side test.
-- Static checks cover JavaScript syntax, both JSON metadata files, translation coverage, and ZIP integrity. Live Steam testing is still required for in-client confirmation.
-
-Repage SteamGrid 3.4.5 — Big Picture Select Shortcut Removal
-
-- Removed the Select (Gamepad API button 8) -> Search action from Big Picture. In the user's Steam client, Select opens the on-screen keyboard and it immediately closes again, with both the Steam keyboard and Repage keyboard settings.
-- Removed the Select mapping from the global Gamepad API polling route rather than trying another callback/event combination. No Big Picture Select handler now opens or toggles Search.
-- Search remains fully available through the visible library search field: navigate to it with the D-pad and press A/X to activate. B remains responsible for closing the keyboard/back navigation.
-- Preserved all other controller mappings, custom panels, library navigation, and color-picker behavior from 3.4.4.
-- Static checks verify there is no Gamepad API button 8 -> search mapping and no Focusable `onSelectButton` handler. JavaScript syntax, metadata, and ZIP integrity are validated.
-- A live Steam/Big Picture session with a physical controller is not available here; the user should confirm Select is inert while D-pad + A/X continues to open Search normally.
-
-Repage SteamGrid 3.4.4 — Select Input Single-Route Fix
-
-Highlights
-- Restored Select-to-search through the Gamepad API rising-edge detector (standard gamepad button index 8), the input path that was confirmed to generate Select presses in the previous build.
-- Removed the unreliable Steam Focusable `onSelectButton` binding. It was the only Select route in 3.4.3 and did not fire reliably in the user's Big Picture setup.
-- Kept Select out of the VGP native-button route and did not restore the competing polling/event/callback combination from 3.4.2. A single rising edge now calls `egBpFire("search")` once; the existing 360 ms duplicate guard remains as an additional safeguard.
-- Manual search bar operation is unchanged. If the Gamepad API does not expose the controller's Select button in a particular Steam setup, the search bar remains available for direct focus and activation without disrupting the keyboard.
-- All other 3.4.3 controller behavior, including R3 library toggle, custom panels, checkbox panels, color picker capture, and navigation, is preserved.
-
-Validation
-- Confirmed the Big Picture root no longer binds `onSelectButton` or `onSelectActionDescription`.
-- Confirmed the Gamepad API edge detector contains exactly one Select mapping (`button index 8 -> search`).
-- Confirmed VGP native-button handling does not map Select, and there is no second `egBpFire("search")` callback.
-- Node.js syntax check, JSON metadata validation, and ZIP integrity check.
-
-Not verified in this environment
-- A live Steam/Big Picture session with a physical controller is unavailable here. Please verify Select opens the keyboard once and that B closes it normally; manual search remains available regardless.
-
-Repage SteamGrid 3.4.2 — EasyGridEditor Render Hotfix
-
-Hotfix
-- Fixed a render-time TypeError in EasyGridEditor when opening the Steam panel. The Big Picture “More” action menu was created with an unbound `R.createElement` reference; it now uses the same `window.SP_REACT` object as the rest of EasyGridEditor.
-- This is a targeted runtime fix. The 3.4.1 custom dropdown panels, checkbox panels, and controller navigation behavior are otherwise preserved.
-
-Validation
-- Confirmed the failing expression was at index.js line 1015, column 7414 in the 3.4.1 bundle, matching the supplied stack location (column 7432 within the expression).
-- Confirmed the corrected EasyGridEditor region contains no remaining unbound `R.createElement` call.
-- Node.js syntax check, JSON metadata checks, and ZIP integrity check.
-
-Not verified in this environment
-- A live Steam/Millennium session is unavailable here. The original TypeError is fixed at the exact call site, but final in-client rendering should still be confirmed.
-
-Repage SteamGrid 3.4.1 — Repage Panels & Controller-Ready Filters (base retained)
-
-Highlights
-- Replaced every dropdown in Big Picture with the same Repage-owned panel UI. This covers image sorting, library sorting (including Recently Played), image tag visibility (including Show essential), language selection, width scale, package selection, and additional action menus.
-- Fixed the Big Picture dropdown expansion bug: Steam Focusable wrappers do not forward a DOM ref through egBtn, so the trigger is now resolved from the stable plain-DOM wrapper. Panel visibility no longer depends on a missing button ref; the panel mounts before focus is assigned.
-- Removed the native Steam context-menu path (Menu/MenuItem/showContextMenu) from dropdowns and the Big Picture More menu.
-- Rebuilt the Formats, Styles, Dimensions and Types multi-select panels with Repage-owned checkbox rows. The square checkbox appearance is retained, every option is independently focusable, and selection remains open so multiple options can be toggled in one pass.
-- Multi-select panels use an explicit vertical list route: Up/Down move one option, Left/Right stay inside the panel, A/X toggles the focused option, and B/Back closes the panel. Outside click and Escape also close it.
-- Desktop multi-select uses the same checkbox rows and a positioned Repage panel; selection and filter values continue to update the existing config fields.
-- Replaced the final Big Picture More native menu with the shared Repage action dropdown.
-
-Validation
-- Node.js syntax check and JSON metadata validation.
-- Static checks confirm no Steam native Menu/MenuItem/showContextMenu path remains for setting dropdowns or multi-select filters, and no DialogCheckbox remains. Existing Steam context menus for app/collection actions are preserved because they are separate context-action integrations.
-- Panel route tests cover vertical traversal, trapped horizontal movement, confirm/toggle and cancel behavior.
-- ZIP integrity check and package contents verification.
-
-Not verified in this environment
-- No live Steam/Big Picture session with a physical controller was available. Verify the panel opens visibly, all dropdowns navigate, and the four filter lists can be traversed and multi-selected in desktop mode.
-
-3.4.0 — Seletor de pacote de cores no controle
-- O menu de pacote de cores do Big Picture agora usa opções Focusable individuais.
-- Cima/baixo percorrem Azul, Dark, Dark OLED e Cancelar; esquerda/direita não escapam do menu.
-- A/X confirma, B cancela e o foco retorna ao seletor ao fechar.
-
-Repage SteamGrid 3.3.8 — Controller-First Library & Desktop Color Focus
-
-Repage SteamGrid 3.3.8 — Controller-First Library & Desktop Color Focus
-
-Highlights
-- Rebuilt the Big Picture library column as a controller-first layout while preserving existing game icons, favorites and row content.
-- Removed the parent Steam Focusable from the Big Picture library column. Individual controls remain Focusable, avoiding competing parent/child focus navigation.
-- Search, Show games, Show software, Sort by and every rendered game row now expose a stable data-eg-library-nav-item marker.
-- D-pad up/down now traverses those markers in DOM order as one continuous sequence, including from the last game back to the search field. The first/last boundaries are safely trapped rather than allowed to fall into unrelated Steam controls.
-- The sequence is rebuilt from live DOM nodes on every press, so changes to filters, search results, sorting and dynamically rendered games are included automatically.
-- Kept the existing Select-to-search action and the library's current game icons/favorite affordances.
-- Added a dedicated Big Picture library presentation with a larger search surface, compact vertical filter controls, a full-width sort control, and a scrollable game list.
-- Desktop Personalization color swatches now appear as rounded squares when idle and morph into circles while focused, matching the Big Picture interaction state.
-- The working 3.3.7 color-picker capture and scroll isolation remain intact.
-
-Validation
-- Node.js syntax check passed.
-- Plugin and metadata JSON validation passed.
-- Unit tests cover the actual library step resolver for search → filters → sort → all app rows and the reverse path.
-- Static integration checks confirm Big Picture library is a non-Focusable layout container and each navigation step is individually addressable.
-- CSS assertions confirm idle rounded-square and focused circular states for desktop color swatches.
-- Backend Lua, credits and license are preserved; ZIP integrity check passed.
-
-Not verified in this environment
-- No live Steam / Big Picture session with physical controller was available. Verify the entire up/down traversal in the Steam client, Select-to-search, and the desktop color-swatch focus morph.
-
-
-Repage SteamGrid 3.3.7 — Color Capture & Library Navigation
-
-Highlights
-- Big Picture right-stick scrolling and all polled controller actions are suspended synchronously while the color picker owns the sticks. The capture begins as soon as the picker opens and is released immediately when it closes.
-- Returning from a page restores the last library control when it is still available, rather than always jumping to the selected game row. The picker is also its own contained scroll surface, preventing Steam's Focusable scroll behavior from moving the personalization page behind it.
-- Color-picker GamepadDirection events are consumed even when they do not map to an HSV adjustment, so they cannot escape to parent focus/scroll handlers.
-- The Big Picture library is now one vertical navigation scope from Search games through Show games, Show software, Sort by and every visible app row.
-- Removed the nested Steam Focusable scope around the library header, which could trap D-pad movement before it reached the app list or search field. Utility collapse control is excluded from the sequential route.
-- Explicit navigation IDs are included in the focus selector, covering Steam TextField wrappers whose inner input is not the focused DOM node.
-- Select (standard Gamepad API button 8) opens Search games in Big Picture; native Select and legacy View aliases are recognized. Back and Share are deliberately not treated as Search. The Select/Search hint is now displayed in Big Picture.
-- Search activation focuses the wrapper and opens the configured Repage keyboard or clicks the underlying Steam TextField to invoke Steam's native keyboard.
-
-Validation performed
-- Node.js JavaScript syntax check passed.
-- Plugin and metadata JSON validation passed.
-- Isolated navigation tests cover search → Show games → Show software → sort → first app and back up through the same sequence, as well as the new Select/Search mapping.
-- Static checks confirm the global right-stick scroll guard and the color picker event/scroll containment.
-- ZIP integrity check passed.
-
-Not verified in this environment
-- A live Steam / Big Picture session with a physical controller was not available. Please verify right-stick color adjustment, Steam's native keyboard launch from Select, and full library-column traversal in the client.
-
-
-REPAGE STEAMGRID — PATCH NOTES
-==============================
-
-============================================================
-Repage SteamGrid 3.3.3 — Controller Navigation Refinement
-============================================================
-
-* Directional navigation now follows semantic groups instead of allowing a single global nearest-element score to mix unrelated controls.
-* The page column (Hero, Logo, Grid, Wide Grid, Icon, Settings, Personalization, About) is navigated sequentially with Up/Down in both normal and Big Picture layouts.
-* Toolbar rows, filter grids, library controls, and app rows use group-local directional routing. Filter cells are navigated as grid cells, then focus their actual interactive control.
-* Added dynamic per-element directional route support through data-eg-nav-up/down/left/right and data-eg-nav-id, plus custom navigation scopes with data-eg-nav-scope and grid/row/list modes. Routes are resolved against the live DOM, so newly rendered controls do not rely on a stale cached map.
-* Image-grid movement can hand off to nearby controls at the grid edges instead of consuming every boundary direction.
-* The virtual keyboard now keeps a stable React identity for Shift, preventing its focused button from being destroyed when the active state changes.
-* LT/RT keyboard actions are edge-triggered instead of repeating while held, preventing Shift flicker.
-* R3/right-stick click now toggles the library in normal layout as well as Big Picture; Big Picture polling uses the owning document's Gamepad API.
-* Focus restoration uses a shorter, token-guarded window to avoid stale navigation targets stealing focus after a new move.
-
-Validation in this build: JavaScript syntax, JSON metadata, ZIP integrity, static route assertions, and isolated directional-grid tests. A real Steam session with physical controllers is still required for final host-level validation.
-
-
-Version 3.3.2
--------------
-* D-pad navigation now chooses the nearest visible control in the requested
-  direction instead of relying on fragile visual-row grouping.
-* Image-grid navigation releases the D-pad at the real right/bottom edges,
-  allowing the surrounding page controls to be reached.
-* Big Picture D-pad handling no longer depends on Chromium's activeElement
-  matching Steam's internal focus state.
-* Back (B / Circle) now walks from content to the page tabs, then to the
-  library, and only then closes the panel; overlays and the virtual keyboard
-  still close first.
-* Faster controller confirmation without suppressing legitimate quick presses.
-* The Repage virtual keyboard keeps its controller-focusable input wrapper,
-  and mouse clicks on its keys no longer dismiss it before activation.
-* Desktop Gamepad API navigation also works when the visible Steam webview
-  does not report document.hasFocus().
-* Explicit tabindex=-1 controls stay excluded; mouse interaction invalidates
-  pending controller-focus restoration so the pointer cannot lose focus.
-* Big Picture B / Circle now resolves navigation from the last controller focus.
-
-Version 3.3.1
--------------
-* Big Picture: Steam's own D-pad navigation is now cancelled inside the panel
-  and the focus is re-asserted on the item Repage picked, so one press moves
-  exactly one image / one item (the grid also keeps its own index, so a stray
-  native move can no longer double the step). Same engine as the normal window.
-* Switches (including "Prioritize animated") are now treated as single
-  controller targets.
-* Much clearer focus highlight on images, switches and rows.
-* New Settings option "Controller diagnostics": shows the last controller
-  events on screen to help report navigation problems.
-
-Version 3.3.0
--------------
-* Controller / keyboard navigation rebuilt with one engine for the normal window
-  and Big Picture: the panel has three zones (library | pages | content); inside
-  a zone items are grouped in visual rows. Up/Down move row to row keeping the
-  column, Left/Right move inside the row and, at its edge, enter the next zone
-  (library -> pages -> content and back), landing on the active game / page or
-  on the last focused item. Works for any option added later.
-* Fixed the D-pad skipping one item (duplicate events from Steam / key mapping
-  are now filtered, and Big Picture focus is re-checked after each move).
-* Stronger focus highlight everywhere (normal window and Big Picture).
-* Big Picture: B closes the color picker / keyboard / menus first, then goes
-  back; the game name and plugin version are back in the pages column.
-* The color picker is raised above neighbouring cards.
-* Lights: no blur filter (it caused the stutter), softer gradients, smoother
-  motion. New setting "Keep lights static".
-* Ctrl+Shift+P also closes the panel, works in every Steam window including
-  Big Picture, and also in the library home. Double-click on the Big Picture
-  banner opens the panel.
-* Removed the "Expand app header size" option.
-* A window left on the plugin route is moved away from it when hidden, to stop
-  Steam from trying to download it ("Save as" window) after a restart or theme
-  change.
-
-Version 3.2.1
--------------
-* Controller focus is now always highlighted in the normal window (including
-  the on-screen keyboard keys), not only in Big Picture.
-* Big Picture: the panel no longer hides under Steam's top and bottom bars, and
-  the right stick scrolls the list / grid / page under focus.
-* Big Picture: the Select / Share button (and its hint) was removed, since it
-  is not needed there; it still works in the normal window.
-
-Version 3.2.0
--------------
-* On-screen keyboard for controllers. Setting "On-screen keyboard":
-    - Automatic (default): Big Picture and Steam Deck use Steam's own keyboard
-      (it opens when you press A on a text field); in the normal window the
-      Repage keyboard opens on A / on the search bar.
-    - Always use the Repage keyboard (also replaces Steam's in Big Picture).
-    - Off.
-  Repage keyboard: X deletes, Y adds a space, L2 toggles Shift, R2 confirms,
-  L1/R1 move the cursor, B closes. It closes by itself when you move the mouse,
-  touch the screen or type on the physical keyboard.
-* Y / Triangle now shows / hides the filters in Big Picture (X / Square = save
-  to disk, Select = search).
-* The background lights now behave like a lamp: they rise and fall slightly,
-  sway and flicker. Still soft; off when the system asks for reduced motion.
-* "Expand app header size" is now a list of fixed sizes (Default, 420, 520,
-  640, 760 px) instead of free text; old free-text values are converted to the
-  nearest size.
-* "Exclude APPIDs from replacement" now uses tags like the author lists
-  (numeric only, duplicates removed). The old value is kept and still works.
-* Faster icon applying: files are written to disk while Steam refreshes the
-  artwork, instead of one after the other.
-* Bigger central loading ring.
-* Fixed: exclusion parser treated numeric app names as APPIDs.
-
-Version 3.1.0
--------------
-* The library can be collapsed in every mode (arrow button in the library
-  header, click, or the P key). Outside Big Picture it always opens expanded.
-* The D-pad reaches every filter, switch (priority toggles and Settings) and
-  the side tab column; A / X confirms.
-* The version chip moved to the library header so it never overlaps anything.
-* Every controller button shows icon + text in the hint bar and in
-  About > Tips.
-
-Version 3.0.1
--------------
-* Controller navigation rebuilt for Big Picture. Columns, toolbar, sort/language
-  row and the image grid are now proper navigation groups, so the D-pad moves
-  in the direction you press (down goes down, left/right changes column,
-  including the library and the tab column).
-* L1/R1 switch tabs, L2/R2 change page, R3 (right stick click) collapses /
-  expands the library. Buttons are read from Steam's gamepad events with the
-  browser Gamepad API as a fallback.
-* Tab entries in the side column are now focusable for keyboard / controller.
-* Controller hint bar: new D-pad "Navigate" icon and, in Big Picture, the R3
-  "Library" icon (PlayStation layout shows R3, Xbox / Steam Deck shows RS).
-  Both texts are translated in all languages and listed in About > Tips.
-* The close (X) button no longer touches the version chip or page headers.
-
-Version 3.0.0
--------------
-* Personalization: create, name and delete your own color presets (up to 9).
-  They store the panel package, accent, accent hover and the three lights.
-* Personalization: the color picker is now built in and works with a
-  controller: right stick moves the cursor, left stick changes the hue,
-  A / X (Cross / Square) applies and closes, B (Circle) cancels. Mouse and
-  keyboard (arrows, Page Up/Down, Enter, Esc) work too.
-* The background lights now drift and glimmer very softly (off when the
-  system asks for reduced motion).
-* Search and text fields have a modern rounded look.
-* New centered loading animation while images load (the bottom progress bar
-  stays).
-* Animated previews skip the first frames so the still image is no longer
-  black or blurred by the fade-in.
-* Removed the "Hover to play" tooltip on animated images.
-* Shortcut: Ctrl+Shift+P, or hold R2/RT and press both sticks, opens the
-  panel. On a game page it opens with that game selected; otherwise on the
-  first game. Documented in About > Tips.
-* Icons: applied icons are remembered, re-applied in the background after
-  Steam starts, and the icon in the panel's library list now matches the one
-  applied. Faster confirmation polling when applying.
-* Big Picture: width scale defaults to Small; pressing the right stick (R3)
-  collapses / expands the library (also in the "More" menu). While collapsed
-  the library is unloaded, so it cannot be navigated by mistake.
-* Credits: Aika theme by hatewbx.
-* Fix (2.6.1): panel crashed with "g is not defined". Fix (2.6.2): Big Picture
-  close button no longer hidden by the profile icon.
-
-Version 2.6.2
--------------
-* Big Picture: the width scale now defaults to Small (still separate from
-  the desktop value and still adjustable in the toolbar).
-* Big Picture: the close (X) button moved down so the Steam profile icon in
-  the top bar no longer covers it.
-
-Version 2.6.1
--------------
-* Fixed: the panel failed to open with "g is not defined" in 2.6.0 (the new
-  controller-icon, status and restart code sat outside the plugin scope).
-  Everything from 2.6.0 is unchanged otherwise.
-
-Version 2.6.0
--------------
-* Controller hints use button icons instead of letters. Xbox / Steam Deck
-  layout (A B X Y, LB RB LT RT) or PlayStation layout (cross, circle, square,
-  triangle, L1 R1 L2 R2). PlayStation controllers are detected automatically
-  (Gamepad API and Steam Input when available). Settings > "Controller icons"
-  lets you force Auto-detect, Xbox / Steam Deck or PlayStation.
-* Fixed: the NSFW/Humor/Epilepsy tag next to the resolution (Show essential)
-  was slightly clipped.
-* Fixed: the Applying / Applied / Failed message no longer disappears when you
-  change tab or game. It stays until the next apply or Reset.
-* The status message now sits on a dark pill with colored text and border, so
-  it stays readable over white, green or red images.
-* New "Restart plugin" button in Settings: clears stuck apply queues, caches
-  and status, reloads the open panel and refreshes the theme WITHOUT touching
-  your settings.
-* About: credits mention the Aika theme (inspiration for the Personalization
-  lights), how-to explains where to create the SteamGridDB API key
-  (steamgriddb.com > Preferences > API) and where to paste it, and a notice
-  states that all images come directly from the SteamGridDB community.
-* About: "Recent updates" refreshed.
-* BIG PICTURE ONLY (desktop panel unchanged):
-  - Width scale defaults to Medium (separate from the desktop value).
-  - Filters start hidden every time the panel opens; showing them lasts only
-    while the panel stays open (also across tabs).
-  - "Show essential" is the default tag mode (remembered separately).
-  - Leaner layout: narrower library without brand and app ids, narrower tab
-    column without the big game title (the name moves to the header), version
-    and ids hidden, smaller toolbar, rarely used actions (Purge cache, Open
-    SGDB, Clear ID, Reset settings) grouped in a "More" menu, compact stats and
-    hint bar, so the image area gets much more room.
-  - Close button (X) in the top-right corner.
-* Lua backend unchanged.
-
-Versão 2.6.0
-------------
-* As dicas de controle usam ícones de botão em vez de letras. Layout Xbox /
-  Steam Deck (A B X Y, LB RB LT RT) ou PlayStation (X, círculo, quadrado,
-  triângulo, L1 R1 L2 R2). Controles PlayStation são detectados automaticamente
-  (Gamepad API e Steam Input quando disponível). Em Configurações > "Ícones do
-  controle" dá para forçar Automático, Xbox / Steam Deck ou PlayStation.
-* Corrigido: a tag NSFW/Humor/Epilepsia ao lado da resolução (Mostrar
-  essencial) ficava levemente cortada.
-* Corrigido: a mensagem Aplicando / Aplicado / Falhou não some mais ao trocar de
-  aba ou de jogo. Ela permanece até a próxima aplicação ou Redefinir.
-* A mensagem agora fica numa pílula escura com texto e borda coloridos, legível
-  sobre imagens brancas, verdes ou vermelhas.
-* Novo botão "Reiniciar plugin" em Configurações: limpa filas de aplicação
-  travadas, caches e status, recarrega o painel aberto e atualiza o tema SEM
-  mexer nas suas configurações.
-* Sobre: os créditos citam o tema Aika (inspiração das luzes da Personalização),
-  o como usar explica onde criar a chave de API do SteamGridDB (steamgriddb.com >
-  Preferences > API) e onde colar, e um aviso informa que todas as imagens vêm
-  diretamente da comunidade do SteamGridDB.
-* Sobre: "Atualizações recentes" revisada.
-* SOMENTE BIG PICTURE (o painel no desktop não muda):
-  - A escala de largura padrão é Médio (separada do valor do desktop).
-  - Os filtros começam ocultos toda vez que o painel abre; mostrá-los vale só
-    enquanto o painel continua aberto (inclusive ao trocar de aba).
-  - "Mostrar essencial" é o modo de tags padrão (lembrado separadamente).
-  - Layout mais enxuto: biblioteca mais estreita sem marca e ids, coluna de abas
-    mais estreita sem o título grande do jogo (o nome vai para o cabeçalho),
-    versão e ids ocultos, barra de ferramentas menor, ações pouco usadas
-    (Limpar cache, Abrir SGDB, Limpar ID, Redefinir configurações) reunidas no
-    menu "Mais", estatísticas e barra de dicas compactas: a área de imagens
-    ganha muito mais espaço.
-  - Botão fechar (X) no canto superior direito.
-* Backend Lua sem alterações.
-
-Version 2.5.6
--------------
-* NSFW tag on image cards: text color is now #ebced0.
-
-Versão 2.5.6
-------------
-* Tag NSFW nos cards de imagem: a cor do texto agora é #ebced0.
-
-Version 2.5.5
--------------
-* NSFW tag on image cards: explicit 1px solid border #943145 (same thickness as
-  the other tags). Text #dc9ba0 and background #281e31 are unchanged.
-
-Versão 2.5.5
-------------
-* Tag NSFW nos cards de imagem: borda sólida explícita de 1px #943145 (mesma
-  espessura das outras tags). Texto #dc9ba0 e fundo #281e31 não mudaram.
-
-Version 2.5.4
--------------
-* NSFW tag on image cards: text #dc9ba0, background #281e31, border #834c57
-  (solid, no gradient or glow).
-
-Versão 2.5.4
-------------
-* Tag NSFW nos cards de imagem: texto #dc9ba0, fundo #281e31, borda #834c57
-  (sólida, sem degradê nem brilho).
-
-Version 2.5.3
--------------
-* All image tags (Static, PNG/JPEG, Alternate, NSFW, Humor, Epilepsy, ...) now use
-  solid, opaque colors in the same style as the counters at the top of the panel.
-  They are no longer tinted by the acrylic opacity or by the ambient lights.
-
-Versão 2.5.3
-------------
-* Todas as tags das imagens (Estática, PNG/JPEG, Alternativa, NSFW, Humor,
-  Epilepsia, ...) agora usam cores sólidas e opacas, no mesmo estilo dos
-  contadores do topo do painel. Elas não são mais afetadas pela opacidade do
-  acrílico nem pelas luzes.
-
-Version 2.5.2
--------------
-* Show essential: the NSFW/Humor/Epilepsy tag next to the resolution is now
-  brighter (stronger fill, border and a soft glow) so it no longer looks faded.
-
-Versão 2.5.2
-------------
-* Mostrar essencial: a tag NSFW/Humor/Epilepsia ao lado da resolução ficou mais
-  viva (preenchimento e borda mais fortes, com um leve brilho) e não parece mais
-  apagada.
-
-Version 2.5.1
--------------
-* "Show essential" tags mode: the NSFW / Humor / Epilepsy tag now sits in the
-  resolution line, right next to the size, and the extra tag row below each
-  image is gone. "Show tags" is unchanged.
-
-Versão 2.5.1
-------------
-* Modo "Mostrar essencial": a tag NSFW / Humor / Epilepsia agora fica na linha
-  da resolução, ao lado do tamanho, e a linha extra de tags abaixo de cada
-  imagem foi removida. "Mostrar tags" não mudou.
-
-Version 2.5.0
--------------
-* One unified background: the library, the tab column and the image area now
-  share the same acrylic surface (the one driven by the Personalization colors
-  and lights). The solid #10141b layer, the extra borders and the rounded cards
-  are gone; the columns are separated only by thin, fading lines. The window
-  frame around the panel adopts the same background.
-* Settings, Personalization and About are aligned to the left like the other
-  tabs, with the same row height and a thin separator above them.
-* Less repeated information: the game name is no longer repeated above the
-  results (it is already the title of the tab column), and the filter, result
-  and toolbar areas lost their boxes.
-* Width Scale moved from the filters to the top toolbar (next to Hide filters).
-  It is still remembered per tab.
-* New image tag selector in the top toolbar: Show tags, Show essential (only
-  NSFW, Humor and Epilepsy) or Hide tags. It replaces the "Hide image tags"
-  switch in Settings; a saved "hidden" choice is migrated automatically.
-* Removed "Always replace custom Images". It was a safeguard that kept bulk
-  Replace from overwriting art you had already applied; that is now always the
-  behavior. To redo everything, use Reset first and then Replace.
-* About: the "Recent updates" list was reviewed (newest first, only what still
-  exists; the opacity bar is gone).
-* Lua backend unchanged (no new callables).
-
-Versão 2.5.0
-------------
-* Fundo único: a biblioteca, a coluna de abas e a área de imagens agora
-  compartilham a mesma superfície acrílica (a das cores e luzes da
-  Personalização). A camada sólida #10141b, as bordas extras e os cartões
-  arredondados saíram; as colunas são separadas apenas por linhas finas com
-  degradê. A moldura da janela ao redor do painel adota o mesmo fundo.
-* Configurações, Personalização e Sobre ficaram alinhadas à esquerda como as
-  demais abas, com a mesma altura de linha e um separador fino acima delas.
-* Menos informação repetida: o nome do jogo não se repete mais acima dos
-  resultados (já é o título da coluna de abas), e as áreas de filtros,
-  resultados e ferramentas perderam as caixas.
-* A Escala de largura saiu dos filtros e foi para a barra superior (ao lado de
-  Ocultar filtros). Continua sendo lembrada por aba.
-* Novo seletor de tags das imagens na barra superior: Mostrar tags, Mostrar
-  essencial (apenas NSFW, Humor e Epilepsia) ou Ocultar tags. Ele substitui o
-  botão "Ocultar tags das imagens" das Configurações; a escolha "oculto" já
-  salva é migrada automaticamente.
-* Removida a opção "Sempre substituir imagens personalizadas". Ela era uma
-  proteção que impedia o Substituir em massa de sobrescrever arte já aplicada;
-  agora esse é sempre o comportamento. Para refazer tudo, use Redefinir e depois
-  Substituir.
-* Sobre: a lista "Atualizações recentes" foi revisada (mais recente primeiro,
-  só o que ainda existe; a barra de opacidade saiu).
-* Backend Lua sem alterações (nenhuma função nova).
-
-Version 2.4.7
--------------
-* Removed the "Create a desktop shortcut with the new icon" option (it will be
-  revisited later). Nothing else changed in the icon flow: Steam API first with a
-  file fallback, .ico/BMP conversion, non-Steam games, and the lock fix from 2.4.6.
-* The technical guide file is no longer shipped inside the zip.
-
-Versão 2.4.7
-------------
-* Removida a opção "Criar um atalho com o novo ícone na área de trabalho" (será
-  revista depois). O resto do fluxo de ícones não mudou: API da Steam primeiro
-  com reserva por arquivos, conversão de .ico/BMP, jogos fora da Steam e a
-  correção do bloqueio da 2.4.6.
-* O arquivo do guia técnico não vai mais dentro do zip.
-
-Version 2.4.6
--------------
-* Fix: applying an icon stayed on "Applying" forever. The panel already holds the
-  per-game apply lock when it calls the icon routine, and the routine asked for
-  the same lock again, so each one waited for the other. The icon routine no longer
-  locks by itself (Auto Replace still locks around it). Added a regression test
-  that uses the real lock.
-
-Versão 2.4.6
-------------
-* Correção: aplicar um ícone ficava em "Aplicando" para sempre. O painel já
-  segura o bloqueio de aplicação do jogo ao chamar a rotina de ícone, e a rotina
-  pedia o mesmo bloqueio de novo, então uma esperava a outra. A rotina de ícone
-  não bloqueia mais sozinha (o Auto Replace continua bloqueando ao redor dela).
-  Foi adicionado um teste de regressão com o bloqueio real.
-
-Version 2.4.5
--------------
-* Icon tab rebuilt. Icons are now applied through Steam's own artwork API
-  (asset type "Icon"), confirmed on disk, and also written to the library cache
-  as a fallback, so they normally show up WITHOUT restarting Steam. If the API
-  does not take the icon, the file route still applies it.
-* Icons that are not plain PNG/JPG (for example .ico files with BMP frames, which
-  used to fail) are converted to PNG inside the panel before being applied.
-* Non-Steam games and programs are supported: their icon is also set with
-  Steam's shortcut icon call, using the PNG saved for them. Negative (signed)
-  ids are normalized to the unsigned ids used in file names.
-* Reset on the Icon tab now clears the API artwork, the saved files and the
-  restored Steam backup (and the shortcut icon of non-Steam games). "Reset all"
-  also resets icons.
-* New bonus option in Settings (off by default): "Create a desktop shortcut
-  with the new icon". When you apply an icon from the panel, a desktop shortcut
-  for the game/program is created with it; applying another icon updates the SAME
-  shortcut (if you delete it, a new one is created). Auto Replace never creates
-  shortcuts. Windows: a .url shortcut whose icon is an .ico built from the PNG
-  (max 256 px; OneDrive-redirected desktops are detected). Linux/Steam Deck: a
-  .desktop file in your XDG Desktop folder, made executable with chmod; if your
-  desktop still asks, choose "Allow launching". Non-Steam games launch through
-  their 64-bit Steam id.
-* The icon pieces are kept in the Steam "config/repage-steamgrid" folder (shortcut
-  index and shortcut icons). Nothing else in your Steam folders is touched.
-* New text in all 7 languages (option, toasts and About changelog).
-
-Versão 2.4.5
-------------
-* Aba Ícone reconstruída. Os ícones agora são aplicados pela API de artes da
-  própria Steam (tipo "Icon"), confirmados em disco, e também gravados no cache da
-  biblioteca como reserva, então normalmente aparecem SEM reiniciar a Steam. Se a
-  API não aceitar o ícone, o caminho por arquivos ainda o aplica.
-* Ícones que não são PNG/JPG simples (por exemplo .ico com quadros BMP, que antes
-  falhavam) são convertidos para PNG dentro do painel antes de aplicar.
-* Jogos e programas fora da Steam são suportados: o ícone também é definido pela
-  chamada de ícone de atalho da Steam, usando o PNG salvo. IDs negativos
-  (com sinal) são normalizados para os IDs sem sinal usados nos nomes de arquivo.
-* "Redefinir" na aba Ícone agora limpa a arte da API, os arquivos salvos e o
-  backup restaurado da Steam (e o ícone de atalho dos jogos fora da Steam).
-* Nova opção bônus em Configurações (desligada por padrão): "Criar um atalho com
-  o novo ícone na área de trabalho". Ao aplicar um ícone pelo painel, cria-se na
-  área de trabalho um atalho do jogo/programa com ele; aplicar outro ícone
-  atualiza o MESMO atalho (se você apagá-lo, um novo é criado). O Auto Replace
-  nunca cria atalhos. Windows: atalho .url com ícone .ico montado a partir do PNG
-  (máx. 256 px; área de trabalho redirecionada pelo OneDrive é detectada).
-  Linux/Steam Deck: arquivo .desktop na pasta Desktop do XDG, tornado executável
-  com chmod; se o ambiente ainda perguntar, escolha "Permitir execução".
-* Os arquivos dessa função ficam na pasta "config/repage-steamgrid" da Steam
-  (índice de atalhos e ícones dos atalhos). Nada mais nas pastas da Steam é tocado.
-* Textos novos nos 7 idiomas (opção, avisos e novidades da aba Sobre).
-
-Version 2.4.1
--------------
-* Removed the opacity slider and restored the fixed acrylic surface values from 2.3.0: 34% for the main columns and 29% for secondary panels. The former 2.4.0 saved slider value is safely ignored; existing color preferences remain intact.
-* Restored the stronger, more perceptible ambient-light treatment from 2.3.0 (soft radial layers, 48 px blur and 138% saturation) while keeping the updated light colors and balanced brightness.
-* Changed the color-picker preview from a circular control to a clean, softly rounded square matching the supplied reference; preset swatches use the same visual language.
-* Reworked the Settings gear as a balanced inline SVG and constrained utility navigation rows to a compact 36 px height to prevent oversized selected highlights.
-* Made Dark and Dark OLED neutral graphite/black instead of blue-tinted. Dark Midnight remains true black; the blue package is slightly darker and less saturated.
-* Gave Aurora, Orchid and Ember more distinct, expressive color identities across Steam Blue, Midnight and Midnight OLED.
-* Preserved all seven interface locales, automatic Steam-language detection, controller focus behavior, Linux/Steam Deck compatibility and the existing artwork/backend pipeline.
-
-Version 2.4.0
--------------
-* Rebalanced all visual presets toward near-black surfaces and much dimmer ambient lighting.
-* Dark Midnight now uses a pure-black base with restrained graphite panel layers; OLED remains near-black.
-* Added a persistent Panel opacity slider with a user-facing 0–100% scale mapped to a safe real surface-opacity range of 30–68%. Text opacity is never changed.
-* Simplified preset color swatches into compact round indicators and removed unnecessary borders from color controls and visual sections.
-* Added compact Settings, Personalization and About icons, plus a subtle divider and extra spacing before the utility tabs.
-* Refined the Personalization typography and renamed the ambient controls Aurora, Orchid and Ember.
-* Removed the old acrylic-opacity note because the new slider communicates the setting directly.
-* Replaced the version-specific About heading with “Recent updates” / “Novidades das últimas atualizações”; newest changes appear first.
-* Updated the technical migration guide with the opacity mapping, visual tokens, localization keys and compatibility requirements.
-* Preserved the existing Steam artwork pipeline, backend Lua files, controller focus flow, Linux/Steam Deck paths and all seven interface locales.
-
-Version 2.3.0
--------------
-* New Personalization tab, available alongside Settings and About.
-* Three re-applicable visual presets: Steam Blue, Midnight and Midnight OLED.
-  Each preset restores its panel package, Accent, Accent Hover and all three
-  ambient light colors. Manual edits remain independent and fully editable.
-* Added three fixed panel color packages: deep Steam-like blue, modern graphite
-  Dark, and near-black Dark OLED. These packages alone control the solid panel
-  palette; Accent and Lights never recolor the base surfaces.
-* Added Aika-inspired ambient Lights (Main, Pink and Warm) behind the Repage
-  workspace. Their low intensity and heavy blur keep the effect subtle.
-* Acrylic surfaces were retuned to approximately 25–34% color fill (66–75%
-  transparency), with stronger 17–27 px backdrop blur. Panel layers now let
-  ambient Lights show through much more clearly without fading the text.
-* Increased the soft Aika-inspired Lights (Main, Pink and Warm), expanded the
-  glow blur and added a slow, restrained ambient drift.
-* Fixed Accent Hover so it changes interactive hover feedback only; static
-  headings, counters and labels no longer change when that color is edited.
-* Smoothed column/window transitions, refined panel outlines and separators,
-  and added subtle LED-style breathing glow to the active preset and controls.
-* Refined image-card hover overlays, lift/zoom, focus states and entrance motion;
-  reduced-motion settings still disable the animations.
-* Added Aika-style Onest / Geist Mono font stacks with Inter and system fallbacks;
-  external font loading is optional and no font binaries are redistributed.
-* Visual settings are stored separately from SteamGridDB configuration and do
-  not modify favorites, sorting, API keys, filters or artwork replacement.
-* All new UI strings and About release notes are localized in the seven existing
-  languages (pt-BR, en, es, ja, ko, ru and fr).
-* Controller navigation uses the existing tab focus and gamepad path; color
-  controls are standard focusable inputs. Reduced-motion preferences disable
-  ambient and entrance animations. Existing Windows/Linux/Steam Deck paths remain
-  unchanged; Big Picture retains the shared focusable controls.
-
-Version 2.1.2
--------------
-* Important fix: with every filter on "All" (nothing excluded), some images were
-  still hidden, so "shown" was lower than "results". It affected all tabs
-  (Grid, Hero, Logo, Wide Grid and Icon), most visibly Icon. The filters only
-  knew a fixed list of sizes, formats and styles, and silently dropped anything
-  else (other sizes, other formats such as GIF, images with no style).
-  Now, when all options of a filter are selected, that filter lets everything
-  through. If you deselect some options, only the selected ones are shown, as before.
-
-Version 2.1.1
--------------
-* Fix: after changing tab and then changing language, the panel could jump back to
-  the previous tab; and after changing tab and then changing game, the next game
-  could open on the previous tab. The panel now reads which page is really
-  showing (any click on the tab, controller or keyboard) and always remembers that
-  one, and re-selects it when the game or language changes.
-
-Version 2.1.0
--------------
-* Fix: the panel header no longer overlaps buttons when the window is small or the
-  text is long (title, sort, language and version now wrap onto new lines).
-* Width scale now defaults to "Bigger" and the panel opens maximized. Maximizing
-  can be turned off in Settings ("Open panel maximized"). Existing installs are
-  moved to "Bigger" once; after that your own choice is kept.
-* New "About" tab: description, what's new, how to use, tips, troubleshooting,
-  notices and credits (all in the 7 languages).
-* The selected tab is remembered when you change game or reopen the panel.
-* Icon tab: verified the whole apply/restore flow (the icon is written to the grid
-  folder and to Steam's library cache, the original is backed up and restored).
-  Icon cards no longer cut off their tags: the tag area now grows to the number of
-  rows the tags really need.
-* New setting "Hide image tags": hides only the tags inside the image cards; the
-  counters at the top stay.
-* Language button now on every tab (Settings and About included).
-* Big Picture: B goes back to the previous screen, bigger touch/controller
-  targets, thicker focus ring and readable hints; the About cards are focusable so
-  the D-pad can scroll them.
-* New text in all 7 languages; works with mouse, keyboard, controller, Linux and
-  Steam Deck.
-
-Version 2.0.0
--------------
-* Repage SteamGrid is now fully independent from the original Easy SteamGrid.
-  Both plugins can be installed and active at the same time: each one adds its
-  own entry to the game right-click menu (Repage SteamGrid: Open, Auto Replace,
-  Set to Steam Assets, Exclude from replacement), opens its own panel and keeps
-  its own settings. Everything that used to be identical now has Repage-only
-  names: Gamepad UI route, popup window, saved settings (browser storage), menu
-  group, collection button, injected styles, CSS classes and internal flags.
-* Your existing settings are imported once from the old storage names on the
-  first start, then Repage uses only its own (changes in the original plugin no
-  longer touch Repage, and the other way around).
-* Banner double-click: Repage has absolute priority. The double-click is caught
-  before the page receives it, so it always opens Repage and never the original.
-* Fix: "Prioritize resolution" was overridden by the sort mode (newest, author...).
-  It now groups by resolution first (highest on top) and, inside the same
-  resolution, follows the chosen "Sort by" rule (newest, score, author).
-* Fix: "Prioritize animated" now always puts every animated image on top, ordered
-  by the chosen "Sort by" rule inside both groups. Priority Authors used to break
-  this grouping; the order is now: animated > resolution > priority authors >
-  chosen sort. The toggle also shows its real saved state when it opens.
-* Shared on purpose: the Steam grid image files and the ".easygrid_orig" icon
-  backup, so restoring always brings back the real Steam original.
-* New text in all 7 languages; everything works with mouse, keyboard,
-  controller (Gamepad UI), Linux and Steam Deck.
-
-Version 1.9.0
--------------
-* "Prioritize Authors" is now a tag field. Type a name and press comma, space or
-  Enter and it becomes a block with an X to remove it (for example "Kla," ->
-  Kla). Pasting a list creates one tag per name; use quotes for names with
-  spaces ("Big Name"); Backspace on an empty field removes the last tag. The tag
-  order is still the priority order, now shown with a number on each tag.
-* New "Exclude Authors" option, same tag system: images from those authors are
-  hidden (case-insensitive). Open editors reload as soon as either list changes.
-* Redesigned image cards: dimensions and author on one line, a divider, and
-  centered tags below. Tags: NSFW (red), Epilepsy (purple), Humor (yellow),
-  Static (gray) / Animated (green), format (blue) and the style
-  (Alternate, Blurred, White logo, Material, No logo, Official...) in teal. The
-  tag area adapts to the card width (one row on wide cards, two on narrow ones,
-  smaller chips and no author name on very small cards), which removes the empty
-  space under the cards on tabs such as Hero.
-* Tag fields and cards are mouse, keyboard, controller (including Gamepad UI)
-  and touch friendly; tags on cards are read-only.
-* All new interface text is available in the 7 supported languages.
-
-Version 1.8.0
--------------
-* Fix: "Width scale" (Small / Medium / Bigger) now always shows a clear
-  difference. The grid used to size cards from the whole window width with a
-  150 px floor, so on smaller windows Small and Medium looked the same and Bigger
-  was barely larger. It now works by number of columns, measured from the real
-  width of the image grid, so it follows window resizes (including Steam Deck),
-  and changing the setting updates open editors right away.
-* New result counters under the title: "N results" (everything SteamGridDB has
-  for this game in this tab, before your filters) and "N shown" (what matches
-  your current filters). The Static/Animated selection in the type filter still
-  limits what is loaded, so it also affects the first number.
-* New indicators for the images currently shown (after filters): NSFW, Humor,
-  Epilepsy, Static and Animated, colored like the card tags. Empty ones are
-  dimmed. They are read-only, so they work the same with mouse, keyboard,
-  controller and touch, and wrap on small screens.
-* All new interface text is available in the 7 supported languages.
-
-Version 1.7.0
--------------
-Compatibility and controller patch: Windows, Linux, Steam Deck and macOS.
-
-Controller, keyboard and touch
-* Joystick / gamepad support in the editor window (Gamepad API): Xbox,
-  PlayStation, Switch Pro and Steam Deck controllers, plus generic joysticks
-  (including hat switches). D-pad / left stick move, A applies or selects,
-  B goes back (menu, then list, then closes the window), X opens the image menu
-  (Save to disk) or favorites a game in the list, Y shows/hides filters,
-  LB/RB switch tabs, LT/RT page up/down, right stick scrolls the images,
-  Select/Back focuses the search. It only reacts while the Steam window has
-  focus. A hint bar is shown when a controller is detected.
-* Keyboard navigation: arrow keys move between the library, tabs, toolbar and
-  image grid; Home/End and PageUp/PageDown in the grid; Enter/Space applies the
-  focused image; Menu key or Shift+F10 opens the image menu; "/" focuses the
-  search; Esc leaves a text field; Ctrl (or Cmd) + PageUp/PageDown switches tabs.
-  The image grid is virtualized, and navigation reaches every image anyway.
-* Animated previews also play when an image is focused with the keyboard or a
-  controller (hover is no longer required).
-* Touch screens (Steam Deck, laptops): press and hold an image to open its
-  menu. Releasing a long-press never applies the image.
-* Gamepad UI (Big Picture / Steam Deck Game Mode) screen: library rows,
-  checkboxes and toolbar buttons are now Steam focusable elements, text fields
-  are Steam text fields, dropdowns open Steam's native menu, X favorites a game
-  or saves the focused image straight to Downloads (the file dialog does not
-  work in Gamepad UI). Not tested on real hardware.
-* Applying an image can no longer run twice when Enter/click/A fire together.
-
-Linux, Steam Deck and macOS
-* Backend: temporary downloads use the right folder per system (TEMP, TMPDIR or
-  /tmp, with fallbacks when one is not writable).
-* "Save to disk" fallback: the Downloads folder follows your XDG setting on
-  Linux/Steam Deck (so localized names like "Transferencias" work), is
-  ~/Downloads on macOS and falls back to the home folder if needed.
-* Only real Steam accounts (numeric folders) in userdata are used for artwork and
-  icons: the placeholder "0" folder, ".DS_Store" and stray folders are ignored.
-  Every filesystem call is guarded, so one unreadable folder no longer aborts the
-  whole operation. Steam paths with spaces ("Application Support") are handled.
-* Non-Steam shortcut ids that arrive as negative numbers now map to the correct
-  unsigned file name.
-* New backend function get_platform (windows, linux, steamdeck, macos).
-* The editor window now fits small screens (Steam Deck: 1280x800) instead of
-  always opening at 1600x900.
-* "Open SGDB" uses Steam's own link opener, which works on every system.
-* Interface font list now includes Linux and macOS system fonts.
-* New interface text is available in the 7 supported languages.
-* Note: Millennium documents Windows and Linux only, and does not support Steam
-  installed through Flatpak or Snap. Steam Deck and macOS depend on your
-  Millennium setup. See INSTALLATION.txt.
-
-Version 1.6.1
--------------
-* "Prioritize resolution" (Hero tab) is now dimmed and locked while the sort
-  order is "Resolution" (which already prioritizes resolution). Hovering it
-  explains why; choosing any other sort order unlocks it again. Your saved
-  value is kept.
-* New tooltip text is available in the 7 supported languages.
-
-Version 1.6.0
--------------
-* Fix: image sorting (Score / Newest / Author) now works on every tab,
-  including Hero. The Hero-only "Prioritize resolution" toggle used to override
-  the sort menu; it now only breaks ties inside the chosen order. A new
-  "Resolution" option in the sort menu gives the old behavior on any tab.
-  The sort menu is also kept in sync across open tabs.
-* Fix: right-click on an image now reliably shows "Save to disk" (the
-  right-click is captured at document level, so Steam or the theme can no
-  longer swallow it; the menu also works without the stylesheet).
-* The interface language now follows the Steam language automatically. If it
-  is one of the 7 supported languages it is used, otherwise English. The
-  language menu has a new "Automatic (Steam language)" entry; picking a
-  language manually still overrides it. A previously saved language choice is
-  reset once to Automatic.
-* All new interface text is available in the 7 supported languages.
-
-Version 1.5.0
--------------
-* Image sorting: new "Sort by" menu in the editor with Score (default),
-  Newest and Author. Newest uses the SteamGridDB image id (higher = newer),
-  because the API does not expose an upload date. The choice is saved.
-* New modern dark dropdown (Inter font) replaces every native white list:
-  language picker (with PT/EN/ES/JA/KO/RU/FR badges), filter values, width
-  scale and library sorting. Keyboard support: arrows, Home/End, Enter, Esc.
-* Right-click on an image: "Save to disk". Opens a save dialog to choose the
-  folder and file name. If the dialog is not available in Steam, the image is
-  copied to your Downloads folder with a non-clashing name.
-* Filter values renamed: True -> Only, False -> Exclude, Any -> Include
-  (stored settings are unchanged, only the labels).
-* The current version is shown in the editor and at the top of the settings.
-* API key: clear "No API key set" message in the editor (with a field and an
-  "Apply key" button) and in the settings, where "Apply key" and "Remove key"
-  buttons reload every open panel with the new key (or without it). Also shows
-  a specific message when SteamGridDB rejects the key.
-* backend/main.lua: new function save_image_to_downloads.
-* All new interface text is available in the 7 supported languages.
-
-Version 1.4.0
--------------
-* Library: "Hours played", "Disk space" and "Acquisition date" sorting now read
-  the real Steam fields (minutes_playtime_forever, size_on_disk,
-  rt_purchased_time) and no longer fall back to alphabetical order. If Steam
-  exposes no value for a mode, a diagnostic line with the available fields is
-  written to the plugin log.
-* Icons: notice that Steam may need to be restarted for icon changes to show
-  (editor tab and settings).
-* "Show filters" is on by default. Fixed: the button saved its state inverted.
-* Dimensions: every option is checked by default for all image types. Saved
-  settings are migrated once to these defaults.
-* Banner double-click: now a single capture-phase listener on the Steam window
-  that checks the banner area at click time, re-registered automatically if the
-  window/theme replaces it. No longer depends on the banner element's class
-  or on the theme.
-* Image cards: besides the author, they show tags for NSFW (highlighted in
-  red), Humor, Epilepsy and the file format (WebP, PNG, JPEG).
-* All new interface text is available in the 7 supported languages.
-
-Version 1.3.0
--------------
-Rebuild of Easy SteamGrid (luthor112). Main changes:
-
-* Renamed to Repage SteamGrid (plugin id: repage-steamgrid).
-* Interface in 7 languages: Portuguese (Brazil), English, Spanish, Japanese,
-  Korean, Russian, French. Language picker in the editor; the system language
-  is detected on first run.
-* Library rework: Games / Software / Tools filters, sorting (alphabetical,
-  recently played, hours played, disk space, acquisition date), favorites,
-  real app icons, optional Steam tools.
-* Safer artwork apply: one operation at a time per slot, size confirmation,
-  cleanup of old files, and decoding of the new image ahead of navigation.
-* Bounded memory/disk usage: temporary download cache is limited and cleaned
-  on unload; poster and catalog caches are limited.
-* Fix: the editor "Reset" button and the collection "Reset" menu now wait for
-  an in-progress apply of the same slot instead of running in parallel.
-
+Repage SteamGrid 3.5.5 - Same-Artwork Original Fallback & Adaptive Preview
 --------------------------------------------------------------------------
+* Paired thumbnail and original logo URLs per candidate before falling back.
 
-NOTAS DA VERSÃO (PT-BR)
+Repage SteamGrid 3.5.4 - Gallery Image Fallback & Tighter Preview Fitting
+-------------------------------------------------------------------------
+* Added automatic original-URL fallback for broken gallery thumbnails.
 
-Versão 2.1.2
-------------
-* Correção importante: com todos os filtros em "Todos" (nada excluído), algumas
-  imagens ainda ficavam ocultas, então "exibidos" era menor que "resultados".
-  Afetava todas as abas (Capa, Plano de fundo, Logo, Capa horizontal e Ícone),
-  mais visível em Ícone. Os filtros só conheciam uma lista fixa de tamanhos,
-  formatos e estilos, e descartavam em silêncio o resto (outros tamanhos, outros
-  formatos como GIF, imagens sem estilo). Agora, quando todas as opções de um
-  filtro estão marcadas, esse filtro deixa tudo passar. Se você desmarcar
-  opções, só as marcadas aparecem, como antes.
+Repage SteamGrid 3.5.3 - Isolated Title-Logo Preview & Source Fallback
+----------------------------------------------------------------------
+* Isolated title-logo candidate caching from live gallery state.
 
-Versão 2.1.1
-------------
-* Correção: ao trocar de aba e depois de idioma, o painel podia voltar para a aba
-  anterior; e ao trocar de aba e depois de jogo, o jogo seguinte podia abrir na
-  aba anterior. Agora o painel lê qual página está realmente aparecendo (qualquer
-  clique na aba, controle ou teclado) e sempre lembra essa, e a seleciona de novo
-  ao trocar de jogo ou idioma.
+Repage SteamGrid 3.5.2 - Adaptive Game-Logo Fitting & CORS-Safe Normalization
+-----------------------------------------------------------------------------
+* Replaced fixed 3:1 normalization with tight aspect-preserving alpha cropping.
 
-Versão 2.1.0
-------------
-* Correção: o cabeçalho do painel não sobrepõe mais os botões quando a janela é
-  pequena ou o texto é longo (título, ordenar, idioma e versão quebram de linha).
-* A escala de largura agora é "Maior" por padrão e o painel abre maximizado. Dá
-  para desligar em Configurações ("Abrir painel maximizado"). Instalações
-  existentes passam para "Maior" uma única vez; depois a sua escolha é mantida.
-* Nova aba "Sobre": descrição, novidades, como usar, dicas, solução de problemas,
-  avisos e créditos (nos 7 idiomas).
-* A aba selecionada é lembrada ao trocar de jogo ou reabrir o painel.
-* Aba Ícone: o fluxo de aplicar/restaurar foi verificado por completo (o ícone é
-  gravado na pasta grid e no cache da biblioteca da Steam, o original é salvo em
-  backup e restaurado). Os cartões de ícone não cortam mais as tags: a área de
-  tags cresce conforme as linhas que as tags realmente precisam.
-* Nova opção "Ocultar tags das imagens": oculta só as tags dentro dos cartões das
-  imagens; os indicadores do topo continuam.
-* Botão de idioma em todas as abas (inclusive Configurações e Sobre).
-* Big Picture: o B volta para a tela anterior, alvos maiores para controle, anel
-  de foco mais grosso e dicas legíveis; os cartões da aba Sobre recebem foco para
-  o direcional conseguir rolar.
-* Textos novos nos 7 idiomas; funciona com mouse, teclado, controle, Linux e
-  Steam Deck.
+Repage SteamGrid 3.5.1 - Content-Aware Game Logo Fitting
+--------------------------------------------------------
+* Measured visible PNG alpha bounds for sidebar game title logos.
 
-Versão 2.0.0
-------------
-* O Repage SteamGrid agora é totalmente independente do Easy SteamGrid original.
-  Os dois plugins podem ficar instalados e ativos juntos: cada um adiciona sua
-  própria opção no menu de clique direito do jogo (Repage SteamGrid: Open, Auto
-  Replace, Set to Steam Assets, Exclude from replacement), abre seu próprio
-  painel e mantém suas próprias configurações. Tudo que era idêntico agora tem
-  nomes exclusivos do Repage: rota da Gamepad UI, janela popup, configurações
-  salvas (armazenamento do navegador), grupo do menu, botão da coleção, estilos
-  injetados, classes CSS e flags internas.
-* Suas configurações atuais são importadas uma única vez dos nomes antigos na
-  primeira inicialização; depois o Repage usa só as dele (mudanças no plugin
-  original não mexem mais no Repage, e vice-versa).
-* Clique duplo no banner: o Repage tem prioridade total. O clique é capturado
-  antes da página recebê-lo, então sempre abre o Repage e nunca o original.
-* Correção: "Priorizar resolução" era sobreposta pelo modo de ordenar (mais
-  recentes, autor...). Agora agrupa por resolução primeiro (maior no topo) e,
-  dentro da mesma resolução, segue a regra de "Ordenar por" (recentes, pontuação,
-  autor).
-* Correção: "Priorizar animadas" agora sempre põe todas as animadas no topo,
-  ordenadas pela regra de "Ordenar por" dentro dos dois grupos. "Priorizar
-  autores" quebrava esse agrupamento; a ordem agora é: animadas > resolução >
-  autores priorizados > ordenação escolhida. A opção também mostra o estado
-  salvo real ao abrir.
-* Compartilhado de propósito: os arquivos de imagem do grid da Steam e o backup
-  de ícone ".easygrid_orig", para a restauração sempre devolver o original real.
-* Textos novos nos 7 idiomas; tudo funciona com mouse, teclado, controle
-  (Gamepad UI), Linux e Steam Deck.
+Repage SteamGrid 3.4.10 - Desktop Title-Logo Placement Fix
+----------------------------------------------------------
+* Constrained the desktop game-logo preview cleanly inside the pages column.
 
-Versão 1.9.0
-* "Priorizar autores" agora é um campo de tags. Digite um nome e pressione
-  vírgula, espaço ou Enter para virar um bloco com X para remover (ex.: "Kla,"
-  -> Kla). Colar uma lista cria uma tag por nome; use aspas para nomes com
-  espaço ("Nome Grande"); Backspace com o campo vazio remove a última tag. A
-  ordem das tags continua sendo a ordem de prioridade, agora com um número em
-  cada tag.
-* Nova opção "Excluir autores", com o mesmo sistema de tags: as imagens desses
-  autores ficam ocultas (sem diferenciar maiúsculas). Os editores abertos
-  recarregam assim que qualquer uma das listas muda.
-* Cartões de imagem redesenhados: dimensões e autor na mesma linha, um divisor
-  e as tags centralizadas abaixo. Tags: NSFW (vermelho), Epilepsy (roxo), Humor
-  (amarelo), Estática (cinza) / Animada (verde), formato (azul) e o estilo
-  (Alternativa, Desfocada, Logo branca, Material, Sem logo, Oficial...) em
-  verde-água. A área de tags se adapta à largura do cartão (uma linha em
-  cartões largos, duas nos estreitos, chips menores e sem o nome do autor nos
-  muito pequenos), o que elimina o espaço vazio embaixo dos cartões em abas
-  como a Hero.
-* Campos de tag e cartões funcionam com mouse, teclado, controle (inclusive na
-  Gamepad UI) e toque; as tags dos cartões são apenas informativas.
-* Todo texto novo em 7 idiomas.
+Repage SteamGrid 3.4.9 - Bounded Title-Logo Box & Alpha Crop
+------------------------------------------------------------
+* Kept title logos centered inside the pages column without pushing dividers.
 
-Versão 1.8.0
-* Correção: "Escala de largura" (Pequeno / Médio / Maior) agora sempre mostra
-  diferença clara. Antes os cartões eram dimensionados pela largura da janela
-  inteira com mínimo de 150 px, então em janelas menores Pequeno e Médio ficavam
-  iguais e Maior quase não mudava. Agora funciona por número de colunas,
-  medido na largura real da grade de imagens, acompanha o redimensionamento da
-  janela (inclusive no Steam Deck) e a mudança da opção atualiza os editores
-  abertos na hora.
-* Novos contadores de resultado abaixo do título: "N resultados" (tudo o que o
-  SteamGridDB tem para este jogo nesta aba, antes dos filtros) e "N exibidos"
-  (o que atende aos filtros atuais). A seleção Estática/Animada do filtro de
-  tipos ainda limita o que é carregado, então ela também afeta o primeiro número.
-* Novos indicadores das imagens exibidas (após filtros): NSFW, Humor, Epilepsy,
-  Estáticas e Animadas, com as mesmas cores das tags dos cartões. Os zerados
-  ficam esmaecidos. São apenas informativos, então funcionam igual com mouse,
-  teclado, controle e toque, e quebram de linha em telas pequenas.
-* Todo texto novo em 7 idiomas.
+Repage SteamGrid 3.4.8 - Title Logos & Transparent Library Icons
+----------------------------------------------------------------
+* Displayed highest-scored static game logos in the sidebar and fixed transparent library icon backgrounds.
 
-Versão 1.7.0
-Patch de compatibilidade e controles: Windows, Linux, Steam Deck e macOS.
+Repage SteamGrid 3.4.7 - Missing 7-Language Personalization Translations
+------------------------------------------------------------------------
+* Completed 7-language translations for Personalization labels.
 
-Controle, teclado e toque
-* Suporte a joystick/controle na janela do editor (Gamepad API): controles Xbox,
-  PlayStation, Switch Pro e do Steam Deck, além de joysticks genéricos (com
-  direcional "hat"). D-pad / analógico esquerdo movem, A aplica ou seleciona,
-  B volta (menu, depois lista, depois fecha a janela), X abre o menu da imagem
-  (Salvar em disco) ou favorita o jogo na lista, Y mostra/oculta filtros,
-  LB/RB trocam de aba, LT/RT página acima/abaixo, analógico direito rola as
-  imagens, Select/Back foca a busca. Só responde enquanto a janela da Steam
-  estiver em foco. Uma barra de dicas aparece quando há um controle conectado.
-* Navegação por teclado: setas entre biblioteca, abas, barra de ferramentas e
-  grade de imagens; Home/End e PageUp/PageDown na grade; Enter/Espaço aplica a
-  imagem em foco; tecla Menu ou Shift+F10 abre o menu da imagem; "/" foca a
-  busca; Esc sai do campo de texto; Ctrl (ou Cmd) + PageUp/PageDown troca de aba.
-* Prévias animadas também tocam quando a imagem recebe foco por teclado ou
-  controle (não depende mais do mouse).
-* Telas de toque (Steam Deck, notebooks): segurar o dedo sobre a imagem abre o
-  menu dela. Soltar depois de segurar nunca aplica a imagem.
-* Tela da Gamepad UI (Big Picture / Modo Jogo do Steam Deck): linhas da
-  biblioteca, caixas de seleção e botões agora são elementos focáveis da Steam,
-  campos de texto são os da Steam, listas abrem o menu nativo da Steam, X favorita
-  o jogo ou salva a imagem em foco direto em Downloads (a janela de salvar não
-  funciona na Gamepad UI). Não testado em hardware real.
-* Aplicar uma imagem não roda mais duas vezes quando Enter/clique/A disparam
-  juntos.
+Repage SteamGrid 3.4.6 - Metadata, About Copy & Attribution Polish
+------------------------------------------------------------------
+* Condensed About -> Latest updates and clarified SteamGridDB community attribution.
 
-Linux, Steam Deck e macOS
-* Backend: downloads temporários usam a pasta certa de cada sistema (TEMP,
-  TMPDIR ou /tmp, com alternativas quando uma não é gravável).
-* "Salvar em disco" (alternativa): a pasta Downloads segue a configuração XDG no
-  Linux/Steam Deck (nomes traduzidos como "Transferências" funcionam), é
-  ~/Downloads no macOS e cai para a pasta pessoal se preciso.
-* Só contas reais da Steam (pastas numéricas) em userdata são usadas para imagens
-  e ícones: a pasta "0", ".DS_Store" e pastas soltas são ignoradas. Toda chamada
-  ao sistema de arquivos é protegida, então uma pasta ilegível não cancela mais a
-  operação inteira. Caminhos da Steam com espaço ("Application Support") funcionam.
-* IDs de atalhos de jogos fora da Steam que chegam negativos agora viram o nome de
-  arquivo sem sinal correto.
-* Nova função de backend get_platform (windows, linux, steamdeck, macos).
-* A janela do editor agora cabe em telas pequenas (Steam Deck: 1280x800) em vez de
-  abrir sempre em 1600x900.
-* "Abrir SGDB" usa o abridor de links da própria Steam, que funciona em qualquer
-  sistema.
-* A lista de fontes da interface inclui fontes do Linux e do macOS.
-* Todo texto novo em 7 idiomas.
-* Observação: o Millennium documenta apenas Windows e Linux e não suporta a Steam
-  instalada por Flatpak ou Snap. Steam Deck e macOS dependem do seu Millennium.
-  Veja o INSTALLATION.txt.
+Repage SteamGrid 3.4.5 - Big Picture Select Shortcut Removal
+------------------------------------------------------------
+* Removed the Big Picture Select-to-Search shortcut that conflicted with Steam's OSK.
 
-Versão 1.6.1
-* "Priorizar resolução" (aba Hero) agora fica levemente opaca e bloqueada
-  enquanto a ordenação for "Resolução" (que já prioriza a resolução). Passar o
-  mouse mostra o motivo; escolher qualquer outra ordenação libera a opção de
-  novo. O valor salvo é mantido.
-* Texto novo da dica em 7 idiomas.
+Repage SteamGrid 3.4.4 - Select Input Single-Route Fix
+------------------------------------------------------
+* Routed Select-to-Search through a single Gamepad API edge detector.
 
-Versão 1.6.0
-* Correção: a ordenação (Pontuação / Mais recentes / Autor) agora funciona em
-  todas as abas, inclusive Hero. O toggle "Prioritize resolution" (só na Hero)
-  sobrescrevia o menu; agora ele apenas desempata dentro da ordem escolhida.
-  Nova opção "Resolução" no menu devolve o comportamento antigo em qualquer
-  aba. O menu também fica sincronizado entre as abas abertas.
-* Correção: o botão direito em uma imagem agora mostra "Salvar em disco" de
-  forma confiável (o clique é capturado no nível do documento, então a Steam ou
-  o tema não conseguem engolir o evento; o menu funciona até sem a folha de
-  estilo).
-* O idioma da interface agora segue o idioma da Steam automaticamente. Se for
-  um dos 7 idiomas suportados, ele é usado; caso contrário, inglês. O menu de
-  idiomas tem a nova opção "Automático (idioma da Steam)"; escolher um idioma
-  manualmente continua valendo. A escolha de idioma salva antes é redefinida
-  uma vez para Automático.
-* Todo texto novo em 7 idiomas.
+Repage SteamGrid 3.4.3 - Big Picture Gamepad Event Deduplication
+----------------------------------------------------------------
+* Deduplicated Big Picture R3 and Select button events.
 
-Versão 1.5.0
-* Ordenação de imagens: novo menu "Ordenar por" no editor com Pontuação
-  (padrão), Mais recentes e Autor. "Mais recentes" usa o id da imagem no
-  SteamGridDB (maior = mais nova), pois a API não informa a data de envio. A
-  escolha fica salva.
-* Novo dropdown escuro e moderno (fonte Inter) no lugar das listas brancas:
-  idioma (com selos PT/EN/ES/JA/KO/RU/FR), valores dos filtros, escala de
-  largura e ordenação da biblioteca. Teclado: setas, Home/End, Enter, Esc.
-* Botão direito em uma imagem: "Salvar em disco". Abre a janela para escolher
-  pasta e nome. Se a janela não estiver disponível na Steam, a imagem é
-  copiada para a pasta Downloads com um nome que não sobrescreve nada.
-* Valores dos filtros renomeados: True -> Somente, False -> Excluir,
-  Any -> Incluir (as configurações salvas não mudam, só os nomes).
-* A versão atual aparece no editor e no topo das configurações.
-* Chave de API: mensagem clara "Nenhuma chave de API definida" no editor (com
-  campo e botão "Aplicar chave") e nas configurações, onde os botões "Aplicar
-  chave" e "Remover chave" recarregam todos os painéis abertos com a nova
-  chave (ou sem ela). Também há aviso específico quando o SteamGridDB recusa a
-  chave.
-* backend/main.lua: nova função save_image_to_downloads.
-* Todo texto novo em 7 idiomas.
+Repage SteamGrid 3.4.2 - EasyGridEditor Render Hotfix
+-----------------------------------------------------
+* Fixed an unbound React reference in the Big Picture More menu.
 
-Versão 1.4.0
-* Biblioteca: ordenar por horas jogadas, espaço em disco e data de aquisição
-  agora usa os campos reais da Steam (antes ficava em ordem alfabética).
-* Ícones: aviso de que pode ser necessário reiniciar a Steam.
-* "Mostrar filtros" ligado por padrão (e corrigido o estado salvo invertido).
-* Dimensões: todas as opções marcadas por padrão; configurações salvas são
-  migradas uma vez.
-* Duplo clique no banner: abre o painel de forma confiável, independente do tema.
-* Cartões de imagem: tags NSFW (vermelho), Humor, Epilepsia e formato
-  (WebP, PNG, JPEG), além do autor.
-* Todo texto novo em 7 idiomas.
+Repage SteamGrid 3.4.1 - Repage Panels & Controller-Ready Filters
+-----------------------------------------------------------------
+* Replaced native white dropdowns and multi-select lists with controller-ready Repage panels.
 
-Versão 1.3.0
-* Renomeado para Repage SteamGrid (id: repage-steamgrid).
-* Interface em 7 idiomas, com seletor de idioma.
-* Biblioteca renovada: filtros, ordenação, favoritos e ícones dos jogos.
-* Aplicação de imagens mais segura, com uma operação por vez em cada slot.
-* Uso de memória e disco limitado; cache temporário limpo ao descarregar.
-* Correção: "Redefinir" (editor e menu de coleção) agora espera a aplicação em
-  andamento do mesmo slot terminar.
+Repage SteamGrid 3.4.0 - Controller Color Package Picker
+--------------------------------------------------------
+* Made Big Picture color package selection individually focusable via D-pad.
 
-Repage SteamGrid 3.3.4 — Big Picture Navigation & Layout Refinement
+Repage SteamGrid 3.3.8 - Controller-First Library & Desktop Color Focus
+-----------------------------------------------------------------------
+* Rebuilt the Big Picture library column for continuous D-pad traversal and circular swatch focus.
 
-Navigation changes
-- Big Picture library and page columns are treated as vertical-only regions. Left/Right leave the column directly; Up/Down move through its own live DOM order.
-- Entering the content region from the page column now selects the first meaningful control in the active page, excluding the language picker and close button.
-- Main content uses semantic groups: row, grid, stack/list. Horizontal moves stay on the same visual row; vertical moves advance to the nearest next visual row or the next page control.
-- The page-wide geometric fallback that could jump from a lower column to the language picker has been removed. Horizontal navigation no longer chooses controls on another row.
-- The active DOM is re-read for every move, preserving access to dynamically rendered controls and future filter options.
-- Personalization now declares explicit navigation scopes for its header, preset grids, package selector, custom preset actions, and color controls.
-- Filter cells remain a navigable grid; edge movement is contained rather than jumping to unrelated controls.
+Repage SteamGrid 3.3.7 - Color Capture & Library Navigation
+-----------------------------------------------------------
+* Suspended background scrolling while the color picker captures sticks and unified library navigation.
 
-Big Picture layout changes
-- Filter panel no longer flex-shrinks into a narrow strip above the image grid. It has a bounded scroll area, a responsive minimum column width, and usable control heights.
-- Pad hints are kept in normal flow and above the filter surface.
+Repage SteamGrid 3.3.5 - Big Picture Personalization Navigation Fix
+-------------------------------------------------------------------
+* Added explicit horizontal preset routes and boundary containment in Personalization.
 
-Validation
-- JavaScript syntax, JSON metadata, archive integrity, and isolated directional-routing cases were checked.
-- The Steam client / Steam Deck Gamepad UI was not available in this environment; native Steam Focusable integration still needs a real controller session.
+Repage SteamGrid 3.3.4 - Big Picture Navigation & Layout Refinement
+-------------------------------------------------------------------
+* Refined semantic directional zones and Big Picture filter panel scrolling.
 
-Repage SteamGrid 3.3.5 — Big Picture Personalization Navigation Fix
+Repage SteamGrid 3.3.3 - Controller Navigation Refinement
+---------------------------------------------------------
+* Added semantic group routing (grid/row/list), data-eg-nav attributes, and edge-triggered triggers.
 
-Decision
-- Kept the Personalization tab enabled in Big Picture and preserved the current visual layout. Code inspection showed fixable focus-source and navigation-boundary defects, so a full redesign or removal was not necessary.
+Repage SteamGrid 3.3.2 - Geometric Nearest-Target D-Pad & Back Walking
+----------------------------------------------------------------------
+* Improved D-pad geometric routing and layered B/Circle back-navigation across zones.
 
-Fixes
-- Big Picture navigation now resolves the most recently marked/focused interactive element inside the Repage root before trusting the Steam page wrapper as activeElement.
-- Focus memory no longer expires after 110 ms. It remains valid while its target is connected, visible, and inside the plugin, and is updated on genuine focusin events.
-- Preset buttons have stable IDs and explicit left/right routes: Steam Blue ↔ Midnight ↔ Midnight OLED. The first and last presets do not escape into controls in another section.
-- User-created preset cards receive the same dynamic explicit horizontal routing.
-- Horizontal group boundaries are now contained for rows, grids, lists and stacks. A missing neighbor does not trigger a page-wide geometric fallback.
-- Horizontal navigation inside Personalization cannot escape to the sidebar or unrelated page controls. Vertical navigation can still reach other sections and the header through the intended vertical path.
+Repage SteamGrid 3.3.1 - Big Picture Single-Step Focus & Controller Diagnostics
+------------------------------------------------------------------------------
+* Prevented double-step Steam focus moves in Big Picture and added Controller diagnostics.
 
-Validation
-- JavaScript syntax and package metadata validated.
-- Isolated tests cover focus recovery after a React-style page-wrapper focus change, explicit preset routes, horizontal edge containment, and dynamic user-preset routing.
-- No live Steam client / physical controller session was available here; Steam Focusable behavior still needs confirmation on the user's Big Picture setup.
+Repage SteamGrid 3.3.0 - Unified 3-Zone Navigation Engine & Soft Ambient Lights
+-------------------------------------------------------------------------------
+* Rebuilt keyboard and controller navigation into a unified 3-zone engine and added Ctrl+Shift+P.
 
+Repage SteamGrid 3.2.1 - Desktop Controller Focus & Big Picture Safe Insets
+---------------------------------------------------------------------------
+* Enabled controller focus highlights in the normal desktop window and added right-stick scrolling.
 
-Repage SteamGrid 3.4.3 — Big Picture Gamepad Event Deduplication
+Repage SteamGrid 3.2.0 - Controller On-Screen Keyboard & Lamp Ambient Lights
+----------------------------------------------------------------------------
+* Added built-in Repage controller keyboard and adaptive lamp-like ambient lighting.
 
-Fixes
-- Select/Search in Big Picture now has one owner: Steam Focusable's onSelectButton callback. Removed the parallel Select handlers from the global VGP event bridge and Gamepad API polling, preventing a single press from activating the search field twice and toggling the Steam on-screen keyboard closed.
-- R3/library toggle now has one owner: the native VGP right-stick-click event. Removed the competing Gamepad API polling route for button 11, preventing duplicate collapse/expand state flips.
-- Added a 360 ms per-action duplicate guard for Search and Library actions to absorb duplicate native notifications from Steam's event bridge; other controller actions retain their existing 75 ms guard.
-- Desktop Gamepad API mappings remain unchanged.
+Repage SteamGrid 3.1.0 - Collapsible Library & Interactive Controller Hints
+---------------------------------------------------------------------------
+* Added collapsible library sidebar and icon + label controller hints.
 
-Validation
-- JavaScript syntax, plugin metadata, and ZIP integrity checked.
-- Static routing audit confirms Big Picture no longer polls Gamepad API buttons 8 (Select) or 11 (R3); Select is connected only through Focusable and R3 through the native VGP button map.
-- Live Steam / physical-controller integration still requires confirmation on the user's client.
+Repage SteamGrid 3.0.1 - Big Picture Column & Grid Navigation Groups
+--------------------------------------------------------------------
+* Rebuilt Big Picture controller groups and L1/R1/L2/R2/R3 shortcuts.
 
+Repage SteamGrid 3.0.0 - Custom Color Presets, Stick Color Picker & Credits
+---------------------------------------------------------------------------
+* Added up to 9 user color presets, analog-stick color picker, and Aika inspiration credits (hatewxb).
 
-Repage SteamGrid 3.5.3 — Isolated title-logo preview and source fallback
+Repage SteamGrid 2.6.2 - Big Picture Close Button & Small Default Width
+-----------------------------------------------------------------------
+* Adjusted Big Picture default width scale and close button placement.
 
-Fixes
-- The title preview now queries its own score-ordered static-logo candidate list; it no longer reads or mutates the live gallery catalogue/cache.
-- Each candidate is attempted in score order: thumbnail first, then the same artwork's original URL, then the next eligible score. A failed thumbnail no longer permanently hides the top-scoring artwork when its original URL is available.
-- A failed preview URL is no longer saved as a negative cache entry for a day; the next visit can retry after transient CDN/network failures.
-- Alpha cropping and adaptive fitting operate only on a temporary canvas/data URL used by the sidebar preview. Gallery thumbnails, selected artwork records, and Steam artwork application keep their original URLs and pixels.
-- Removed the preview's dependency on the shared backend temporary-download/chunk-cache helper. CORS fallback now uses an isolated browser fetch/blob path, so preview inspection cannot unpin or clean up a temporary file used by the gallery/apply pipeline.
+Repage SteamGrid 2.6.1 - Scope Hotfix
+-------------------------------------
+* Fixed startup scope error in 2.6.0.
 
-Validation
-- JavaScript syntax, JSON metadata, version consistency, and ZIP integrity checked.
-- Real Steam client / CDN behavior still requires visual confirmation on the user's setup.
+Repage SteamGrid 2.6.0 - Platform Controller Icons, Status Pills & Big Picture Lean Layout
+------------------------------------------------------------------------------------------
+* Added Xbox/PlayStation controller icons, high-contrast status pills, Restart plugin, and lean Big Picture layout.
 
+Repage SteamGrid 2.5.6 / 2.5.5 / 2.5.4 / 2.5.3 / 2.5.2 / 2.5.1 - Tag & NSFW Badge Polish
+-----------------------------------------------------------------------------------------
+* Refined solid opaque image tag colors and inline essential tags next to image dimensions.
 
-======================================================================
-3.5.6 — PREVIEW LOAD PERFORMANCE
-======================================================================
-- The title logo is now revealed as soon as the browser has loaded the
-  selected preview image. Alpha analysis and the isolated backend image
-  read run after first paint, instead of delaying the text-to-logo swap.
-- Preview images use eager/high fetch priority and no crossOrigin mode,
-  avoiding a failed CORS-mode request followed by a second normal request.
-  The backend remains responsible for safe pixel analysis of a copy.
-- Cached candidate URLs are now served stale-while-revalidate: a saved
-  logo remains available immediately, while entries older than seven days
-  are refreshed in the background (with a six-hour retry cooldown).
-- Normalized previews remain in a bounded in-memory cache and are reused
-  immediately when revisiting a game in the same Steam session.
-- Gallery fallback, artwork ranking, original artwork URLs, application
-  logic, controller navigation, and Lua artwork backend were not changed.
+Repage SteamGrid 2.5.0 - Unified Acrylic Background & Essential Tag Mode
+------------------------------------------------------------------------
+* Unified the acrylic background across columns and moved Width Scale and Card tags to the toolbar.
+
+Repage SteamGrid 2.4.7 / 2.4.6 / 2.4.5 - Rebuilt Icon Tab & Non-Steam Shortcut Support
+--------------------------------------------------------------------------------------
+* Rebuilt icon applying with Steam API + library cache fallback, .ico/BMP conversion, and lock fixes.
+
+Repage SteamGrid 2.4.1 / 2.4.0 / 2.3.0 - Personalization Tab, Acrylic Surfaces & Presets
+----------------------------------------------------------------------------------------
+* Introduced the Personalization tab with Steam Blue, Midnight, Midnight OLED, and ambient lights.
+
+Repage SteamGrid 2.1.2 / 2.1.1 / 2.1.0 - About Tab, Tag Rows & Complete 'All' Filters
+-------------------------------------------------------------------------------------
+* Added the About tab, remembered active tabs, Bigger default width scale, and fixed 'All' filter passthrough.
+
+Repage SteamGrid 2.0.0 - Full Independence from Easy SteamGrid
+--------------------------------------------------------------
+* Isolated storage, routes, styles, and context menu entries from Easy SteamGrid while sharing grid backups.
+
+Repage SteamGrid 1.9.0 - Author Tag Fields & Redesigned Image Cards
+-------------------------------------------------------------------
+* Added ordered Prioritize/Exclude Authors tag inputs and adaptive card metadata rows.
+
+Repage SteamGrid 1.8.0 - Column-Based Width Scale & Result Counter Bar
+----------------------------------------------------------------------
+* Switched Width Scale to column counts and added summary result counters.
+
+Repage SteamGrid 1.7.0 - Controller, Linux, Steam Deck & macOS Compatibility
+----------------------------------------------------------------------------
+* Added Gamepad API navigation, touch long-press, Gamepad UI mode, XDG downloads, and multi-account Steam paths.
+
+Repage SteamGrid 1.6.1 / 1.6.0 / 1.5.0 - Image Sorting, Save to Disk & Auto Steam Language
+------------------------------------------------------------------------------------------
+* Added Sort by (Score, Newest, Author, Resolution), Save to disk, dark dropdowns, and automatic Steam language detection.
+
+Repage SteamGrid 1.4.0 / 1.3.0 - Repage Rebuild Foundation
+----------------------------------------------------------
+* Rebuilt Easy SteamGrid as Repage SteamGrid with 7-language UI, library sorting/favorites, per-slot apply locks, and bounded caches.
