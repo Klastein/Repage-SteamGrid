@@ -1,3 +1,9 @@
+Repage SteamGrid 6.2.0 - Distinct Stat Pill Palette & Temporary Excluded Authors Peek Section
+---------------------------------------------------------------------------------------------
+* Redesigned all 7 summary stat pills (NSFW, Humor, Epilepsy, Static, Animated, Filtered, Excluded) with unique non-repeating semantic colors, detaching Static from the theme accent.
+* Added a temporary eye toggle inside the Excluded pill (both in the top summary bar and inside the Confused Fluxuos empty card) that reveals excluded authors' artwork in a dedicated 'Excluded' section at the top of the virtualized grid without changing permanent Settings.
+* Automatically resets excluded authors back to hidden when clicking the eye again, switching tabs/games, or closing the panel.
+
 Repage SteamGrid 6.1.3 - Complete Official SteamGridDB Dimensions for Wide Grid & Icon Tabs
 ----------------------------------------------------------------------------------------
 * Added the missing SteamGridDB grid dimensions (600x900, 342x482, 660x930) to Wide Grid and the 9 missing official icon dimensions (8x8, 10x10, 14x14, 35x35, 56x56, 90x90, 100x100, 150x150, 310x310) to Icon.
