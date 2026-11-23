@@ -10,6 +10,12 @@ Available in all 7 supported languages: English, Português (Brasil), Español,
 日本語, 한국어, Русский, and Français.
 ================================================================================
 
+Repage SteamGrid 6.2.3 - Packaging, Linux Script & Documentation Polish
+------------------------------------------------------------------------
+* Fixed lowercase .millennium/dist/.check_tmp.js ignore rule in .gitignore for Linux builds.
+* Standardized linux-fix.sh console messages to English.
+* Removed outdated 2.3.0 version reference in CREDITS.md and updated INSTALLATION.txt with full Windows installer details.
+
 Repage SteamGrid 6.2.2 - Streamlined Release ZIP, Updated About & Help & Clean Patch Notes
 ------------------------------------------------------------------------------------------
 * Excluded PATCH_NOTES.txt from release ZIP archives (kept only in the GitHub repository) and updated INSTALLATION.txt accordingly.

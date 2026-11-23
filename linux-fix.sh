@@ -8,5 +8,5 @@ elif [ -d ".millennium/Dist" ] && [ ! -e ".millennium/dist" ]; then
   ln -s Dist ".millennium/dist"
 fi
 chmod -R u+rwX,go+rX "$DIR"
-echo "[Repage SteamGrid] Permissoes e links (.millennium/dist <-> Dist) corrigidos em: $DIR"
-echo "Reinicie a Steam para carregar o plugin."
+echo "[Repage SteamGrid] Permissions and links (.millennium/dist <-> Dist) fixed in: $DIR"
+echo "Restart Steam to load the plugin."

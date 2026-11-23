@@ -8,7 +8,7 @@ Requirements:
 - Tested on Windows 10, Windows 11 and Linux (Ubuntu). Steam Deck support is prepared but not tested yet (alpha).
 
 Easiest way on Windows (optional):
-- Download Repage_SteamGrid_Setup.exe from the Releases page and run it. It finds Steam and Millennium automatically and installs, repairs or uninstalls the plugin. Windows SmartScreen may warn about an unsigned file; compare its SHA-256 with the one in the release notes.
+- Download Repage_SteamGrid_Setup.exe from the Releases page and run it. It finds Steam and Millennium automatically, verifies the release ZIP with SHA-256 before copying files, enables the plugin in Millennium on a fresh install, and handles install, repair, or uninstall from one window. Its full source code is available in the repository's installer/ folder. Windows SmartScreen may warn about an unsigned file; compare its SHA-256 with the one in the release notes.
 
 Installation Steps:
 1. Extract this archive into a folder named "repage-steamgrid".
@@ -57,7 +57,8 @@ Quick Controls & Shortcuts:
 - Back / Close: Esc | B (Circle)
 
 Uninstallation:
-- Disable "Repage SteamGrid" in Millennium Settings -> Plugins and delete the "repage-steamgrid" folder.
+- Windows installer (optional): run Repage_SteamGrid_Setup.exe and click "Uninstall".
+- Manual: disable "Repage SteamGrid" in Millennium Settings -> Plugins and delete the "repage-steamgrid" folder.
 
 Linux / Steam Deck Note:
 - If the plugin backend loads in Millennium Logs but the UI does not appear on first install, run the included helper script:
