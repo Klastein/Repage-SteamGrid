@@ -3,7 +3,7 @@
   "name": "repage-steamgrid",
   "common_name": "Repage SteamGrid",
   "description": "SteamGridDB artwork manager with multilingual interface, favorites, advanced library sorting, and customizable acrylic visuals.",
-  "version": "6.1.2",
+  "version": "6.1.3",
   "author": "Klastein",
   "backendType": "lua"
 }

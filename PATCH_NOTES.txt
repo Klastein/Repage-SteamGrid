@@ -1,3 +1,8 @@
+Repage SteamGrid 6.1.3 - Complete Official SteamGridDB Dimensions for Wide Grid & Icon Tabs
+----------------------------------------------------------------------------------------
+* Added the missing SteamGridDB grid dimensions (600x900, 342x482, 660x930) to Wide Grid and the 9 missing official icon dimensions (8x8, 10x10, 14x14, 35x35, 56x56, 90x90, 100x100, 150x150, 310x310) to Icon.
+* Added a non-destructive defaults_version 5 migration on startup and backup import so 'All' dimension filters automatically include the newly added resolutions while preserving custom selections, Grid filters, and Width Scale.
+
 Repage SteamGrid 6.1.2 - Fixed Custom Preset Confirm-Delete & Art-Safe Card Text Layout
 --------------------------------------------------------------------------------------
 * Fixed custom preset deletion confirmation ('Confirm?') across mouse, keyboard, and controller in both Desktop and Big Picture by removing premature onBlur resets and preventing mouse-modality blur from firing mid-click.
