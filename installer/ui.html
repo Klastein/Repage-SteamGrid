@@ -110,6 +110,11 @@ body.is-dragging .mascot-stage{transition:none}
 .btn.success-btn{border-color:rgba(109,227,171,.6);background:linear-gradient(145deg,rgba(42,118,84,.9),rgba(24,76,54,.95));color:#eafff4}
 .btn.danger-btn{border-color:rgba(255,130,150,.55);background:linear-gradient(145deg,rgba(128,36,54,.86),rgba(78,20,34,.94));color:#ffeaf0}
 .btn.danger-btn:hover:not(:disabled){border-color:#ffa8b8;background:linear-gradient(145deg,rgba(160,44,68,.94),rgba(98,25,42,.98));box-shadow:0 0 18px rgba(255,110,138,.32)}
+.notice-warn{margin-top:8px;padding:9px 12px;border-radius:10px;border:1px solid rgba(245,199,94,.52);background:rgba(245,199,94,.11);color:#ffe29a;font-size:12px;font-weight:650;line-height:1.45;display:flex;align-items:flex-start;gap:8px;box-shadow:0 4px 14px rgba(0,0,0,.28)}
+.notice-warn b{color:#fff2cc}
+.uninst-chk{margin-top:10px;padding:9px 12px;border-radius:10px;border:1px solid rgba(155,134,201,.28);background:rgba(255,255,255,.035);color:#ddd5f4;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:9px;cursor:pointer;user-select:none;transition:.15s}
+.uninst-chk:hover{border-color:rgba(196,178,240,.5);background:rgba(255,255,255,.06);color:#fff}
+.uninst-chk input{width:15px;height:15px;accent-color:#7c63b8;cursor:pointer;margin:0}
 .confirm-backdrop{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(4,4,9,.72);backdrop-filter:blur(8px)}
 .confirm-backdrop.is-open{display:flex;animation:ddPop .16s ease-out}
 .confirm-box{width:min(440px,100%);padding:20px 22px;border-radius:16px;background:linear-gradient(160deg,rgba(24,20,38,.98),rgba(11,10,18,.99));border:1.5px solid rgba(155,134,201,.48);box-shadow:0 22px 54px rgba(0,0,0,.78);display:flex;flex-direction:column;gap:12px}
@@ -998,7 +1003,17 @@ function renderState(mode, detail, silent) {
     setPose("uninstall");
     eyebrow.innerHTML = icLabel("trash", "uninstEyebrow");
     title.textContent = t("uninstTitle");
-    desc.textContent = t("uninstDesc");
+    const rmCfgLabels = {
+      "pt-BR": "Desativar e remover também do arquivo de configuração do Millennium",
+      "en": "Also remove from Millennium's configuration file",
+      "es": "Eliminar también del archivo de configuración de Millennium",
+      "ja": "Millenniumの設定ファイルからも削除する",
+      "ko": "Millennium 설정 파일에서도 제거",
+      "ru": "Также удалить из файла конфигурации Millennium",
+      "fr": "Supprimer aussi du fichier de configuration Millennium"
+    };
+    const lgU = activeLang();
+    desc.innerHTML = '<div>' + String(t("uninstDesc")).replace(/</g, "&lt;") + '</div><label class="uninst-chk"><input type="checkbox" id="chkCleanConfig" /><span>' + (rmCfgLabels[lgU] || rmCfgLabels["en"]) + '</span></label>';
     btnRow.innerHTML = '<button type="button" class="btn" onclick="playSound(\'click\');renderState(\'welcome\')">' + t("btnCancel") + '</button><button type="button" class="btn danger-btn" onclick="playSound(\'click\');confirmUninstall()">' + icLabel("trash", "btnConfirmUninstall") + '</button>';
   } else if (mode === "uninstall_done") {
     setPose("uninstall"); if (!silent) playSound("click");
@@ -1017,28 +1032,46 @@ function renderState(mode, detail, silent) {
     btnRow.innerHTML = '<button type="button" class="btn" disabled>' + icLabel("loading", "btnInstalling") + '</button>';
   } else if (mode === "success") {
     setPose("success"); if (!silent) playSound("success");
-    const millEnableNote = {
-      "pt-BR": " Se não ativar sozinho, ative em: Steam → Millennium → Plugins → Repage SteamGrid.",
-      "en": " If not auto-enabled, enable it at: Steam → Millennium → Plugins → Repage SteamGrid.",
-      "es": " Si no se activa solo, actívalo en: Steam → Millennium → Plugins → Repage SteamGrid.",
-      "ja": " 自動有効化されない場合は Steam → Millennium → Plugins → Repage SteamGrid で有効にしてください。",
-      "ko": " 자동 활성화되지 않으면 Steam → Millennium → Plugins → Repage SteamGrid에서 켜주세요.",
-      "ru": " Если плагин не включился сам, включите его: Steam → Millennium → Plugins → Repage SteamGrid.",
-      "fr": " S’il ne s’active pas seul, activez-le dans : Steam → Millennium → Plugins → Repage SteamGrid."
+    const millManualWarn = {
+      "pt-BR": "Não foi possível confirmar a ativação automática no Millennium. Ative manualmente em: <b>Steam → Millennium → Plugins → Repage SteamGrid</b>.",
+      "en": "Could not confirm automatic activation in Millennium. Enable it manually at: <b>Steam → Millennium → Plugins → Repage SteamGrid</b>.",
+      "es": "No se pudo confirmar la activación automática en Millennium. Actívalo manualmente en: <b>Steam → Millennium → Plugins → Repage SteamGrid</b>.",
+      "ja": "Millenniumの自動有効化を確認できませんでした。手動で有効にしてください：<b>Steam → Millennium → Plugins → Repage SteamGrid</b>",
+      "ko": "Millennium 자동 활성화를 확인하지 못했습니다. 수동으로 켜주세요: <b>Steam → Millennium → Plugins → Repage SteamGrid</b>",
+      "ru": "Не удалось подтвердить автовключение в Millennium. Включите вручную: <b>Steam → Millennium → Plugins → Repage SteamGrid</b>.",
+      "fr": "Impossible de confirmer l’activation automatique dans Millennium. Activez-le manuellement dans : <b>Steam → Millennium → Plugins → Repage SteamGrid</b>."
     };
     eyebrow.innerHTML = icLabel("check", "sucEyebrow"); title.textContent = t("sucTitle");
-    const autoTxt = envStatus.autoEnabled ? t("sucAutoNote") : (millEnableNote[activeLang()] || millEnableNote["en"]);
-    desc.textContent = (envStatus.steamRunning ? t("sucDesc") : t("sucDescClosed")) + autoTxt;
+    const baseDesc = (envStatus.steamRunning ? t("sucDesc") : t("sucDescClosed")) + (envStatus.autoEnabled ? t("sucAutoNote") : "");
+    const lg = activeLang();
+    if (!envStatus.autoEnabled) {
+      desc.innerHTML = '<div style="margin-bottom:4px">' + baseDesc.replace(/</g, "&lt;") + '</div><div class="notice-warn"><span>⚠️</span><span>' + (millManualWarn[lg] || millManualWarn["en"]) + '</span></div>';
+    } else {
+      desc.textContent = baseDesc;
+    }
     const steamBtn = envStatus.steamRunning
       ? '<button type="button" class="btn success-btn" onclick="playSound(\'click\');promptRestartSteam()">' + icLabel("restart", "btnRestartSteam") + '</button>'
       : '<button type="button" class="btn success-btn" onclick="playSound(\'click\');launchSteamOnly()">' + icLabel("play", "btnStartSteam") + '</button>';
-    btnRow.innerHTML = '<button type="button" class="btn" onclick="playSound(\'click\');openPluginFolder()">' + icLabel("openFolder", "btnOpenFolder") + '</button>' + steamBtn + '<button type="button" class="btn primary" onclick="playSound(\'click\');closeInstaller()">' + icLabel("check", "btnFinish") + '</button>';
+    btnRow.innerHTML = '<button type="button" class="btn danger-btn" onclick="playSound(\'click\');renderState(\'uninstall\')">' + icLabel("trash", "btnUninstall") + '</button><button type="button" class="btn" onclick="playSound(\'click\');openPluginFolder()">' + icLabel("openFolder", "btnOpenFolder") + '</button>' + steamBtn + '<button type="button" class="btn primary" onclick="playSound(\'click\');closeInstaller()">' + icLabel("check", "btnFinish") + '</button>';
   } else if (mode === "error") {
     setPose("error"); if (!silent) playSound("error");
     eyebrow.innerHTML = icLabel("warn", "errEyebrow"); title.textContent = t("errTitle"); desc.textContent = formatServerError(detail) || t("errDesc");
     const isLock = String(detail || "").includes("ERR_INSTALL_LOCKED") || String(detail || "").includes("ERR_UNINSTALL_LOCKED");
     const closeBtn = (isLock && envStatus.steamRunning) ? '<button type="button" class="btn danger-btn" id="btnCloseSteamRetry" onclick="playSound(\'click\');promptCloseSteamAndRetry()">' + icLabel("restart", "btnCloseSteamRetry") + '</button>' : '';
     btnRow.innerHTML = '<button type="button" class="btn" id="btnCopyErrLog" onclick="playSound(\'click\');copyErrorLog()">' + copyIconHtml() + '<span>' + t("btnCopyLog") + '</span></button><button type="button" class="btn" onclick="playSound(\'click\');pickFolder()">' + icLabel("folder", "btnChangeFolder") + '</button>' + closeBtn + '<button type="button" class="btn primary" onclick="playSound(\'click\');retryFromError()">' + icLabel("refresh", "btnRetry") + '</button>';
+  }
+  if (mode === "uninstall_done" && envStatus.configCleanPending) {
+    const lg = activeLang();
+    const cleanWarn = {
+      "pt-BR": "Os arquivos foram removidos, mas a configuração do Millennium não pôde ser limpa automaticamente. Se ainda aparecer listado, desative em: <b>Steam → Millennium → Plugins</b>.",
+      "en": "Plugin files were removed, but Millennium's config could not be cleaned automatically. If still listed, disable it in: <b>Steam → Millennium → Plugins</b>.",
+      "es": "Los archivos se eliminaron, pero no se pudo limpiar la configuración de Millennium. Si sigue listado, desactívalo en: <b>Steam → Millennium → Plugins</b>.",
+      "ja": "プラグインファイルは削除されましたが、Millennium設定を自動更新できませんでした。残っている場合は <b>Steam → Millennium → Plugins</b> で無効化してください。",
+      "ko": "플러그인 파일은 제거되었으나 Millennium 설정을 자동으로 정리하지 못했습니다. 목록에 남아 있으면 <b>Steam → Millennium → Plugins</b>에서 꺼주세요.",
+      "ru": "Файлы удалены, но не удалось автоматически очистить конфиг Millennium. Если плагин всё ещё виден, отключите его в <b>Steam → Millennium → Plugins</b>.",
+      "fr": "Les fichiers ont été supprimés, mais la configuration Millennium n’a pas pu être nettoyée automatiquement. Désactivez-le dans <b>Steam → Millennium → Plugins</b>."
+    };
+    desc.innerHTML = '<div style="margin-bottom:4px">' + String(t("uninstDoneDesc")).replace(/</g, "&lt;") + '</div><div class="notice-warn"><span>⚠️</span><span>' + (cleanWarn[lg] || cleanWarn["en"]) + '</span></div>';
   }
 }
 let lastInstallWasClean = false;
@@ -1190,7 +1223,7 @@ async function startInstall(cleanMode) {
         document.getElementById("uiProgPct").textContent = (pd.percent || 0) + "%";
         document.getElementById("uiProgFill").style.width = (pd.percent || 0) + "%";
         document.getElementById("uiProgStep").textContent = formatStepText(pd.stepCode, pd.kb);
-        if (pd.status === "done") { clearInterval(poll); if (typeof pd.steamRunning === "boolean") envStatus.steamRunning = pd.steamRunning; envStatus.installedVersion = envStatus.latestVersion; try { const sr = await apiFetch("/api/check"); const sd = await sr.json(); envStatus = { ...envStatus, ...sd }; } catch {} renderState("success"); }
+        if (pd.status === "done") { clearInterval(poll); if (typeof pd.steamRunning === "boolean") envStatus.steamRunning = pd.steamRunning; if (typeof pd.autoEnabled === "boolean") envStatus.autoEnabled = pd.autoEnabled; envStatus.installedVersion = envStatus.latestVersion; try { const sr = await apiFetch("/api/check"); const sd = await sr.json(); envStatus = { ...envStatus, ...sd }; } catch {} renderState("success"); }
         else if (pd.status === "error") { clearInterval(poll); renderState("error", pd.error); }
       } catch { clearInterval(poll); renderState("error", ""); }
     }, 180);
@@ -1231,15 +1264,19 @@ function launchSteamOnly() {
     setTimeout(() => { steamActionBusy = false; if (sBtn) { sBtn.disabled = false; sBtn.innerHTML = icLabel("play", "btnStartSteam"); } }, 4500);
   });
 }
+let lastUninstallCleanCfg = false;
 async function confirmUninstall() {
   lastFailedAction = "uninstall";
+  const chk = document.getElementById("chkCleanConfig");
+  if (chk) lastUninstallCleanCfg = Boolean(chk.checked);
   if (IS_PREVIEW) { envStatus.installedVersion = ""; renderState("uninstall_done"); return; }
   try {
-    const r = await apiFetch("/api/uninstall", { method: "POST" });
+    const r = await apiFetch("/api/uninstall?clean=" + (lastUninstallCleanCfg ? "1" : "0"), { method: "POST" });
     const d = await r.json();
     if (!d.ok) { renderState("error", d.error); return; }
     envStatus.installedVersion = "";
     if (typeof d.steamRunning === "boolean") envStatus.steamRunning = d.steamRunning;
+    envStatus.configCleanPending = Boolean(d.configCleanPending);
     renderState("uninstall_done");
   } catch (e) { renderState("error", e.message); }
 }

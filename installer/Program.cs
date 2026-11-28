@@ -73,13 +73,14 @@ namespace RepageInstaller {
     internal const long MaxZipDownloadBytes = 32L * 1024L * 1024L;
     internal const long MaxZipExtractedBytes = 64L * 1024L * 1024L;
     internal const int MaxZipEntries = 64;
-    internal static readonly string UserAgentStr = "RepageSteamGrid-Setup/4.9";
+    internal static readonly string UserAgentStr = "RepageSteamGrid-Setup/4.9.2";
     internal static object InstallLock = new object();
     internal static bool PickingFolder = false;
     internal static bool RestartingSteam = false;
     internal static bool AutoEnabledInConfig = false;
     internal static bool DidAutoEnableThisSession = false;
     internal static bool DidUninstallThisSession = false;
+    internal static bool ConfigCleanPending = false;
     internal static string CustomSelectedPath = "";
     internal static string ExpectedZipSha256 = "";
     internal static string SessionToken = Guid.NewGuid().ToString("N");
@@ -109,14 +110,15 @@ namespace RepageInstaller {
         }
         if (args[0] == "--elevated-uninstall" && args.Length >= 3) {
           string uSid = args.Length >= 4 ? args[3] : "none";
-          Environment.Exit(ExecuteElevatedUninstall(args[1], args[2], uSid));
+          bool uClean = args.Length >= 5 && args[4] == "1";
+          Environment.Exit(ExecuteElevatedUninstall(args[1], args[2], uSid, uClean));
           return;
         }
       }
       try { SetProcessDPIAware(); } catch {}
       try { File.WriteAllText(LogFilePath, "", Encoding.UTF8); } catch {}
       HtmlPayload = HtmlPayload.Replace("__SESSION_TOKEN__", SessionToken);
-      Log("BOOT", "Repage SteamGrid Setup v4.9 starting (OS=" + Environment.OSVersion + ", 64Bit=" + Environment.Is64BitProcess + ", Culture=" + OsLocale + ", Log=" + LogFilePath + ")");
+      Log("BOOT", "Repage SteamGrid Setup v4.9.2 starting (OS=" + Environment.OSVersion + ", 64Bit=" + Environment.Is64BitProcess + ", Culture=" + OsLocale + ", Log=" + LogFilePath + ")");
       AppDomain.CurrentDomain.AssemblyResolve += ResolveEmbeddedAssembly;
       try { ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072 | (SecurityProtocolType)12288 | SecurityProtocolType.Tls; }
       catch { try { ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; } catch {} }
@@ -283,7 +285,10 @@ namespace RepageInstaller {
           Thread.Sleep(250);
           if (IsPluginEnabledInMillennium()) {
             bool clOk = SetPluginEnabledInMillennium(false);
-            Log(clOk ? "MILL_CFG" : "MILL_CFG_WARN", "Re-clean enabledPlugins while Steam closed: ok=" + clOk);
+            ConfigCleanPending = !clOk || IsPluginEnabledInMillennium();
+            Log(!ConfigCleanPending ? "MILL_CFG" : "MILL_CFG_WARN", "Re-clean enabledPlugins while Steam closed: ok=" + clOk + ", stillEnabled=" + ConfigCleanPending);
+          } else {
+            ConfigCleanPending = false;
           }
         }
         LaunchSteamOnly();
@@ -749,7 +754,7 @@ namespace RepageInstaller {
       SkipJsonWs(s, ref i);
       if (i >= arrEnd || s[i] != '[') return false;
       i++; SkipJsonWs(s, ref i);
-      if (i < arrEnd && s[i] == ']') { i++; SkipJsonWs(s, ref i); return i == arrEnd; }
+      if (i < arrEnd && s[i] == ']') { i++; return i == arrEnd; }
       while (i < arrEnd) {
         SkipJsonWs(s, ref i);
         int ss = i;
@@ -759,7 +764,7 @@ namespace RepageInstaller {
         if (!string.IsNullOrEmpty(val) && !items.Exists(x => string.Equals(x, val, StringComparison.OrdinalIgnoreCase))) items.Add(val);
         SkipJsonWs(s, ref i);
         if (i < arrEnd && s[i] == ',') { i++; continue; }
-        if (i < arrEnd && s[i] == ']') { i++; SkipJsonWs(s, ref i); return i == arrEnd; }
+        if (i < arrEnd && s[i] == ']') { i++; return i == arrEnd; }
         return false;
       }
       return false;
@@ -1101,6 +1106,7 @@ namespace RepageInstaller {
       string tmpZip = Path.Combine(Path.GetTempPath(), "Repage_Install_" + txId + ".zip");
       string stageDir = "";
       string backupDir = "";
+      ConfigCleanPending = false;
       Log("INSTALL", "Starting transactional install worker (cleanFirst=" + cleanFirst + ", tx=" + txId + ")");
       try {
         if (string.IsNullOrEmpty(ZipDownloadUrl) || !IsValidSha256Hex(ExpectedZipSha256)) CheckGithubLatest();
@@ -1227,11 +1233,12 @@ namespace RepageInstaller {
             Log(AutoEnabledInConfig ? "MILL_CFG" : "MILL_CFG_WARN", "Fresh install auto-enable ok=" + cfgOk + ", verified=" + AutoEnabledInConfig);
           }
         }
-        Log("EXTRACT_OK", "Promoted " + extractedCount + " files into " + targetPluginDir + " (elevated=" + usedElevation + ", autoEnabled=" + AutoEnabledInConfig + ")");
         DetectSteamAndMillennium(CustomSelectedPath);
         if (string.IsNullOrEmpty(InstalledVersion)) {
           throw new Exception("ERR_MISSING_FILES");
         }
+        AutoEnabledInConfig = IsPluginEnabledInMillennium();
+        Log("EXTRACT_OK", "Promoted " + extractedCount + " files into " + targetPluginDir + " (elevated=" + usedElevation + ", verifiedAutoEnabled=" + AutoEnabledInConfig + ")");
         InstallPercent = 100;
         InstallStepCode = "done";
         InstallStatus = "done";
@@ -1352,11 +1359,31 @@ namespace RepageInstaller {
                 if (!File.Exists(cfgPath) || !BytesEqual(File.ReadAllBytes(cfgPath), origBytes)) {
                   throw new IOException("concurrent_modification");
                 }
-                try { if (File.Exists(swapBak)) File.Delete(swapBak); } catch {}
-                File.Replace(tmp, cfgPath, swapBak, true);
+                string activeSwapBak = File.Exists(swapBak) ? (cfgPath + ".repage_swap_" + attempt + ".bak") : swapBak;
+                if (File.Exists(activeSwapBak)) { try { File.Delete(activeSwapBak); } catch {} }
+                File.Replace(tmp, cfgPath, activeSwapBak, true);
+                if (!BytesEqual(File.ReadAllBytes(cfgPath), outBytes)) {
+                  bool restoredOk = false;
+                  if (File.Exists(activeSwapBak)) {
+                    try {
+                      File.Replace(activeSwapBak, cfgPath, null, true);
+                      restoredOk = BytesEqual(File.ReadAllBytes(cfgPath), origBytes);
+                    } catch (Exception rstEx) {
+                      Log("MILL_CFG_BAK_ERR", "Restore failed (backup preserved at " + activeSwapBak + "): " + rstEx.Message);
+                    }
+                  }
+                  if (restoredOk) {
+                    try { if (File.Exists(activeSwapBak)) File.Delete(activeSwapBak); } catch {}
+                    throw new IOException("final_readback_mismatch");
+                  }
+                  if (File.Exists(activeSwapBak)) Log("MILL_CFG_BAK_KEPT", "Preserved recovery backup at: " + activeSwapBak);
+                  return false;
+                }
+                try { if (File.Exists(activeSwapBak)) File.Delete(activeSwapBak); } catch {}
               } else {
                 if (File.Exists(cfgPath)) throw new IOException("concurrent_creation");
                 File.Move(tmp, cfgPath);
+                if (!BytesEqual(File.ReadAllBytes(cfgPath), outBytes)) throw new IOException("final_readback_mismatch");
               }
             } catch (UnauthorizedAccessException) {
               try { if (File.Exists(tmp)) File.Delete(tmp); } catch {}
@@ -1379,16 +1406,13 @@ namespace RepageInstaller {
                       rfs.SetLength(origBytes.Length);
                       rfs.Flush(true);
                     }
-                  } catch {}
+                  } catch (Exception rEx) {
+                    Log("MILL_CFG_ROLLBACK_ERR", "Direct rollback failed: " + rEx.Message);
+                  }
                 }
                 throw;
               }
             }
-            if (!BytesEqual(File.ReadAllBytes(cfgPath), outBytes)) {
-              if (File.Exists(swapBak)) { try { File.Replace(swapBak, cfgPath, null, true); } catch {} }
-              throw new IOException("final_readback_mismatch");
-            }
-            try { if (File.Exists(swapBak)) File.Delete(swapBak); } catch {}
             Log("MILL_CFG", "Safely updated & verified " + cfgPath + " (enable=" + enable + ")");
             return true;
           } catch (IOException ioEx) {
@@ -1514,7 +1538,7 @@ namespace RepageInstaller {
       }
     }
 
-    static int ExecuteElevatedUninstall(string steamRoot, string pluginsRoot, string ownerSid) {
+    static int ExecuteElevatedUninstall(string steamRoot, string pluginsRoot, string ownerSid, bool cleanConfig) {
       try {
         if (string.IsNullOrEmpty(steamRoot)) return 2;
         string fullSteam = Path.GetFullPath(steamRoot).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
@@ -1547,8 +1571,12 @@ namespace RepageInstaller {
             return 3;
           }
         }
-        SetPluginEnabledInMillennium(false);
-        try { string cp = FindMillenniumConfigPath(); if (!string.IsNullOrEmpty(cp)) GrantConfigAccessLeastPrivilege(cp, ownerSid); } catch {}
+        if (cleanConfig) {
+          bool elCleanOk = SetPluginEnabledInMillennium(false);
+          bool elStill = IsPluginEnabledInMillennium();
+          Log((elCleanOk && !elStill) ? "ELEVATED_MILL_CFG" : "ELEVATED_MILL_CFG_WARN", "Uninstall Millennium config clean ok=" + elCleanOk + ", stillEnabled=" + elStill);
+          try { string cp = FindMillenniumConfigPath(); if (!string.IsNullOrEmpty(cp)) GrantConfigAccessLeastPrivilege(cp, ownerSid); } catch {}
+        }
         foreach (string bDir in candidateBases) {
           if (string.IsNullOrEmpty(bDir) || HasReparsePointInChain(Path.Combine(bDir, "repage-steamgrid"))) continue;
           string target = Path.Combine(bDir, "repage-steamgrid");
@@ -1568,7 +1596,7 @@ namespace RepageInstaller {
       }
     }
 
-    static string UninstallPlugin() {
+    static string UninstallPlugin(bool cleanConfig) {
       try {
         var candidateBases = new System.Collections.Generic.List<string>();
         if (!string.IsNullOrEmpty(PluginsDir)) candidateBases.Add(PluginsDir);
@@ -1591,7 +1619,8 @@ namespace RepageInstaller {
             }
           }
         }
-        if (!needsElevation) SetPluginEnabledInMillennium(false);
+        bool directCfgOk = true;
+        if (!needsElevation && cleanConfig) directCfgOk = SetPluginEnabledInMillennium(false);
         foreach (string bDir in candidateBases) {
           if (string.IsNullOrEmpty(bDir)) continue;
           string target = Path.Combine(bDir, "repage-steamgrid");
@@ -1622,8 +1651,8 @@ namespace RepageInstaller {
         if (needsElevation) {
           string uSid = "none";
           try { var id = System.Security.Principal.WindowsIdentity.GetCurrent(); if (id != null && id.User != null) uSid = id.User.Value; } catch {}
-          Log("UNINSTALL_UAC", "Requesting UAC elevation for uninstall...");
-          int code = RunElevatedSelf("--elevated-uninstall \"" + SteamDir + "\" \"" + PluginsDir + "\" \"" + uSid + "\"");
+          Log("UNINSTALL_UAC", "Requesting UAC elevation for uninstall (cleanConfig=" + cleanConfig + ")...");
+          int code = RunElevatedSelf("--elevated-uninstall \"" + SteamDir + "\" \"" + PluginsDir + "\" \"" + uSid + "\" " + (cleanConfig ? "1" : "0"));
           if (code == -3) {
             DetectSteamAndMillennium(CustomSelectedPath);
             return "ERR_ELEVATION_CANCELLED";
@@ -1645,12 +1674,19 @@ namespace RepageInstaller {
             return "ERR_UNINSTALL_LOCKED";
           }
         }
-        SetPluginEnabledInMillennium(false);
+        if (cleanConfig) {
+          bool finalCfgOk = needsElevation ? SetPluginEnabledInMillennium(false) : (directCfgOk && !IsPluginEnabledInMillennium());
+          bool stillEnabled = IsPluginEnabledInMillennium();
+          ConfigCleanPending = !finalCfgOk || stillEnabled;
+          DidUninstallThisSession = true;
+        } else {
+          ConfigCleanPending = false;
+          DidUninstallThisSession = false;
+        }
         DidAutoEnableThisSession = false;
-        DidUninstallThisSession = true;
         DetectSteamAndMillennium(CustomSelectedPath);
         InstalledVersion = "";
-        Log("UNINSTALL_OK", "Removed repage-steamgrid cleanly (Millennium config cleaned)");
+        Log(ConfigCleanPending ? "UNINSTALL_CFG_PENDING" : "UNINSTALL_OK", cleanConfig ? (ConfigCleanPending ? "Plugin files removed, but Millennium config.json still lists repage-steamgrid" : "Removed repage-steamgrid and cleaned Millennium config") : "Removed repage-steamgrid files (kept user config & Millennium state)");
         return "";
       } catch (Exception ex) {
         Log("UNINSTALL_ERR", ex.Message);
@@ -1675,6 +1711,7 @@ namespace RepageInstaller {
         "\"online\":" + (IsOnline ? "true" : "false") + "," +
         "\"steamRunning\":" + (IsSteamRunning() ? "true" : "false") + "," +
         "\"autoEnabled\":" + (AutoEnabledInConfig ? "true" : "false") + "," +
+        "\"configCleanPending\":" + (ConfigCleanPending ? "true" : "false") + "," +
         "\"customFolder\":" + (!string.IsNullOrEmpty(CustomSelectedPath) ? "true" : "false") + "," +
         "\"steamPath\":\"" + EscapeJson(shownPath) + "\"," +
         "\"hasMillennium\":" + (HasMillennium ? "true" : "false") + "," +
@@ -1788,8 +1825,9 @@ namespace RepageInstaller {
           return;
         }
         if (p == "/api/uninstall") {
-          string err = UninstallPlugin();
-          if (string.IsNullOrEmpty(err)) SendJson(res, "{\"ok\":true,\"steamRunning\":" + (IsSteamRunning() ? "true" : "false") + "}");
+          bool cleanCfg = (req.QueryString["clean"] == "1");
+          string err = UninstallPlugin(cleanCfg);
+          if (string.IsNullOrEmpty(err)) SendJson(res, "{\"ok\":true,\"steamRunning\":" + (IsSteamRunning() ? "true" : "false") + ",\"configCleanPending\":" + (ConfigCleanPending ? "true" : "false") + "}");
           else SendJson(res, "{\"ok\":false,\"error\":\"" + EscapeJson(err) + "\"}");
           return;
         }
@@ -1800,7 +1838,7 @@ namespace RepageInstaller {
         }
 
         if (p == "/api/progress") {
-          SendJson(res, "{\"status\":\"" + EscapeJson(InstallStatus) + "\",\"percent\":" + InstallPercent + ",\"stepCode\":\"" + EscapeJson(InstallStepCode) + "\",\"kb\":" + DownloadedKb + ",\"steamRunning\":" + (IsSteamRunning() ? "true" : "false") + ",\"error\":\"" + EscapeJson(LastError) + "\"}");
+          SendJson(res, "{\"status\":\"" + EscapeJson(InstallStatus) + "\",\"percent\":" + InstallPercent + ",\"stepCode\":\"" + EscapeJson(InstallStepCode) + "\",\"kb\":" + DownloadedKb + ",\"steamRunning\":" + (IsSteamRunning() ? "true" : "false") + ",\"autoEnabled\":" + (AutoEnabledInConfig ? "true" : "false") + ",\"error\":\"" + EscapeJson(LastError) + "\"}");
           return;
         }
         if (p == "/api/open-folder") {
