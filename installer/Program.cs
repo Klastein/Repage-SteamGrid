@@ -73,12 +73,13 @@ namespace RepageInstaller {
     internal const long MaxZipDownloadBytes = 32L * 1024L * 1024L;
     internal const long MaxZipExtractedBytes = 64L * 1024L * 1024L;
     internal const int MaxZipEntries = 64;
-    internal static readonly string UserAgentStr = "RepageSteamGrid-Setup/4.7";
+    internal static readonly string UserAgentStr = "RepageSteamGrid-Setup/4.8";
     internal static object InstallLock = new object();
     internal static bool PickingFolder = false;
     internal static bool RestartingSteam = false;
     internal static bool AutoEnabledInConfig = false;
     internal static bool DidAutoEnableThisSession = false;
+    internal static bool DidUninstallThisSession = false;
     internal static string CustomSelectedPath = "";
     internal static string ExpectedZipSha256 = "";
     internal static string SessionToken = Guid.NewGuid().ToString("N");
@@ -107,14 +108,15 @@ namespace RepageInstaller {
           return;
         }
         if (args[0] == "--elevated-uninstall" && args.Length >= 3) {
-          Environment.Exit(ExecuteElevatedUninstall(args[1], args[2]));
+          string uSid = args.Length >= 4 ? args[3] : "none";
+          Environment.Exit(ExecuteElevatedUninstall(args[1], args[2], uSid));
           return;
         }
       }
       try { SetProcessDPIAware(); } catch {}
       try { File.WriteAllText(LogFilePath, "", Encoding.UTF8); } catch {}
       HtmlPayload = HtmlPayload.Replace("__SESSION_TOKEN__", SessionToken);
-      Log("BOOT", "Repage SteamGrid Setup v4.7 starting (OS=" + Environment.OSVersion + ", 64Bit=" + Environment.Is64BitProcess + ", Culture=" + OsLocale + ", Log=" + LogFilePath + ")");
+      Log("BOOT", "Repage SteamGrid Setup v4.8 starting (OS=" + Environment.OSVersion + ", 64Bit=" + Environment.Is64BitProcess + ", Culture=" + OsLocale + ", Log=" + LogFilePath + ")");
       AppDomain.CurrentDomain.AssemblyResolve += ResolveEmbeddedAssembly;
       try { ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072 | (SecurityProtocolType)12288 | SecurityProtocolType.Tls; }
       catch { try { ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; } catch {} }
@@ -271,9 +273,15 @@ namespace RepageInstaller {
       try {
         SafeShutdownSteamCore();
         if (DidAutoEnableThisSession && !string.IsNullOrEmpty(InstalledVersion)) {
+          Thread.Sleep(250);
           if (!IsPluginEnabledInMillennium() && SetPluginEnabledInMillennium(true)) {
             AutoEnabledInConfig = IsPluginEnabledInMillennium();
             Log("MILL_CFG", "Re-applied enabledPlugins while Steam is closed; verified=" + AutoEnabledInConfig);
+          }
+        } else if (DidUninstallThisSession && string.IsNullOrEmpty(InstalledVersion)) {
+          Thread.Sleep(250);
+          if (IsPluginEnabledInMillennium() && SetPluginEnabledInMillennium(false)) {
+            Log("MILL_CFG", "Re-cleaned repage-steamgrid from enabledPlugins while Steam is closed");
           }
         }
         LaunchSteamOnly();
@@ -670,16 +678,194 @@ namespace RepageInstaller {
       return null;
     }
 
+    static string ResolveMillenniumConfigPathForWrite() {
+      string existing = FindMillenniumConfigPath();
+      if (!string.IsNullOrEmpty(existing)) return existing;
+      if (string.IsNullOrEmpty(SteamDir) || !Directory.Exists(SteamDir)) return null;
+      string millDir = Path.Combine(SteamDir, "millennium");
+      if (Directory.Exists(millDir)) return Path.Combine(millDir, "config", "config.json");
+      string extDir = Path.Combine(SteamDir, "ext");
+      if (Directory.Exists(extDir)) return Path.Combine(extDir, "config.json");
+      if (!string.IsNullOrEmpty(PluginsDir)) {
+        string pParent = Path.GetDirectoryName(PluginsDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        if (!string.IsNullOrEmpty(pParent) && string.Equals(Path.GetFileName(pParent), "millennium", StringComparison.OrdinalIgnoreCase)) {
+          return Path.Combine(pParent, "config", "config.json");
+        }
+      }
+      return null;
+    }
+
+    static void GrantConfigAccessLeastPrivilege(string cfgPath, string ownerSid) {
+      try {
+        if (string.IsNullOrEmpty(cfgPath) || !File.Exists(cfgPath) || IsReparsePoint(cfgPath)) return;
+        if (string.IsNullOrEmpty(ownerSid) || ownerSid == "none") return;
+        string cfgDir = Path.GetDirectoryName(cfgPath);
+        if (!string.IsNullOrEmpty(cfgDir) && !IsReparsePoint(cfgDir) && string.Equals(Path.GetFileName(cfgDir), "config", StringComparison.OrdinalIgnoreCase)) {
+          GrantOwnerModifyPermission(cfgDir, ownerSid);
+          return;
+        }
+        var sid = new System.Security.Principal.SecurityIdentifier(ownerSid);
+        var fs = File.GetAccessControl(cfgPath);
+        fs.AddAccessRule(new System.Security.AccessControl.FileSystemAccessRule(sid, System.Security.AccessControl.FileSystemRights.Modify, System.Security.AccessControl.AccessControlType.Allow));
+        File.SetAccessControl(cfgPath, fs);
+        Log("ACL_OK", "Granted file-only Modify permission on " + cfgPath);
+      } catch (Exception ex) {
+        Log("ACL_WARN", "Could not update config ACL on " + cfgPath + ": " + ex.Message);
+      }
+    }
+
+    static void SkipJsonWs(string s, ref int i) {
+      while (i < s.Length && (s[i] == ' ' || s[i] == '\t' || s[i] == '\r' || s[i] == '\n')) i++;
+    }
+
+    static bool ParseJsonStr(string s, ref int i) {
+      if (i >= s.Length || s[i] != '"') return false;
+      i++;
+      while (i < s.Length) {
+        char c = s[i++];
+        if (c == '"') return true;
+        if (c < 0x20) return false;
+        if (c == '\\') {
+          if (i >= s.Length) return false;
+          char e = s[i++];
+          if (e == '"' || e == '\\' || e == '/' || e == 'b' || e == 'f' || e == 'n' || e == 'r' || e == 't') continue;
+          if (e == 'u') {
+            if (i + 4 > s.Length) return false;
+            for (int k = 0; k < 4; k++) {
+              char h = s[i++];
+              bool ok = (h >= '0' && h <= '9') || (h >= 'a' && h <= 'f') || (h >= 'A' && h <= 'F');
+              if (!ok) return false;
+            }
+            continue;
+          }
+          return false;
+        }
+      }
+      return false;
+    }
+
+    static bool ParseJsonNum(string s, ref int i) {
+      if (i < s.Length && s[i] == '-') i++;
+      if (i >= s.Length) return false;
+      if (s[i] == '0') { i++; } else if (s[i] >= '1' && s[i] <= '9') { while (i < s.Length && s[i] >= '0' && s[i] <= '9') i++; } else return false;
+      if (i < s.Length && s[i] == '.') {
+        i++; if (i >= s.Length || s[i] < '0' || s[i] > '9') return false;
+        while (i < s.Length && s[i] >= '0' && s[i] <= '9') i++;
+      }
+      if (i < s.Length && (s[i] == 'e' || s[i] == 'E')) {
+        i++; if (i < s.Length && (s[i] == '+' || s[i] == '-')) i++;
+        if (i >= s.Length || s[i] < '0' || s[i] > '9') return false;
+        while (i < s.Length && s[i] >= '0' && s[i] <= '9') i++;
+      }
+      return true;
+    }
+
+    static bool ParseJsonVal(string s, ref int i, int depth) {
+      if (depth > 32) return false;
+      SkipJsonWs(s, ref i);
+      if (i >= s.Length) return false;
+      char c = s[i];
+      if (c == '{') return ParseJsonObj(s, ref i, depth + 1);
+      if (c == '[') return ParseJsonArr(s, ref i, depth + 1);
+      if (c == '"') return ParseJsonStr(s, ref i);
+      if (c == '-' || (c >= '0' && c <= '9')) return ParseJsonNum(s, ref i);
+      if (i + 4 <= s.Length && s.Substring(i, 4) == "true") { i += 4; return true; }
+      if (i + 5 <= s.Length && s.Substring(i, 5) == "false") { i += 5; return true; }
+      if (i + 4 <= s.Length && s.Substring(i, 4) == "null") { i += 4; return true; }
+      return false;
+    }
+
+    static bool ParseJsonArr(string s, ref int i, int depth) {
+      if (i >= s.Length || s[i] != '[') return false;
+      i++; SkipJsonWs(s, ref i);
+      if (i < s.Length && s[i] == ']') { i++; return true; }
+      while (i < s.Length) {
+        if (!ParseJsonVal(s, ref i, depth)) return false;
+        SkipJsonWs(s, ref i);
+        if (i < s.Length && s[i] == ',') { i++; continue; }
+        if (i < s.Length && s[i] == ']') { i++; return true; }
+        return false;
+      }
+      return false;
+    }
+
+    static bool ParseJsonObj(string s, ref int i, int depth) {
+      if (i >= s.Length || s[i] != '{') return false;
+      i++; SkipJsonWs(s, ref i);
+      if (i < s.Length && s[i] == '}') { i++; return true; }
+      while (i < s.Length) {
+        SkipJsonWs(s, ref i);
+        if (!ParseJsonStr(s, ref i)) return false;
+        SkipJsonWs(s, ref i);
+        if (i >= s.Length || s[i] != ':') return false;
+        i++;
+        if (!ParseJsonVal(s, ref i, depth)) return false;
+        SkipJsonWs(s, ref i);
+        if (i < s.Length && s[i] == ',') { i++; continue; }
+        if (i < s.Length && s[i] == '}') { i++; return true; }
+        return false;
+      }
+      return false;
+    }
+
+    static bool IsValidJsonObject(string s) {
+      if (string.IsNullOrEmpty(s)) return false;
+      int i = 0; SkipJsonWs(s, ref i);
+      if (i >= s.Length || s[i] != '{') return false;
+      if (!ParseJsonObj(s, ref i, 0)) return false;
+      SkipJsonWs(s, ref i);
+      return i == s.Length;
+    }
+
+    static bool FindJsonKeyInObject(string s, int objStart, string targetKey, out int valStart, out int valEnd) {
+      valStart = -1; valEnd = -1;
+      int i = objStart;
+      SkipJsonWs(s, ref i);
+      if (i >= s.Length || s[i] != '{') return false;
+      i++; SkipJsonWs(s, ref i);
+      if (i < s.Length && s[i] == '}') return false;
+      while (i < s.Length) {
+        SkipJsonWs(s, ref i);
+        int ks = i;
+        if (!ParseJsonStr(s, ref i)) return false;
+        string keyName = s.Substring(ks + 1, i - ks - 2);
+        SkipJsonWs(s, ref i);
+        if (i >= s.Length || s[i] != ':') return false;
+        i++; SkipJsonWs(s, ref i);
+        int vs = i;
+        if (!ParseJsonVal(s, ref i, 0)) return false;
+        int ve = i;
+        if (string.Equals(keyName, targetKey, StringComparison.OrdinalIgnoreCase)) {
+          valStart = vs; valEnd = ve; return true;
+        }
+        SkipJsonWs(s, ref i);
+        if (i < s.Length && s[i] == ',') { i++; continue; }
+        return false;
+      }
+      return false;
+    }
+
+    static bool BytesEqual(byte[] a, byte[] b) {
+      if (a == null || b == null || a.Length != b.Length) return false;
+      for (int i = 0; i < a.Length; i++) if (a[i] != b[i]) return false;
+      return true;
+    }
+
     static bool IsPluginEnabledInMillennium() {
       try {
         string cfgPath = FindMillenniumConfigPath();
         if (string.IsNullOrEmpty(cfgPath)) return false;
-        string raw = File.ReadAllText(cfgPath, Encoding.UTF8);
-        var rx = new System.Text.RegularExpressions.Regex("(\"enabledPlugins\"\\s*:\\s*\\[)([\\s\\S]*?)(\\])", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        var m = rx.Match(raw);
-        if (!m.Success) return false;
+        if (new FileInfo(cfgPath).Length > 4 * 1024 * 1024) return false;
+        string raw = File.ReadAllText(cfgPath, Encoding.UTF8).TrimStart('\uFEFF');
+        if (!IsValidJsonObject(raw)) return false;
+        int rootObj = raw.IndexOf('{'), ps, pe, es = -1, ee = -1;
+        bool foundArr = false;
+        if (FindJsonKeyInObject(raw, rootObj, "plugins", out ps, out pe)) foundArr = FindJsonKeyInObject(raw, ps, "enabledPlugins", out es, out ee);
+        if (!foundArr) foundArr = FindJsonKeyInObject(raw, rootObj, "enabledPlugins", out es, out ee);
+        if (!foundArr) return false;
+        string arrSlice = raw.Substring(es, ee - es);
         var itemRx = new System.Text.RegularExpressions.Regex("\"([^\"]+)\"");
-        foreach (System.Text.RegularExpressions.Match im in itemRx.Matches(m.Groups[2].Value)) {
+        foreach (System.Text.RegularExpressions.Match im in itemRx.Matches(arrSlice)) {
           if (string.Equals(im.Groups[1].Value, "repage-steamgrid", StringComparison.OrdinalIgnoreCase)) return true;
         }
         return false;
@@ -914,8 +1100,9 @@ namespace RepageInstaller {
           string elArgs = "--elevated-install \"" + tmpZip + "\" \"" + verifiedZipSha + "\" \"" + targetPluginDir + "\" \"" + SteamDir + "\" " + (cleanFirst ? "1" : "0") + " \"" + sidArg + "\"";
           int exitCode = RunElevatedSelf(elArgs);
           if (exitCode != 0) throw new Exception(MapElevatedInstallExitCode(exitCode));
+          DidUninstallThisSession = false;
           AutoEnabledInConfig = IsPluginEnabledInMillennium();
-          if (!hadExisting && AutoEnabledInConfig) DidAutoEnableThisSession = true;
+          if (!hadExisting) DidAutoEnableThisSession = true;
         } else {
           if (hadExisting && CheckDirectoryLocks(targetPluginDir) > 0) {
             throw new Exception("ERR_INSTALL_LOCKED");
@@ -965,9 +1152,10 @@ namespace RepageInstaller {
             AutoEnabledInConfig = IsPluginEnabledInMillennium();
             Log("MILL_CFG", "Update preserved existing Millennium enabledPlugins=" + AutoEnabledInConfig);
           } else {
+            DidUninstallThisSession = false;
+            DidAutoEnableThisSession = true;
             SetPluginEnabledInMillennium(true);
             AutoEnabledInConfig = IsPluginEnabledInMillennium();
-            if (AutoEnabledInConfig) DidAutoEnableThisSession = true;
             Log("MILL_CFG", "Verified enabledPlugins in config.json=" + AutoEnabledInConfig);
           }
         }
@@ -998,46 +1186,141 @@ namespace RepageInstaller {
 
     static bool SetPluginEnabledInMillennium(bool enable) {
       try {
-        string cfgPath = FindMillenniumConfigPath();
-        if (string.IsNullOrEmpty(cfgPath)) return false;
-
-        string raw = File.ReadAllText(cfgPath, Encoding.UTF8);
-        var rx = new System.Text.RegularExpressions.Regex("(\"enabledPlugins\"\\s*:\\s*\\[)([\\s\\S]*?)(\\])", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        var m = rx.Match(raw);
-        if (!m.Success) return false;
-
-        string inner = m.Groups[2].Value;
-        var itemRx = new System.Text.RegularExpressions.Regex("\"([^\"]+)\"");
-        var items = new System.Collections.Generic.List<string>();
-        foreach (System.Text.RegularExpressions.Match im in itemRx.Matches(inner)) {
-          string val = im.Groups[1].Value;
-          if (!string.IsNullOrEmpty(val) && !items.Contains(val)) items.Add(val);
+        string cfgPath = enable ? ResolveMillenniumConfigPathForWrite() : FindMillenniumConfigPath();
+        if (string.IsNullOrEmpty(cfgPath)) return !enable;
+        string cfgDir = Path.GetDirectoryName(cfgPath);
+        if (IsReparsePoint(SteamDir) || IsReparsePoint(cfgPath) || (!string.IsNullOrEmpty(cfgDir) && IsReparsePoint(cfgDir))) {
+          Log("MILL_CFG_ERR", "Blocked reparse point on Millennium config path: " + cfgPath);
+          return false;
         }
-        bool has = items.Exists(x => string.Equals(x, "repage-steamgrid", StringComparison.OrdinalIgnoreCase));
-        if (enable && has) return true;
-        if (!enable && !has) return true;
-        if (enable) items.Add("repage-steamgrid");
-        else items.RemoveAll(x => string.Equals(x, "repage-steamgrid", StringComparison.OrdinalIgnoreCase));
+        try { if (File.Exists(cfgPath + ".repage_bak")) File.Delete(cfgPath + ".repage_bak"); } catch {}
 
-        StringBuilder arr = new StringBuilder();
-        if (items.Count == 0) {
-          arr.Append("[]");
+        bool existed = File.Exists(cfgPath);
+        byte[] origBytes = null;
+        string updated = null;
+
+        if (!existed) {
+          if (!enable) return true;
+          if (!string.IsNullOrEmpty(cfgDir)) Directory.CreateDirectory(cfgDir);
+          updated = "{\n  \"plugins\": {\n    \"enabledPlugins\": [\n      \"repage-steamgrid\"\n    ]\n  }\n}\n";
+          Log("MILL_CFG", "Preparing fresh Millennium config.json at " + cfgPath);
         } else {
-          arr.Append("[\n");
-          for (int i = 0; i < items.Count; i++) {
-            arr.Append("      \"").Append(items[i]).Append("\"");
-            if (i < items.Count - 1) arr.Append(",");
-            arr.Append("\n");
+          if (new FileInfo(cfgPath).Length > 4 * 1024 * 1024) {
+            Log("MILL_CFG_ERR", "Refused oversized config.json (>4 MB)");
+            return false;
           }
-          arr.Append("    ]");
+          origBytes = File.ReadAllBytes(cfgPath);
+          string raw = File.ReadAllText(cfgPath, Encoding.UTF8).TrimStart('\uFEFF');
+          if (!IsValidJsonObject(raw)) {
+            Log("MILL_CFG_ERR", "Refused to modify malformed existing config.json");
+            return false;
+          }
+          int rootObj = raw.IndexOf('{'), ps, pe, es = -1, ee = -1;
+          bool hasPlugins = FindJsonKeyInObject(raw, rootObj, "plugins", out ps, out pe);
+          bool hasEnabled = hasPlugins ? FindJsonKeyInObject(raw, ps, "enabledPlugins", out es, out ee) : FindJsonKeyInObject(raw, rootObj, "enabledPlugins", out es, out ee);
+          if (hasEnabled) {
+            string arrSlice = raw.Substring(es, ee - es).Trim();
+            var items = new System.Collections.Generic.List<string>();
+            if (arrSlice.StartsWith("[")) {
+              var itemRx = new System.Text.RegularExpressions.Regex("\"([^\"]+)\"");
+              foreach (System.Text.RegularExpressions.Match im in itemRx.Matches(arrSlice)) {
+                string val = im.Groups[1].Value;
+                if (!string.IsNullOrEmpty(val) && !items.Contains(val)) items.Add(val);
+              }
+            }
+            bool has = items.Exists(x => string.Equals(x, "repage-steamgrid", StringComparison.OrdinalIgnoreCase));
+            if (enable && has) return true;
+            if (!enable && !has) return true;
+            if (enable) items.Add("repage-steamgrid");
+            else items.RemoveAll(x => string.Equals(x, "repage-steamgrid", StringComparison.OrdinalIgnoreCase));
+            StringBuilder arr = new StringBuilder();
+            if (items.Count == 0) {
+              arr.Append("[]");
+            } else {
+              arr.Append("[\n");
+              for (int i = 0; i < items.Count; i++) {
+                arr.Append("      \"").Append(items[i]).Append("\"");
+                if (i < items.Count - 1) arr.Append(",");
+                arr.Append("\n");
+              }
+              arr.Append("    ]");
+            }
+            updated = raw.Substring(0, es) + arr.ToString() + raw.Substring(ee);
+          } else if (hasPlugins) {
+            string plugVal = raw.Substring(ps, pe - ps).Trim();
+            if (!enable) return true;
+            if (plugVal == "null") {
+              updated = raw.Substring(0, ps) + "{\n    \"enabledPlugins\": [\n      \"repage-steamgrid\"\n    ]\n  }" + raw.Substring(pe);
+            } else {
+              int pOpen = raw.IndexOf('{', ps);
+              if (pOpen < 0 || pOpen >= pe) return false;
+              string pRest = raw.Substring(pOpen + 1, pe - (pOpen + 1)).Trim();
+              string ins = pRest == "}" ? "\n    \"enabledPlugins\": [\n      \"repage-steamgrid\"\n    ]\n  " : "\n    \"enabledPlugins\": [\n      \"repage-steamgrid\"\n    ],";
+              updated = raw.Substring(0, pOpen + 1) + ins + raw.Substring(pOpen + 1);
+            }
+          } else {
+            if (!enable) return true;
+            string rRest = raw.Substring(rootObj + 1).Trim();
+            if (rRest == "}") {
+              updated = "{\n  \"plugins\": {\n    \"enabledPlugins\": [\n      \"repage-steamgrid\"\n    ]\n  }\n}\n";
+            } else {
+              updated = raw.Substring(0, rootObj + 1) + "\n  \"plugins\": {\n    \"enabledPlugins\": [\n      \"repage-steamgrid\"\n    ]\n  }," + raw.Substring(rootObj + 1);
+            }
+          }
         }
-        string updated = raw.Substring(0, m.Groups[1].Index) + "\"enabledPlugins\": " + arr.ToString() + raw.Substring(m.Groups[3].Index + m.Groups[3].Length);
-        try { File.Copy(cfgPath, cfgPath + ".repage_bak", true); } catch {}
+
+        if (string.IsNullOrEmpty(updated) || !IsValidJsonObject(updated)) {
+          Log("MILL_CFG_ERR", "Aborted write: generated config.json failed strict JSON validation!");
+          return false;
+        }
+        byte[] outBytes = new UTF8Encoding(false).GetBytes(updated);
         string tmp = cfgPath + ".repage_tmp";
-        File.WriteAllText(tmp, updated, new UTF8Encoding(false));
-        File.Copy(tmp, cfgPath, true);
-        try { File.Delete(tmp); } catch {}
-        return true;
+        for (int attempt = 0; attempt < 3; attempt++) {
+          try {
+            try {
+              using (FileStream fs = new FileStream(tmp, FileMode.Create, FileAccess.Write, FileShare.None)) {
+                fs.Write(outBytes, 0, outBytes.Length);
+                fs.Flush(true);
+              }
+              if (!BytesEqual(File.ReadAllBytes(tmp), outBytes)) throw new IOException("tmp_readback_mismatch");
+              if (File.Exists(cfgPath)) File.Replace(tmp, cfgPath, null, true);
+              else File.Move(tmp, cfgPath);
+            } catch (UnauthorizedAccessException) {
+              try { if (File.Exists(tmp)) File.Delete(tmp); } catch {}
+              if (!existed) throw;
+              try {
+                using (FileStream fs = new FileStream(cfgPath, FileMode.Open, FileAccess.Write, FileShare.None)) {
+                  fs.Seek(0, SeekOrigin.Begin);
+                  fs.Write(outBytes, 0, outBytes.Length);
+                  fs.SetLength(outBytes.Length);
+                  fs.Flush(true);
+                }
+                if (!BytesEqual(File.ReadAllBytes(cfgPath), outBytes)) throw new IOException("direct_readback_mismatch");
+              } catch {
+                if (origBytes != null) {
+                  try {
+                    using (FileStream rfs = new FileStream(cfgPath, FileMode.Open, FileAccess.Write, FileShare.None)) {
+                      rfs.Seek(0, SeekOrigin.Begin);
+                      rfs.Write(origBytes, 0, origBytes.Length);
+                      rfs.SetLength(origBytes.Length);
+                      rfs.Flush(true);
+                    }
+                  } catch {}
+                }
+                throw;
+              }
+            }
+            if (!BytesEqual(File.ReadAllBytes(cfgPath), outBytes)) throw new IOException("final_readback_mismatch");
+            Log("MILL_CFG", "Safely updated & verified " + cfgPath + " (enable=" + enable + ")");
+            return true;
+          } catch (IOException ioEx) {
+            try { if (File.Exists(tmp)) File.Delete(tmp); } catch {}
+            if (attempt < 2) { Thread.Sleep(120); continue; }
+            Log("MILL_CFG_ERR", "Atomic write failed after retries: " + ioEx.Message);
+            return false;
+          }
+        }
+        return false;
       } catch (Exception ex) {
         Log("MILL_CFG_ERR", ex.Message);
         return false;
@@ -1132,6 +1415,7 @@ namespace RepageInstaller {
             Log("ELEVATED_MILL_CFG", "Update preserved existing Millennium enabledPlugins=" + IsPluginEnabledInMillennium());
           } else {
             bool cfgOk = SetPluginEnabledInMillennium(true);
+            try { string cp = FindMillenniumConfigPath(); if (!string.IsNullOrEmpty(cp)) GrantConfigAccessLeastPrivilege(cp, ownerSid); } catch {}
             Log("ELEVATED_MILL_CFG", "Fresh install SetPluginEnabledInMillennium=" + cfgOk + ", verified=" + IsPluginEnabledInMillennium());
           }
           return 0;
@@ -1152,7 +1436,7 @@ namespace RepageInstaller {
       }
     }
 
-    static int ExecuteElevatedUninstall(string steamRoot, string pluginsRoot) {
+    static int ExecuteElevatedUninstall(string steamRoot, string pluginsRoot, string ownerSid) {
       try {
         if (string.IsNullOrEmpty(steamRoot)) return 2;
         string fullSteam = Path.GetFullPath(steamRoot).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
@@ -1186,8 +1470,9 @@ namespace RepageInstaller {
           }
         }
         SetPluginEnabledInMillennium(false);
+        try { string cp = FindMillenniumConfigPath(); if (!string.IsNullOrEmpty(cp)) GrantConfigAccessLeastPrivilege(cp, ownerSid); } catch {}
         foreach (string bDir in candidateBases) {
-          if (string.IsNullOrEmpty(bDir)) continue;
+          if (string.IsNullOrEmpty(bDir) || IsReparsePoint(bDir) || IsReparsePoint(Path.Combine(bDir, "repage-steamgrid"))) continue;
           string target = Path.Combine(bDir, "repage-steamgrid");
           if (Directory.Exists(target)) {
             int lockCount = CleanDirectoryCountFailures(target);
@@ -1257,8 +1542,10 @@ namespace RepageInstaller {
           }
         }
         if (needsElevation) {
+          string uSid = "none";
+          try { var id = System.Security.Principal.WindowsIdentity.GetCurrent(); if (id != null && id.User != null) uSid = id.User.Value; } catch {}
           Log("UNINSTALL_UAC", "Requesting UAC elevation for uninstall...");
-          int code = RunElevatedSelf("--elevated-uninstall \"" + SteamDir + "\" \"" + PluginsDir + "\"");
+          int code = RunElevatedSelf("--elevated-uninstall \"" + SteamDir + "\" \"" + PluginsDir + "\" \"" + uSid + "\"");
           if (code == -3) {
             DetectSteamAndMillennium(CustomSelectedPath);
             return "ERR_ELEVATION_CANCELLED";
@@ -1280,9 +1567,12 @@ namespace RepageInstaller {
             return "ERR_UNINSTALL_LOCKED";
           }
         }
+        SetPluginEnabledInMillennium(false);
+        DidAutoEnableThisSession = false;
+        DidUninstallThisSession = true;
         DetectSteamAndMillennium(CustomSelectedPath);
         InstalledVersion = "";
-        Log("UNINSTALL_OK", "Removed repage-steamgrid cleanly");
+        Log("UNINSTALL_OK", "Removed repage-steamgrid cleanly (Millennium config cleaned)");
         return "";
       } catch (Exception ex) {
         Log("UNINSTALL_ERR", ex.Message);
