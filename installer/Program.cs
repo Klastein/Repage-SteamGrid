@@ -1393,7 +1393,6 @@ namespace RepageInstaller {
             return true;
           } catch (IOException ioEx) {
             try { if (File.Exists(tmp)) File.Delete(tmp); } catch {}
-            try { if (File.Exists(swapBak)) File.Delete(swapBak); } catch {}
             if (attempt < 2) { Thread.Sleep(120); continue; }
             Log("MILL_CFG_ERR", "Atomic write failed after retries: " + ioEx.Message);
             return false;
